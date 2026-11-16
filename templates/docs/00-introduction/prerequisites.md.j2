@@ -1,0 +1,183 @@
+# Prerequisites
+
+This page confirms the required permissions and preview features, creates a catalog for the lab, and verifies {{ s.source.noun }}.
+
+!!! warning "Working in a shared workspace"
+    - If multiple people are working in the same workspace, add your **name** to the asset names you create in this lab to distinguish them from others' assets.
+    - Do not modify or delete catalogs, dashboards, Genie Agents, or other assets created by others.
+{% if s.source.facilitator_setup %}
+
+!!! info "Before the workshop (facilitator)"
+    {{ s.source.facilitator_setup | indent(4) }}
+{% endif %}
+
+## Task 1 - Confirm required permissions
+
+Confirm you have the following {{ 'four' if mode == 'uc_table' else 'five' }} permissions. If you don't, request them from your workspace admin.
+
+| Permission | Used in | How to confirm |
+|---|---|---|
+| Create catalog | Prerequisites Task 3 | [1.1) Catalog creation permission](#11-catalog) |
+| SQL Warehouse usage | Steps 2–5 | [1.2) SQL Warehouse usage permission](#12-sql-warehouse) |
+| Governed Tag creation | Step 3 (Create Domain) | [1.3) Governed Tag creation permission](#13-governed-tag) |
+| Domain creation | Step 3 (Create Domain) | [1.4) Domain creation permission](#14-domain) |
+{% if mode != 'uc_table' %}
+| {{ source_access_permission }} | Step 1 (Bronze) | [1.5) Source data access](#15-source-access) |
+{% endif %}
+
+### 1.1) Catalog creation permission { #11-catalog }
+
+1. Click **Catalog** in the left sidebar.
+
+    {{ shot('00-introduction/prereq-01-catalog-menu.png', 'Catalog menu') }}
+
+2. Click the **+** button at the top of the **Catalog** page. If **Create a catalog** appears, you can create catalogs.
+
+    {{ shot('00-introduction/prereq-02-create-catalog-menu.png', 'Create a catalog menu') }}
+
+### 1.2) SQL Warehouse usage permission { #12-sql-warehouse }
+
+1. Click **SQL Warehouses** in the left sidebar. Verify that an available SQL Warehouse (e.g., **Serverless Starter Warehouse**) appears in the list.
+
+    {{ shot('00-introduction/prereq-03-warehouse-list.png', 'SQL Warehouses list') }}
+
+2. Click the SQL Warehouse you want to use, then click **Permissions** in the top-right corner. Confirm that you or your group has **Can use** or higher permission.
+
+    {{ shot('00-introduction/prereq-04-warehouse-permissions.png', 'SQL Warehouse Permissions') }}
+
+### 1.3) Governed Tag creation permission { #13-governed-tag }
+
+When you create a Domain in Step 3, a Governed Tag with the same name is created automatically. You need permission to create Governed Tags.
+
+1. Click **Catalog** in the left sidebar, then click the **Govern** button (shield icon) at the top and select **Governed Tags**.
+
+    {{ shot('00-introduction/prereq-05-govern-menu.png', 'Govern > Governed Tags menu') }}
+
+2. Click the **Account Permissions** tab. Confirm that you or your group has **CREATE** permission.
+
+    {{ shot('00-introduction/prereq-06-governed-tags-permissions.png', 'Governed Tags > Account Permissions') }}
+
+!!! info "Workspace admins have default permissions"
+    Workspace admins have Governed Tag creation permission by default.
+
+### 1.4) Domain creation permission { #14-domain }
+
+1. Click **Discover** in the left sidebar, then click **Create** in the top-right corner. If **Create domain** appears, you can create domains.
+
+    {{ shot('00-introduction/prereq-07-create-domain-button.png', 'Discover > Create domain button') }}
+
+!!! info "Permission required to create a domain"
+    To create a Domain, you need `MANAGE DISCOVERY` permission. Account admins and workspace admins have this permission by default.
+{% if mode != 'uc_table' %}
+
+### 1.5) Source data access { #15-source-access }
+
+{% if mode == 'files' %}
+The Bronze tables read raw files from `{{ s.architecture.files.root }}`. You need **{{ source_access_permission }}** on {{ 'the Volume' if s.architecture.files.root.startswith('/Volumes/') else 'the external location that covers this path' }}.
+
+1. Click **Catalog** in the left sidebar and open {{ 'the Volume' if s.architecture.files.root.startswith('/Volumes/') else '**External Data** → **External Locations** and open the location that covers the path' }}.
+2. Click **Permissions** and confirm that you or your group has **{{ source_access_permission }}**.
+{% elif mode == 'federation' %}
+The Bronze tables read from the foreign catalog `{{ s.architecture.federation.foreign_catalog }}`, which mirrors {{ s.architecture.federation.system }} through Lakehouse Federation. You need **{{ source_access_permission }}** on it.
+
+1. Click **Catalog** in the left sidebar and open the foreign catalog `{{ s.architecture.federation.foreign_catalog }}`.
+2. Click **Permissions** and confirm that you or your group has **USE CATALOG**, **USE SCHEMA**, and **SELECT**.
+{% endif %}
+{% endif %}
+
+## Task 2 - Confirm preview features
+
+This lab uses some features in preview. Confirm the following {{ 'two features are' if s.options.volumes else 'feature is' }} enabled. If not, request them from your workspace admin.
+
+| Preview feature | Used in | How to confirm |
+|---|---|---|
+{% if s.options.volumes %}
+| Analyze Files in Volumes with Genie Agents | Step 4.5 (Volumes) | [2.1) Analyze Files in Volumes with Genie Agents](#21-genie-volumes) |
+{% endif %}
+| Genie Ontology snippets | Step 5 (Genie One) | [2.2) Genie Ontology snippets](#22-ontology-snippets) |
+
+!!! info "Only admins can see Previews"
+    Only workspace admins can see the **Previews** page. If you're not an admin, ask your workspace admin to check whether these {{ 'two features are' if s.options.volumes else 'features are' }} enabled. It may take a few minutes for changes to take effect.
+{% if s.options.volumes %}
+
+### 2.1) Analyze Files in Volumes with Genie Agents { #21-genie-volumes }
+
+1. Click your user icon in the top-right corner, then click **Previews**.
+
+    {{ shot('00-introduction/prereq-08-previews-menu.png', 'User menu > Previews') }}
+
+2. Search for `Analyze Files in Volumes with Genie Agents` and verify the toggle is **On**. If it's **Off**, click to enable it.
+
+    {{ shot('00-introduction/prereq-10-preview-genie-volumes.png', 'Previews > Analyze Files in Volumes with Genie Agents') }}
+
+    !!! warning "Lakebase is required"
+        For a Genie Agent to read documents in a Volume, your workspace must have **Lakebase** available. If there is no **Lakebase** tab in the **Compute** section of the left sidebar, you won't be able to complete 4.5 even if you enable the preview. Since 4.5 is Optional, you can skip it without affecting other Steps.
+{% endif %}
+
+### 2.2) Genie Ontology snippets { #22-ontology-snippets }
+
+1. Click your user icon in the top-right corner, then click **Previews**.
+
+    {{ shot('00-introduction/prereq-08-previews-menu.png', 'User menu > Previews') }}
+
+2. Search for `Genie Ontology snippets` and verify the toggle is **On**. If it's **Off**, click to enable it.
+
+    {{ shot('00-introduction/prereq-11-preview-ontology-snippets.png', 'Previews > Genie Ontology snippets') }}
+
+## Task 3 - Create a catalog
+
+Create a catalog that will be used throughout the lab. All pipeline tables, Metric Views, and Volumes will be created in the `default` schema of this catalog.
+
+1. Click **Catalog** in the left sidebar, then click the **+** button at the top and select **Create a catalog**.
+
+    {{ shot('00-introduction/prereq-02-create-catalog-menu.png', 'Create a catalog menu') }}
+
+2. Enter `{{ cat }}` in **Catalog name**. For example, if your name is {{ s.naming.example_user | capitalize }}, enter `{{ ex_cat }}`. Select **Standard** for **Type**, keep **Storage location** at its default, and click **Create**.
+
+    {{ shot('00-introduction/prereq-13-create-catalog-dialog.png', 'Create a new catalog dialog') }}
+
+    !!! tip "Naming rule"
+        Use only lowercase English letters, numbers, and underscores (`_`) in `<your_name>`. The SQL queries and screenshots in this guide use `{{ s.naming.example_user }}` as an example, so replace it with your name when you follow along.
+
+3. When the **Catalog created!** message appears, click **View catalog**.
+
+    {{ shot('00-introduction/prereq-14-catalog-created.png', 'Catalog created message') }}
+
+4. Verify that the `default` schema is automatically created under the catalog. This lab uses the `default` schema; you do not need to create a separate one.
+
+    {{ shot('00-introduction/prereq-15-catalog-default-schema.png', 'Catalog and default schema') }}
+
+## Task 4 - Verify {{ s.source.noun }}
+
+{{ s.source.intro }}
+
+1. {{ s.source.browse_step }}
+
+    {{ shot('00-introduction/prereq-16-source-data.png', s.source.browse_alt) }}
+
+2. Click **SQL Editor** in the left sidebar.
+
+    {{ shot('00-introduction/prereq-17-sql-editor-menu.png', 'SQL Editor menu') }}
+
+3. Click the **Connect** icon in the top-right corner, then click **More…**. In the **Attach to an existing compute resource** window, select a SQL Warehouse (e.g., **Serverless Starter Warehouse**) and click **Start and attach**.
+
+    {{ shot('00-introduction/prereq-18-sql-editor-warehouse.png', 'SQL Editor Warehouse selection') }}
+
+4. Paste the following query and click **Run all**.
+
+    ```sql
+    {{ source_count_sql | indent(4) }}
+    ```
+
+5. Verify that the results match the table below:
+
+    | table_name | row_count |
+    |---|---|
+{% for src in s.sources %}
+    | {{ src.name }} | {{ src.rows | num }} |
+{% endfor %}
+
+    {{ shot('00-introduction/prereq-19-sample-count-result.png', s.source.noun | capitalize ~ ' count query result') }}
+
+!!! success "Congratulations!"
+    Lab setup is complete. On the next page, you'll meet {{ s.lab.company }} and its four personas.

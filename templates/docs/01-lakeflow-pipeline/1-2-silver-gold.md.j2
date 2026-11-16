@@ -1,0 +1,71 @@
+# 1.2) Silver & Gold: Cleanse and {{ s.gold.title }}
+
+On this page, you'll define 3 Silver tables that cleanse Bronze data with data quality rules (Expectations) and build a Gold table `{{ s.gold.table }}` that summarizes {{ s.gold.grain }}.
+
+## Task 1 - Write the Silver file
+
+1. In the file browser, click the **+** icon next to the `transformations` folder, then click **Transformation**.
+
+    {{ shot('01-lakeflow-pipeline/1-2-01-add-transformation.png', '+ > Transformation') }}
+
+2. Rename the file to `silver`. Hover over the file name and click **Rename** from the three-dot menu (⋮).
+
+    {{ shot('01-lakeflow-pipeline/1-2-02-create-silver-file.png', 'Create silver file') }}
+
+3. Paste the code below into `silver.sql`.
+
+    ```sql title="silver.sql"
+    --8<-- "lab-files/eng/step1/silver.sql"
+    ```
+
+    {{ shot('01-lakeflow-pipeline/1-2-03-silver-code.png', 'Write silver.sql') }}
+
+### Understanding the code: Expectations
+
+Silver tables define data quality rules with `CONSTRAINT ... EXPECT (...) ON VIOLATION DROP ROW` syntax. Rows that violate a rule are not stored in the table, and violation counts are recorded in the pipeline execution results.
+
+| Table | Main rules | Rows removed |
+|---|---|---|
+{% for src in s.sources %}
+| `{{ src.silver.table }}` | {{ src.silver.rules_summary }} | {{ src.silver.removed_text }} |
+{% endfor %}
+
+!!! info "ON VIOLATION options"
+    Omit `ON VIOLATION DROP ROW` to keep violating rows but record violation counts.{% for w in warn_rules %} The `{{ w.rule }}` rule in `{{ w.table }}` uses this approach.{% endfor %} Use `ON VIOLATION FAIL UPDATE` to stop pipeline execution if violations occur.
+
+## Task 2 - Write the Gold file
+
+1. Use the same method: click the **+** icon next to the `transformations` folder → **Transformation**, and rename the file to `gold`.
+
+    {{ shot('01-lakeflow-pipeline/1-2-04-create-gold-file.png', 'Create gold file') }}
+
+2. Paste the code below into `gold.sql`.
+
+    ```sql title="gold.sql"
+    --8<-- "lab-files/eng/step1/gold.sql"
+    ```
+
+    {{ shot('01-lakeflow-pipeline/1-2-05-gold-code.png', 'Write gold.sql') }}
+
+3. Verify that your `transformations` folder contains 3 files: `bronze.sql`, `silver.sql`, and `gold.sql`.
+
+    {{ shot('01-lakeflow-pipeline/1-2-06-three-files.png', 'Three files in transformations folder') }}
+
+### Understanding the code: {{ s.gold.title }}
+
+{{ s.gold.intro }}
+
+| Column | Description |
+|---|---|
+{% for c in s.gold.key_columns %}
+| `{{ c.name }}` | {{ c.desc }} |
+{% endfor %}
+
+!!! tip "{{ s.gold.tip_title }}"
+    {{ s.gold.tip | indent(4) }}
+
+!!! info "Column comments and primary key"
+    Column comments (`COMMENT`) and primary key (`PRIMARY KEY`) are declared inside the table definition. This preserves metadata across pipeline re-runs, allowing AI features like Genie to understand tables more accurately.
+
+!!! success "Congratulations!"
+    You've defined 3 Silver tables and 1 Gold table. On the next page, you'll run the pipeline and verify the results.

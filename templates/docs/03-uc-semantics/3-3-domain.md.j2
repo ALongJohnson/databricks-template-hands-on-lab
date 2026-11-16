@@ -1,0 +1,88 @@
+# 3.3) Create and Link a Domain
+
+On this page, you'll create a Domain and connect the two Metric Views you just built to it. Assets linked to a Domain become discoverable in the **Discover** page, organized by business area.
+
+<div class="wb-arch">
+  <div class="wb-arch__col">
+    <p class="wb-arch__label">Task 1 · Create a Domain</p>
+    <div class="wb-arch__node"><strong>Domain</strong><span>{{ s.naming.catalog | wbr }}</span></div>
+    <div class="wb-arch__node"><strong>Governed Tag</strong><span>{{ s.naming.catalog | wbr }} · created together</span></div>
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col">
+    <p class="wb-arch__label">Task 2 · Link Tags</p>
+    <div class="wb-arch__node"><strong>{{ mv1.name }}</strong><span>link Governed Tag</span></div>
+    <div class="wb-arch__node"><strong>{{ mv2.name }}</strong><span>link Governed Tag</span></div>
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col wb-arch__col--center">
+    <p class="wb-arch__label">Task 3 · Show in Domain</p>
+    <div class="wb-arch__node"><strong>Domain</strong><span>2 Metric Views displayed</span></div>
+  </div>
+</div>
+
+## Task 1 - Create a Domain
+
+A Domain is based on a Governed Tag. When you create a Domain, a Governed Tag with the same name is created automatically.
+
+1. Click **Discover** in the left sidebar, then click **Create** → **Create domain** in the top right.
+
+    {{ shot('03-uc-semantics/3-3-04-create-domain.png', 'Discover > Create domain') }}
+
+2. Leave **Source** as **New tag**, and enter `{{ cat }}` (e.g., `{{ ex_cat }}`) in the input field on the right. Fill in the other fields as shown below, then click **Create**.
+
+    | Field | Value |
+    |---|---|
+    | **Subtitle** | `{{ s.domain.subtitle }}` |
+    | **Description** | `{{ s.domain.description }}` |
+    | **Business Contacts** (optional) | Yourself |
+
+    {{ shot('03-uc-semantics/3-3-06-domain-form.png', 'Enter Domain information') }}
+
+3. The Domain is created in **Draft** status. Click **Publish** in the top right to make it visible to other users.
+
+    {{ shot('03-uc-semantics/3-3-07-publish-domain.png', 'Publish Domain') }}
+
+## Task 2 - Link Tags to Metric Views
+
+1. In **Catalog**, navigate to `{{ cat }}` → `default` → `{{ mv1.name }}`.
+
+    {{ shot('03-uc-semantics/3-3-08-open-mv-1.png', 'Open ' ~ mv1.name) }}
+
+2. Scroll down to the **About this metric view** section, and click **Add tags** under **Tags**.
+
+    {{ shot('03-uc-semantics/3-3-09-add-tags.png', 'Add tags') }}
+
+3. Type in **Key** to find and select `{{ cat }}`, leave **Value** empty, and click **Save**.
+
+    {{ shot('03-uc-semantics/3-3-10-select-tag-save.png', 'Select tag and save') }}
+
+4. Repeat the same process to link the tag to `{{ mv2.name }}`.
+
+    {{ shot('03-uc-semantics/3-3-11-tag-mv-2.png', 'Link tag to ' ~ mv2.name) }}
+
+??? tip "Link Tags with SQL"
+    You can also link tags by running these queries in SQL Editor:
+
+    ```sql
+    ALTER VIEW {{ cat }}.default.{{ mv1.name }}
+      SET TAGS ('{{ cat }}' = '');
+    ALTER VIEW {{ cat }}.default.{{ mv2.name }}
+      SET TAGS ('{{ cat }}' = '');
+    ```
+
+## Task 3 - Verify in the Domain
+
+1. Click **Discover** in the left sidebar, then click **Domain** in the filter bar at the top. Search for your name and select `{{ cat }}`.
+
+    {{ shot('03-uc-semantics/3-3-12-open-domain.png', 'Select Domain') }}
+
+2. Verify that `{{ mv1.name }}` and `{{ mv2.name }}` appear on the Domain page.
+
+    {{ shot('03-uc-semantics/3-3-13-domain-assets.png', 'Metric Views linked to Domain') }}
+
+!!! info "Tags may take a few minutes to appear"
+    It may take a few minutes for linked assets to show up on the Domain page. If you don't see them immediately, refresh after a moment.
+
+!!! success "Congratulations!"
+    You've completed {{ da.name | poss }} work. You've defined business KPIs as Metric Views and organized {{ s.domain.assets_noun }} into a Domain. Next, in Step 4, you'll become {{ ai.title }} {{ ai.name }} and build a Genie Agent using these Metric Views for {{ bu.title }} {{ bu.name }}.

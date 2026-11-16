@@ -1,0 +1,118 @@
+# 1.4) (Optional) Genie Code and Visual Data Prep
+
+This page is optional. After building the pipeline with SQL in 1.1–1.3, you'll request the same pipeline from **Genie Code** in natural language and explore **Visual Data Prep**, a code-free data transformation feature.
+
+| Method | Build | Best for |
+|---|---|---|
+| Write SQL directly (1.1–1.3) | Lakeflow pipeline | Data engineers who need fine-grained control of logic |
+| Genie Code (Tasks 1–3) | Same Lakeflow pipeline | Rapid prototyping and code review/editing |
+| Visual Data Prep (Tasks 4–6) | Canvas-based data prep flow | Analysts who prefer UI manipulation over SQL |
+
+!!! warning "Use a different schema"
+    You'll create tables with the same names (`{{ s.sources[0].bronze }}`, `{{ s.gold.table }}`, etc.) as in 1.1–1.3, so if you use the same catalog and schema, they will conflict. For this lab, use a new schema (e.g., `{{ s.naming.genie_code_schema }}`) instead of `default`. Create the schema in Catalog first before starting.
+
+## Task 1 - Create a new pipeline and open Genie Code
+
+1. Click **New** → **ETL pipeline** in the top left of the sidebar. Follow the same method as [Task 1 in 1.1)](1-1-bronze.md#task-1), setting the pipeline name (e.g., `<your_name>_{{ s.naming.genie_code_pipeline }}`) and default catalog·schema (`{{ cat }}` / `{{ s.naming.genie_code_schema }}`).
+
+2. Click **Create with Genie Code** in the empty file in the editor. A Genie Code panel opens on the right. You can also click the Genie Code icon in the top right.
+
+    {{ shot('01-lakeflow-pipeline/1-4-01-genie-code-button.png', 'Create with Genie Code') }}
+
+## Task 2 - Enter a prompt
+
+1. If the Genie Code input box has pre-filled text, clear it. Then paste the prompt below and send it.
+
+    !!! prompt "Prompt"
+        ```text
+        {{ s.genie_code_pipeline.prompt | trim | indent(8) }}
+        ```
+
+    {{ shot('01-lakeflow-pipeline/1-4-02-pipeline-prompt.png', 'Pipeline prompt input') }}
+
+2. Genie Code creates a plan, generates files, and runs the pipeline. This takes 2–4 minutes.
+
+    {{ shot('01-lakeflow-pipeline/1-4-03-pipeline-generating.png', 'Genie Code generating pipeline') }}
+
+!!! tip "What should I write in the prompt?"
+    {{ s.genie_code_pipeline.tip | trim | indent(4) }}
+
+## Task 3 - Review results and accept
+
+1. Genie Code lists the 3 generated files in the **assets** section below the panel, and execution results for the 7 tables appear in the **Tables** tab at the bottom. Review the code by clicking file names, then click **Accept all** to apply them.
+
+    {{ shot('01-lakeflow-pipeline/1-4-04-pipeline-result.png', 'Genie Code results and Accept all') }}
+
+2. Check the **Pipeline graph** tab at the bottom. Verify that 7 table dependencies are created like in 1.3). The numbers on the right of Silver nodes ({{ silver_removed_desc }}) show rows removed per Expectations.
+
+    {{ shot('01-lakeflow-pipeline/1-4-05-pipeline-graph.png', 'Pipeline graph created by Genie Code') }}
+
+3. Verify results match below. They should equal the SQL results from 1.3).
+
+    | Table | Row count |
+    |---|---|
+{% for src in s.sources %}
+    | `{{ src.silver.table }}` | {{ src.silver.rows | num }} |
+{% endfor %}
+    | `{{ s.gold.table }}` | {{ s.gold.rows | num }}{{ ' (' ~ s.gold.total_note ~ ')' if s.gold.total_note else '' }} |
+
+!!! info "Results may vary slightly"
+    As Genie Code is generative AI, file structure, column order, and comment wording may differ per learner. If row counts or totals differ, use follow-up requests like "Re-check the Expectations for {{ s.sources[2].silver.table }}" or edit the code directly. Compare results to adjust if needed.
+
+## Task 4 - Explore Visual Data Prep
+
+**Visual Data Prep** is a code-free data transformation feature in **Lakeflow Designer**. Drag operators onto a canvas, connect them, and see results at each step without writing code.
+
+1. Click **New** → **Visual data prep** in the top left of the sidebar.
+
+    {{ shot('01-lakeflow-pipeline/1-4-06-new-visual-data-prep.png', 'New > Visual data prep') }}
+
+2. The operator list appears on the left, a canvas in the middle. Input the desired transformation in natural language in the center, or choose **Select a source** to pick a table and start directly.
+
+    {{ shot('01-lakeflow-pipeline/1-4-07-designer-overview.png', 'Visual Data Prep screen') }}
+
+### Main operators
+
+| Category | Operator | Purpose |
+|---|---|---|
+| Source and output | **Source**, Enter Data | Load tables·files from Unity Catalog or enter values directly |
+| | **Output**, Notifications | Save results as tables, Materialized Views, or files; send notifications |
+| AI transformations | **AI Function** | Apply AI functions (sentiment analysis, classification, summarization, translation, etc.) row by row |
+| Transformations | **Filter**, Select, Sort, Limit, Unique | Filter rows, select columns, sort, limit counts, deduplicate |
+| | **Prepare** | Trim whitespace, change case, replace values, apply formulas, clean columns |
+| | **Aggregate**, Pivot | Group and aggregate, transpose rows and columns |
+| | **Join**, Combine | Join tables on keys, merge multiple tables (Union, etc.) |
+| | **SQL**, Python | Write code for complex logic not expressible in UI |
+
+## Task 5 - (Sample) Build a flow in natural language
+
+Use the Silver tables from Task 3 to build a flow that computes "{{ s.genie_code_pipeline.vdp_goal }}", the same work as the Gold table in 1.2).
+
+1. Type the prompt below in the center input box on the canvas. Replace catalog and schema names with your own.
+
+    !!! prompt "Prompt"
+        ```text
+        {{ s.genie_code_pipeline.vdp_prompt | trim | indent(8) }}
+        ```
+
+    {{ shot('01-lakeflow-pipeline/1-4-08-designer-prompt.png', 'Visual Data Prep prompt') }}
+
+2. If Genie Code shows a summary and asks for approval (**Auto-approve needs your confirmation**), review it and click **Allow**. Genie Code may also build the flow without asking.
+
+3. The canvas draws a flow (for example, {{ s.genie_code_pipeline.vdp_flow_example }}), with input and output data in the **Preview** below. The operators may differ each time. Click **Accept** (or **Accept all**) to apply.
+
+    {{ shot('01-lakeflow-pipeline/1-4-10-designer-flow.png', 'Visual Data Prep flow') }}
+
+## Task 6 - Review operator settings
+
+1. {{ s.genie_code_pipeline.vdp_operator_review }}
+
+    {{ shot('01-lakeflow-pipeline/1-4-11-designer-aggregate.png', s.genie_code_pipeline.vdp_operator_alt) }}
+
+2. To save results as a table, append an **Output** operator after the last step. Click **Run all** at the top to process all data, or use the calendar icon (**Schedule**) to set up a recurring Job.
+
+!!! info "Visual Data Prep vs. Lakeflow Pipeline"
+    Visual Data Prep flows are saved as `<name>.designer.ipynb` notebook files, not Lakeflow pipelines. When run, Output operators write to tables, Materialized Views, or files. **Streaming Table incremental processing** and **Expectations** support is unclear from official docs. Use the **Guardrails** operator for quality checks instead. See [Lakeflow Designer docs](https://docs.databricks.com/aws/en/designer/what-is-lakeflow-designer) and [operator list](https://docs.databricks.com/aws/en/designer/built-in-operators) for details.
+
+!!! success "Congratulations!"
+    You've built the same pipeline with Genie Code and explored code-free data transformation with Visual Data Prep. When done, delete the pipeline, `{{ s.naming.genie_code_schema }}` schema, and Visual Data Prep files you created on this page.

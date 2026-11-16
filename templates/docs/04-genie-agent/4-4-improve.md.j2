@@ -1,0 +1,214 @@
+{% set im = s.improve %}{% set circ = ['①', '②', '③', '④', '⑤', '⑥'] %}{% set mvt = mv1 %}
+# 4.4) Improve: Update Metric View and Create Pages
+
+Both problems found in 4.2 and 4.3 stem from the same root cause: **business terms are not defined in the Metric View**. On this page, you'll use two approaches to define these terms.
+
+| Approach | Target | Effect |
+|---|---|---|
+| **① Update Metric View** | Add {{ (im.measures + im.fields) | map(attribute='name') | map('code') | join(', ') }} to `{{ mvt.name }}` | Genie Agent generates accurate SQL. |
+| **② Create Pages** | Add {{ im.pages | map(attribute='name') | map('code') | join(', ') }} Pages to Domain | Standardize term definitions across the organization, and Genie One references Pages when answering definitions. |
+
+Finally, you'll rerun Benchmark and ask the 4.2 question again to verify the improvement.
+
+## Task 1 - Add terms to the Metric View
+
+### 1.1) Open edit mode
+
+1. Click **Catalog** in the left sidebar, navigate to `{{ cat }}` → `default` → `{{ mvt.name }}`, then click it.
+
+    {{ shot('04-genie-agent/4-4-01-open-mv-1.png', 'Open ' ~ mvt.name) }}
+
+2. Click **Edit** in the top right. When the edit screen opens in YAML, click **UI** in the top right. The left side of the edit screen now shows **Measures** ({{ mvt.n_measures }}) and **Fields** ({{ mvt.n_fields }}) lists.
+
+    {{ shot('04-genie-agent/4-4-02-edit-mode.png', 'Edit screen') }}
+{% set sec = namespace(n=1) %}
+{% for m in im.measures %}{% set sec.n = sec.n + 1 %}
+
+### 1.{{ sec.n }}) Add the `{{ m.name }}` measure
+
+{% if loop.first %}
+1. Click the **+** button next to **Measures** (**Add measure**).
+
+    {{ shot('04-genie-agent/4-4-03-add-measure.png', 'Add measure') }}
+
+2. Click **Custom** next to **Expression** to enter a SQL expression directly.
+
+    {{ shot('04-genie-agent/4-4-04-expression-custom.png', 'Expression Custom') }}
+
+3. Enter the values below. Enter **Expression** first (the name will auto-populate), then enter **Measure name** and **Display name**.
+{% else %}
+1. Similarly, click **Add measure** → **Custom** and enter the values below.
+{% endif %}
+
+    | Field | Value |
+    |---|---|
+    | **Measure name** | `{{ m.name }}` |
+    | **Expression** | `{{ m.expr }}` |
+    | **Display name** | `{{ m.display_name | default(m.name) }}` |
+    | **Comment** | `{{ m.comment }}` |
+    | **Synonyms** | `{{ m.synonyms | join(', ') }}` |
+{% if m.format_ui %}
+    | **Format** | {{ m.format_ui }} |
+{% endif %}
+
+    {{ shot('04-genie-agent/4-4-0' ~ (4 + loop.index) ~ '-measure-' ~ loop.index ~ '.png', 'Enter ' ~ m.name ~ ' measure') if loop.index <= 2 else shot('04-genie-agent/4-4-measure-' ~ loop.index ~ '.png', 'Enter ' ~ m.name ~ ' measure') }}
+{% endfor %}
+{% for f in im.fields %}{% set sec.n = sec.n + 1 %}
+
+### 1.{{ sec.n }}) Add the `{{ f.name }}` field
+
+{% if loop.first %}
+1. Click the **+** button next to **Fields** (**Add field**), then click **Custom** for **Expression**.
+
+    {{ shot('04-genie-agent/4-4-07-add-field.png', 'Add field') }}
+
+2. Enter **Expression** first, then enter the remaining values.
+{% else %}
+1. Similarly, click **Add field** → **Custom** and enter the values below.
+{% endif %}
+
+    | Field | Value |
+    |---|---|
+    | **Field name** | `{{ f.name }}` |
+    | **Expression** | `{{ f.expr }}` |
+    | **Display name** | `{{ f.display_name | default(f.name) }}` |
+    | **Comment** | `{{ f.comment }}` |
+    | **Synonyms** | `{{ f.synonyms | join(', ') }}` |
+
+    {{ shot('04-genie-agent/4-4-0' ~ (7 + loop.index) ~ '-field-' ~ loop.index ~ '.png', 'Enter ' ~ f.name ~ ' field') if loop.index <= 2 else shot('04-genie-agent/4-4-field-' ~ loop.index ~ '.png', 'Enter ' ~ f.name ~ ' field') }}
+{% endfor %}
+{% if im.clarify %}{% set sec.n = sec.n + 1 %}
+
+### 1.{{ sec.n }}) Clarify the `{{ im.clarify.measure }}` description
+
+{{ im.clarify.why }}
+
+1. Click `{{ im.clarify.measure }}` in the **Measures** list.
+
+    {{ shot('04-genie-agent/4-4-10-select-clarified-measure.png', 'Select ' ~ im.clarify.measure) }}
+
+2. Add the text below to the end of **Comment**.
+
+    ```text
+     {{ im.clarify.append }}
+    ```
+
+    {{ shot('04-genie-agent/4-4-11-clarified-comment.png', 'Update ' ~ im.clarify.measure ~ ' Comment') }}
+{% endif %}
+{% set sec.n = sec.n + 1 %}
+
+### 1.{{ sec.n }}) Save and verify
+
+1. Click **Save** in the top right. Verify the list now shows **Measures** ({{ mvt.n_measures + im.measures | length }}) and **Fields** ({{ mvt.n_fields + im.fields | length }}).
+
+    {{ shot('04-genie-agent/4-4-12-save.png', 'Save') }}
+
+2. In **SQL Editor**, run the query below to verify the new measures and fields work correctly.
+
+    ```sql
+    {{ im.verify.sql | trim | indent(4) }}
+    ```
+
+3. Verify the results match:
+
+    | {{ im.verify.columns | join(' | ') }} |
+    |{% for c in im.verify.columns %}---|{% endfor %}
+
+    | {{ im.verify.results | join(' | ') }} |
+
+    {{ shot('04-genie-agent/4-4-13-verify-query.png', 'Verify query result') }}
+
+!!! info "UI edits preserve Tags"
+    When you edit a Metric View via **Edit** in the UI, Governed Tags connected in 3.3 are retained. When editing via SQL, use `ALTER VIEW` instead of `CREATE OR REPLACE VIEW` to preserve Tags.
+
+## Task 2 - Create business term Pages
+
+!!! info "Why create Pages?"
+    Pages do **not** directly affect Genie Agent's SQL generation. Genie Agent's accuracy is handled by the **Metric View** you updated in Task 1 and the Genie Agent's **Instructions**.
+
+    Pages standardize business terms across the organization. For example, if a user asks "{{ im.pages_example_question }}" in Genie One, Genie One references this Page to provide a definition and display it as a source (citation). You'll see Pages actually being referenced in Step 5.
+
+### 2.1) Create Pages
+
+1. Click **Discover** in the left sidebar.
+
+    {{ shot('04-genie-agent/4-4-14-discover-pages.png', 'Discover > Pages') }}
+
+2. Click **Create** in the top right → **Create page**.
+
+    {{ shot('04-genie-agent/4-4-15-create-page.png', 'Create page') }}
+
+3. Enter the content for **Page {{ circ[0] }} {{ im.pages[0].name }}** below:
+    - Click **Click to set page name** at the top to enter the name.
+    - For **Domain**, select `{{ cat }}` created in 3.3.
+    - For **Synonyms**, click the **+** button to add each one, then press Enter.
+    - The body has **Definition** and **Business use** headings pre-filled. Add content under each. Use the table button in the toolbar to insert a table, then delete extra rows and columns.
+
+    {{ shot('04-genie-agent/4-4-16-page-form.png', 'Enter Page') }}
+
+4. Click **Publish**.
+
+    {{ shot('04-genie-agent/4-4-17-page-publish.png', 'Publish Page') }}
+
+5. Create {% for p in im.pages[1:] %}**Page {{ circ[loop.index] }} {{ p.name }}**{{ ' and ' if loop.revindex == 2 else (', ' if not loop.last else '') }}{% endfor %} the same way and publish them.
+
+!!! warning "Don't include personal information in Pages"
+    Page names, descriptions, synonyms, and body text are stored unencrypted. Don't include personal or sensitive information.
+
+### 2.2) Page content
+{% for p in im.pages %}
+
+=== "{{ circ[loop.index0] }} {{ p.name }}"
+
+    | Field | Value |
+    |---|---|
+    | **Name** | `{{ p.name }}` |
+    | **Domain** | `{{ cat }}` |
+    | **Owner** | You |
+    | **Synonyms** | {{ p.synonyms | map('code') | join(', ') }} |
+    | **Description** | {{ p.description }} |
+
+    **Body**
+
+    ```markdown
+    {{ p.body | trim | indent(4) }}
+    ```
+{% endfor %}
+
+## Task 3 - Verify improvements
+
+### 3.1) Rerun Benchmark
+
+1. Click **Benchmark** at the top of the Genie Agent screen, then click **Run all benchmarks**.
+
+    {{ shot('04-genie-agent/4-4-18-rerun-benchmarks.png', 'Run all benchmarks') }}
+
+2. {{ im.benchmark_after }}
+
+    {{ shot('04-genie-agent/4-4-19-benchmark-good.png', 'Benchmark result Good') }}
+
+### 3.2) Ask the Monitoring question again
+
+1. Click **Chat** at the top, then click the **New chat** icon in the top right and enter the same question as 4.2.
+
+    !!! prompt "Prompt"
+        ```text
+        {{ t1.question }}
+        ```
+
+2. {{ im.reask_verify }}
+
+    {{ shot('04-genie-agent/4-4-20-answer-after.png', t1.term | capitalize ~ ' answer after improvement') }}
+
+### 3.3) Before / After
+
+| Question | Before improvement | After improvement |
+|---|---|---|
+| {{ t1.question }} | {{ im.before_after[0].before }} | {{ im.before_after[0].after }} |
+| {{ t2.question }} | {{ im.before_after[1].before }} | {{ im.before_after[1].after }} |
+
+!!! tip "Real improvements often require multiple iterations"
+    {{ im.iteration_tip | trim | indent(4) }}
+
+!!! success "Congratulations!"
+    You've solved the problems found in Monitoring and Benchmark by updating the Metric View, and standardized business terms with Pages.{{ ' The next page is Optional: you\'ll connect ' ~ s.volume.docs_noun ~ ' to Genie Agent.' if s.options.volumes else ' In the next Step, you\'ll ask questions in Genie One.' }}

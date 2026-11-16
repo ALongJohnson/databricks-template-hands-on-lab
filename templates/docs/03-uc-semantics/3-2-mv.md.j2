@@ -1,0 +1,49 @@
+{% set mv = mv2 %}
+# 3.2) Metric View: {{ mv.title }}
+
+On this page, you'll create `{{ mv.name }}`, a Metric View that defines KPIs for {{ mv.subject }}.
+
+!!! tip "{{ mv.why_separate.title }}"
+    {{ mv.why_separate.body | trim | indent(4) }}
+
+## Task 1 - Create a Metric View
+
+1. In **Catalog**, navigate to `{{ cat }}` → `default` schema, then click **Create** → **Metric view** in the top right.
+
+    {{ shot('03-uc-semantics/3-2-01-create-metric-view.png', 'Create > Metric view') }}
+
+2. Enter `{{ mv.name }}` in the **Name** field.
+
+    {{ shot('03-uc-semantics/3-2-02-metric-view-name.png', 'Enter Metric View name') }}
+
+3. If the editor opens in UI mode, click the `<>` toggle in the top right to switch to YAML editor. Delete all content and paste the YAML below. Replace `{{ cat }}` ({{ mv.catalog_refs }} places) with your catalog name.
+
+    ```yaml title="{{ mv.name }}"
+    --8<-- "lab-files/eng/step3/{{ mv.name }}.yaml"
+    ```
+
+    {{ shot('03-uc-semantics/3-2-03-yaml-editor.png', 'Paste YAML') }}
+
+4. Click **Save**. Verify on the **Overview** tab that **Measures** ({{ mv.n_measures }}) and **Fields** ({{ mv.n_fields }}) are registered.
+
+    {{ shot('03-uc-semantics/3-2-04-overview.png', mv.name ~ ' Overview') }}
+
+## Task 2 - Query with SQL
+
+1. In **SQL Editor**, run this query:
+
+    ```sql
+    {{ mv.queries[0].sql | trim | indent(4) }}
+    ```
+
+2. {{ mv.queries[0].verify }}
+
+    {{ shot('03-uc-semantics/3-2-05-query-total.png', mv.queries[0].shot_alt | default('Review KPI results')) }}
+{% if mv.note %}
+
+!!! info "{{ mv.note.title }}"
+    {{ mv.note.body | trim | indent(4) }}
+{% endif %}
+
+!!! success "Congratulations!"
+    You've created both Metric Views. Next, you'll create a Domain and link these Metric Views to it.

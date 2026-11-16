@@ -1,0 +1,73 @@
+# 2.1) Create the Dataset and Tabs
+
+On this page, you will create the dashboard, the `{{ ds_main.name }}` dataset, and two tabs for widgets to use.
+
+## Task 1 - Create a dashboard
+
+1. Click **New** in the left sidebar, then click **Dashboard**.
+
+    {{ shot('02-aibi-dashboard/2-1-01-new-dashboard.png', 'New > Dashboard') }}
+
+2. Click the dashboard name at the top (**New Dashboard ...**) and enter `<your_name> - {{ s.naming.dashboard }}`. For example, if your name is {{ s.naming.example_user | capitalize }}, enter `{{ s.naming.example_user }} - {{ s.naming.dashboard }}`.
+
+    {{ shot('02-aibi-dashboard/2-1-02-dashboard-name.png', 'Enter dashboard name') }}
+
+## Task 2 - Create a dataset { #task-2 }
+
+Dashboard widgets are based on **datasets**. {{ ds_main.intro }}
+
+1. Click the **Data** tab at the top.
+
+    {{ shot('02-aibi-dashboard/2-1-03-data-tab.png', 'Data tab') }}
+
+2. Click **Add SQL dataset**.
+
+    {{ shot('02-aibi-dashboard/2-1-04-create-from-sql.png', 'Create from SQL') }}
+
+3. Paste the query below into the SQL editor. Replace `{{ ex_cat }}` with your own catalog name.
+
+    ```sql title="{{ ds_main.name }} dataset"
+    --8<-- "lab-files/eng/step2/{{ ds_main.file }}"
+    ```
+
+4. Click **Run** to execute the query and check that the results table appears below.
+
+    {{ shot('02-aibi-dashboard/2-1-05-dataset-run.png', 'Dataset query execution result') }}
+
+5. Click the dataset name (**Untitled dataset**) in the left dataset list and rename it to `{{ ds_main.name }}`.
+
+    {{ shot('02-aibi-dashboard/2-1-06-dataset-rename.png', 'Rename dataset') }}
+
+### Understanding the dataset
+
+{{ ds_main.columns_intro }}
+
+| Column | Meaning | Values |
+|---|---|---|
+{% for c in ds_main.columns %}
+| `{{ c.name }}` | {{ c.meaning }} | {{ c.vals }} |
+{% endfor %}
+{% if ds_main.note %}
+
+!!! info "{{ ds_main.note.title }}"
+    {{ ds_main.note.body | indent(4) }}
+{% endif %}
+
+## Task 3 - Create two tabs
+
+Create two tabs on the dashboard. On the first tab, you will manually create widgets. On the second tab, you will create widgets with Genie Code.
+
+1. Click the page tab (**Untitled page**) next to the **Data** tab to return to the canvas.
+
+    {{ shot('02-aibi-dashboard/2-1-07-canvas-tab.png', 'Page tab') }}
+
+2. Double-click the page tab name (**Untitled page**) and rename it to `① Build It Yourself`.
+
+    {{ shot('02-aibi-dashboard/2-1-08-rename-page-1.png', 'Rename first tab') }}
+
+3. Click **+** next to the page tab to add a new page and rename it to `② Build with Genie Code`.
+
+    {{ shot('02-aibi-dashboard/2-1-09-add-page-2.png', 'Add second tab') }}
+
+!!! success "Congratulations!"
+    You have created the dashboard, the `{{ ds_main.name }}` dataset, and two tabs. On the next page, you will manually create core widgets on the first tab.

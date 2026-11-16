@@ -1,0 +1,51 @@
+# 2) Build an AI/BI Dashboard
+
+<div class="wb-meta" markdown>
+
+- :material-clock-outline: About 35 min
+- :material-account-outline: {{ da.name }}
+- :material-file-document-multiple-outline: 3 pages
+
+</div>
+
+## Lab Overview
+
+{{ s.dashboard.overview }}
+
+## Your Role in This Lab
+
+<div class="wb-roles" markdown>
+
+<div class="wb-persona wb-persona--side" markdown>
+
+![{{ da.name }}](../assets/images/{{ da.avatar }})
+
+<p class="wb-persona__name">{{ da.name }}<span>{{ da.title }}</span></p>
+
+You are {{ da.name }}, a {{ da.title | role }} at {{ s.lab.company }}. You will build the {{ s.dashboard.title }} dashboard that {{ s.dashboard.audience }} view every day. You will configure the core widgets manually, and delegate the rest to Genie Code with a single prompt.
+
+</div>
+
+</div>
+
+## Lab Structure
+
+| Page | Content |
+|---|---|
+| [2.1) Create the Dataset and Tabs](2-1-dataset.md) | Create the dashboard, the `{{ ds_main.name }}` dataset, and two tabs for widgets. |
+| [2.2) Build Core Widgets](2-2-widgets.md) | Manually create four segment and distribution widgets (Heatmap, Histogram, stacked Bar, and Bubble) on the first tab. |
+| [2.3) Build with Genie Code](2-3-genie-code.md) | Use Genie Code to build the dashboard with a single prompt on the second tab. |
+
+## Features Used in This Lab
+
+| Feature | Description |
+|---|---|
+| **AI/BI Dashboard** | Create a dashboard by arranging visualization widgets based on SQL datasets. |
+| **Dataset** | A SQL query used by widgets. Multiple widgets can reuse a single dataset. |
+| **Genie Code** | An AI assistant that automatically creates dashboard widgets when you request them in natural language. |
+
+## Learning Goals
+
+- Define dashboard datasets with SQL.
+- Manually create and configure Heatmap, Histogram, Bar, and Scatter widgets.
+- Create multiple widgets in natural language with Genie Code in a single prompt.

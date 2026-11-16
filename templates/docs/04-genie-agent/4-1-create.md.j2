@@ -1,0 +1,74 @@
+{% set g = s.genie_agent %}
+# 4.1) Create a Genie Agent
+
+On this page, you'll build a Genie Agent using the 2 Metric Views created in Step 3 as data sources and ask your first question.
+
+## Task 1 - Create a Genie Agent
+
+1. Click **Genie Agents** in the left sidebar, then click **New** in the top right.
+
+    {{ shot('04-genie-agent/4-1-01-new-genie-agent.png', 'Genie Agents > New') }}
+
+2. In the **Connect your data** window, click the **Metric views** filter, select `{{ mv1.name }}` and `{{ mv2.name }}` from `{{ cat }}.default`, then click **Create**.
+
+    {{ shot('04-genie-agent/4-1-02-select-sources.png', 'Select 2 Metric Views') }}
+
+    !!! tip "Why only Metric Views?"
+        {{ g.why_metric_views | trim | indent(8) }}
+
+## Task 2 - Set basic information
+
+1. Click **Configure** in the top right, then click the **About** tab.
+
+    {{ shot('04-genie-agent/4-1-03-settings-tab.png', 'Configure > About') }}
+
+2. Click the pencil icon next to **About this agent**. In the **Edit agent details** window, enter the values below and click **Save**.
+
+    | Field | Value |
+    |---|---|
+    | **Name** | `<your_name> - {{ s.naming.agent }}` (example: `{{ s.naming.example_user }} - {{ s.naming.agent }}`) |
+    | **Default warehouse** | Your SQL Warehouse (example: **Serverless Starter Warehouse**) |
+
+    {{ shot('04-genie-agent/4-1-04-settings-form.png', 'Edit agent details') }}
+
+3. If **Genie Suggested Description** appears, close it with the **X** in the top right. Click the pencil icon next to **Description**, enter `{{ g.description }}` in the **Edit description** window, then click **Save**.
+
+    {{ shot('04-genie-agent/4-1-04b-description.png', 'Enter Description') }}
+
+## Task 3 - Add Instructions and sample questions
+
+1. Click the **Instructions** tab, paste the following into the **General Instructions** field, then click **Save**. The gray placeholder text in the field is just a guide and doesn't need to be deleted.
+
+    ```text title="Instructions"
+    {{ g.instructions | trim | indent(4) }}
+    ```
+
+    {{ shot('04-genie-agent/4-1-05-instructions.png', 'Enter Instructions') }}
+
+2. Go back to the **About** tab and click the pencil icon next to **Common questions**. In the **Edit common questions** window, enter the question below, click **Add**, then click **Save**. Common questions appear as recommended questions when users start a new conversation.
+
+    ```text
+    {{ g.common_question }}
+    ```
+
+    {{ shot('04-genie-agent/4-1-06-sample-question.png', 'Add sample question') }}
+
+## Task 4 - Ask your first question
+
+1. Close the **Configure** panel and verify **Chat** is selected at the top. Click the recommended question **{{ g.common_question }}** below the input box.
+
+    {{ shot('04-genie-agent/4-1-07-click-sample.png', 'Click recommended question') }}
+
+    !!! info "Agent mode vs. Chat mode"
+        Use the **Agent** / **Chat** toggle below the input box to choose the response style. The default **Agent** mode reasons in multiple steps for deeper analysis. This lab uses the default **Agent** mode.
+
+2. Genie generates and runs SQL, showing results in a table and explanation. {{ g.first_answer_verify }}
+
+    {{ shot('04-genie-agent/4-1-08-first-answer.png', 'First question answer') }}
+
+3. Click **Show code** above the result chart to verify that Genie used `` MEASURE(`{{ g.first_answer_measure }}`) `` to query the Metric View.
+
+    {{ shot('04-genie-agent/4-1-09-show-code.png', 'Generated SQL') }}
+
+!!! success "Congratulations!"
+    You've built a Genie Agent and received an answer to your first question. On the next page, you'll become {{ bu.name }} and ask real business questions.

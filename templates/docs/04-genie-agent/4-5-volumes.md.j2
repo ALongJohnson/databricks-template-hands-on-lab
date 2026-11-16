@@ -1,0 +1,105 @@
+{% set v = s.volume %}
+# 4.5) (Optional) Analyze Documents with Volumes
+
+On this page, you'll upload {{ v.docs_noun_long | default(v.docs_noun) }} (PDFs) to a Unity Catalog Volume and connect them to Genie Agent to answer questions that require both documents and data.
+
+| Question | From documents | From Metric View |
+|---|---|---|
+{% for q in v.questions %}
+| {{ q.summary }} | {{ q.from_docs }} | {{ q.from_data }} |
+{% endfor %}
+
+!!! warning "Prerequisites"
+    This page requires **Analyze Files in Volumes with Genie Agents** Preview to be enabled and **Lakebase** available in your workspace. Check in [Prerequisites](../00-introduction/prerequisites.md#21-genie-volumes).
+
+## Task 1 - Download lab files
+
+Download the {{ v.docs | length }} PDFs below.
+
+| File | Content |
+|---|---|
+{% for d in v.docs %}
+| [:material-file-pdf-box: {{ d.file }}](../assets/files/{{ d.file }}) | {{ d.content }} |
+{% endfor %}
+
+## Task 2 - Create a Volume and upload files
+
+1. Click **Catalog**, navigate to `{{ cat }}` → `default` schema, click the top right **Create** → **Volume**.
+
+    {{ shot('04-genie-agent/4-5-01-create-volume.png', 'Create > Volume') }}
+
+2. Enter `{{ s.naming.volume }}` for **Volume name**, select **Managed volume** for **Volume type**, then click **Create**.
+
+    {{ shot('04-genie-agent/4-5-02-volume-form.png', 'Enter Volume details') }}
+
+3. Click **Upload to this volume** in the top right of the created Volume screen and upload the {{ v.docs | length }} PDFs from Task 1.
+
+    {{ shot('04-genie-agent/4-5-03-upload-files.png', 'Upload files') }}
+
+4. Verify the {{ v.docs | length }} PDFs are now in the Volume.
+
+    {{ shot('04-genie-agent/4-5-04-uploaded-files.png', 'Uploaded files') }}
+
+## Task 3 - Connect the Volume to Genie Agent
+
+1. Click **Configure** in the top right of the Genie Agent screen, then click **Add** on the **Sources** tab.
+
+    {{ shot('04-genie-agent/4-5-05-add-source.png', 'Configure > Sources > Add') }}
+
+2. Select **Volume** from the menu. Type `{{ s.naming.volume }}` in the search field, select `{{ s.naming.volume }}` from your catalog (`{{ cat }}.default`), then click **Confirm**.
+
+    !!! info "If Volume doesn't appear in the menu"
+        If the menu only shows **Table**, **Metric View**, **SQL function**, then **Analyze Files in Volumes with Genie Agents** Preview hasn't been enabled. Ask your workspace administrator to enable it. If you select a Volume and click **Confirm** but it doesn't appear in the Sources list, your workspace can't use Lakebase.
+
+    {{ shot('04-genie-agent/4-5-06-select-volume.png', 'Select Volume') }}
+
+3. The `{{ s.naming.volume }}` Volume appears in **Sources** with **Indexing…** status. Click the pencil icon to the right of `{{ s.naming.volume }}` to see **Content Search Status** showing **Indexing in progress**. Genie is indexing documents so it can read them, which takes a few minutes.
+
+    {{ shot('04-genie-agent/4-5-06b-indexing.png', 'Indexing Volume') }}
+
+    !!! warning "Wait for indexing to complete before asking questions"
+        If you ask questions before indexing finishes, Genie might not find document content. Verify the status in the **Sources** list changes from **Indexing…** to **Indexed** before moving to Task 4.
+
+    {{ shot('04-genie-agent/4-5-06c-indexed.png', 'Volume indexing complete') }}
+
+4. Click the pencil icon next to **Description** on the same screen and enter the text below, then click **Save**. Genie uses this description to decide which questions should reference documents.
+
+    ```text
+    {{ v.description | trim | indent(4) }}
+    ```
+
+    {{ shot('04-genie-agent/4-5-07-volume-description.png', 'Enter Volume Description') }}
+
+## Task 4 - Ask questions in Agent mode
+
+!!! warning "Only Agent mode reads documents"
+    In **Chat** mode, Genie doesn't read Volume documents and will say "{{ v.chat_mode_symptom }}." To analyze both documents and data together, you must ask in **Agent** mode.
+
+1. Close the **Configure** panel, click the **New chat** icon in the top right, then verify **Agent** is selected in the mode toggle below the input box.
+
+    {{ shot('04-genie-agent/4-5-08-agent-mode.png', 'Select Agent mode') }}
+
+2. Enter the question below.
+
+    !!! prompt "Prompt"
+        ```text
+        {{ v.questions[0].prompt }}
+        ```
+
+3. {{ v.questions[0].verify | trim | indent(4) }}
+
+    {{ shot('04-genie-agent/4-5-09-doc-answer-1.png', v.questions[0].shot_alt) }}
+
+4. In a new conversation, ask in Agent mode:
+
+    !!! prompt "Prompt"
+        ```text
+        {{ v.questions[1].prompt }}
+        ```
+
+5. {{ v.questions[1].verify | trim | indent(4) }}
+
+    {{ shot('04-genie-agent/4-5-10-doc-answer-2.png', v.questions[1].shot_alt) }}
+
+!!! success "Congratulations!"
+    You've completed {{ ai.name | poss }} work. You've built a complete Genie Agent that analyzes both structured data (Metric View) and unstructured documents (PDFs). In the next Step, you'll become {{ bu.name }} and ask questions in Genie One.

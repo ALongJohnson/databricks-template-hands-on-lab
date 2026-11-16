@@ -1,0 +1,92 @@
+{% set mv = mv1 %}
+# 3.1) Metric View: {{ mv.title }}
+
+On this page, you'll create `{{ mv.name }}`, a Metric View that defines KPIs for {{ mv.subject }}, and query it with SQL.
+
+!!! tip "Why use Silver tables instead of Gold?"
+    {{ mv.why_silver | trim | indent(4) }}
+
+## Task 1 - Create a Metric View
+
+1. Click **Catalog** in the left sidebar, then navigate to `{{ cat }}` → `default` schema.
+
+    {{ shot('03-uc-semantics/3-1-01-default-schema.png', 'default schema') }}
+
+2. Click **Create** in the top right, then click **Metric view**.
+
+    {{ shot('03-uc-semantics/3-1-02-create-metric-view.png', 'Create > Metric view') }}
+
+3. Enter `{{ mv.name }}` in the **Name** field.
+
+    {{ shot('03-uc-semantics/3-1-03-metric-view-name.png', 'Enter Metric View name') }}
+
+4. If the editor opens in UI mode, click the `<>` toggle in the top right to switch to YAML editor. Delete all content in the YAML editor and paste the YAML below. Replace `{{ cat }}` ({{ mv.catalog_refs }} places) with your catalog name.
+
+    ```yaml title="{{ mv.name }}"
+    --8<-- "lab-files/eng/step3/{{ mv.name }}.yaml"
+    ```
+
+    {{ shot('03-uc-semantics/3-1-04-yaml-editor.png', 'Paste YAML') }}
+
+5. Click **Save**. After the Metric View is created, verify on the **Overview** tab that **Measures** ({{ mv.n_measures }}) and **Fields** ({{ mv.n_fields }}) are registered. Note: Metric View dimensions appear as **Fields** in the UI.
+
+    {{ shot('03-uc-semantics/3-1-05-overview.png', mv.name ~ ' Overview') }}
+
+??? tip "Create Metric View with SQL"
+    You can also create the same Metric View by running this query in SQL Editor:
+
+    ```sql
+    CREATE OR REPLACE VIEW {{ cat }}.default.{{ mv.name }}
+    WITH METRICS
+    LANGUAGE YAML
+    AS $$
+    --8<-- "lab-files/eng/step3/{{ mv.name }}.yaml"
+    $$;
+    ```
+
+## Task 2 - Understand the YAML
+
+| Key | In This Metric View | Description |
+|---|---|---|
+| `source` | `{{ mv.source_table }}` | {{ mv.explain.source }} |
+{% for j in mv.joins %}
+| `joins` | `{{ j.name }}` → `{{ j.table }}` | {{ mv.explain.joins }} |
+{% endfor %}
+| `dimensions` | {{ mv.dimension_names | join(', ') }} | Criteria by which you slice the data. |
+| `measures` | {{ mv.measure_names | join(', ') }} | KPIs to aggregate. Calculation logic is defined in one place. |
+| `comment` | On every dimension and measure | Field meaning. Genie uses this when interpreting questions. |
+| `synonyms` | {{ mv.explain.synonyms_example }} | Helps find the same field even when users phrase questions differently. |
+| `format` | {{ mv.explain.formats }} | Display formatting for results. |
+{% if mv.note %}
+
+!!! info "{{ mv.note.title }}"
+    {{ mv.note.body | trim | indent(4) }}
+{% endif %}
+
+## Task 3 - Query with SQL
+
+Metric View measures are queried using the `MEASURE()` function. Regardless of which dimensions you `GROUP BY`, the measure calculation logic applies as defined in the Metric View.
+
+1. Click **SQL Editor** in the left sidebar and run this query:
+
+    ```sql
+    {{ mv.queries[0].sql | trim | indent(4) }}
+    ```
+
+2. {{ mv.queries[0].verify }}
+
+    {{ shot('03-uc-semantics/3-1-06-query-total.png', 'Total KPI results') }}
+
+3. {{ mv.queries[1].intro }}
+
+    ```sql
+    {{ mv.queries[1].sql | trim | indent(4) }}
+    ```
+
+    {{ shot('03-uc-semantics/3-1-07-query-by-segment.png', mv.queries[1].shot_alt) }}
+
+!!! warning "Use `ALTER VIEW` when modifying a Metric View"
+    After linking a Governed Tag to the Metric View in 3.3), do not use `CREATE OR REPLACE VIEW` to modify it, as this will remove the Tag and break the Domain connection. Instead, use the UI **Edit** button or `ALTER VIEW ... AS $$ ... $$` to modify.
+
+!!! success "Congratulations!"
+    You've created `{{ mv.name }}`, a Metric View that defines {{ mv.kpi_noun }}. Next, you'll create `{{ mv2.name }}` to define {{ mv2.kpi_noun }}.
