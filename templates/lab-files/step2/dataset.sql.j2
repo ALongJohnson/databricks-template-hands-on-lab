@@ -1,0 +1,5 @@
+-- {{ s.lab.company }} HOL · Step 2 · Dashboard dataset "{{ ds.name }}"
+{{ ds.header | trim | prefix_lines('-- ') }}
+-- Replace {{ cat }} with your own catalog name.
+
+{{ ds.sql | trim }}

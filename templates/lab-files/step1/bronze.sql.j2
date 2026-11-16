@@ -1,0 +1,23 @@
+-- {{ s.lab.company }} HOL · Step 1 · Bronze: Ingest source data as-is (schema preservation + audit columns)
+-- Source: {{ s.architecture.source_label }} / Target: pipeline's default catalog·schema
+{% for src in s.sources %}
+
+CREATE OR REFRESH {{ 'MATERIALIZED VIEW' if mode == 'federation' else 'STREAMING TABLE' }} {{ src.bronze }}
+  COMMENT '{{ src.bronze_comment }}'
+  TBLPROPERTIES ('quality' = 'bronze', 'wb_layer' = 'bronze')
+{% if mode == 'files' %}
+AS SELECT *, current_timestamp() AS _ingested_at, _metadata.file_path AS _source
+FROM STREAM read_files(
+  '{{ src.path }}',
+  format => '{{ src.format | default(s.architecture.files.format) }}'{% for k, v in (src.options | default(s.architecture.files.options) | default({})).items() %},
+  {{ k }} => {{ v | sqlval }}{% endfor %}
+
+);
+{% elif mode == 'federation' %}
+AS SELECT *, current_timestamp() AS _ingested_at, '{{ src.ref }}' AS _source
+FROM {{ src.ref }};
+{% else %}
+AS SELECT *, current_timestamp() AS _ingested_at, '{{ src.ref }}' AS _source
+FROM STREAM({{ src.ref }});
+{% endif %}
+{% endfor %}
