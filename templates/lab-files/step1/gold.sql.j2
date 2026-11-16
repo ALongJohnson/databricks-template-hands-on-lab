@@ -1,0 +1,18 @@
+-- {{ s.lab.company }} HOL · Step 1 · Gold: {{ s.gold.title }} (Materialized View)
+-- Source: {{ s.architecture.source_label }} / Target: pipeline's default catalog·schema
+{% if s.gold.sql_note %}
+
+{{ s.gold.sql_note | trim | prefix_lines('-- ') }}
+{% endif %}
+{% set w1 = s.gold.columns | map(attribute='name') | map('length') | max %}{% set w2 = s.gold.columns | map(attribute='type') | map('length') | max %}
+
+CREATE OR REFRESH MATERIALIZED VIEW {{ s.gold.table }} (
+{% for c in s.gold.columns %}
+  {{ c.name.ljust(w1) }} {{ (c.type ~ (' NOT NULL' if c.not_null else '')).ljust(w2) }} COMMENT '{{ c.comment | sq }}',
+{% endfor %}
+  CONSTRAINT pk_{{ s.gold.table }} PRIMARY KEY ({{ s.gold.primary_key }})
+)
+  COMMENT '{{ s.gold.comment | sq }}'
+  TBLPROPERTIES ('quality' = 'gold', 'wb_layer' = 'gold')
+AS
+{{ s.gold.sql | trim }}

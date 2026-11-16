@@ -1,0 +1,16 @@
+-- {{ s.lab.company }} HOL · Step 1 · Silver: Cleanse & standardize (quality enforced with Expectations)
+-- Source: {{ s.architecture.source_label }} / Target: pipeline's default catalog·schema
+{% for src in s.sources %}{% set sv = src.silver %}{% set w = sv.constraints | map(attribute='name') | map('length') | max %}{% set we = sv._wexpr %}
+
+-- {{ sv.header }}
+CREATE OR REFRESH {{ 'MATERIALIZED VIEW' if mode == 'federation' else 'STREAMING TABLE' }} {{ sv.table }} (
+{% for c in sv.constraints %}
+  CONSTRAINT {{ c.name.ljust(w) }} EXPECT {{ ('(' ~ c.expr ~ ')').ljust(we) if c.action != 'warn' else '(' ~ c.expr ~ ')' }}{{ ' ON VIOLATION DROP ROW' if c.action == 'drop' else (' ON VIOLATION FAIL UPDATE' if c.action == 'fail' else '') }}{{ ',' if not loop.last else '' }}
+{% endfor %}
+)
+  COMMENT '{{ sv.comment | sq }}'
+  TBLPROPERTIES ('quality' = 'silver', 'wb_layer' = 'silver')
+AS SELECT
+{{ sv.select | trim | indent(2, first=True) }}
+FROM {{ upstream(src.bronze) }};
+{% endfor %}
