@@ -1,0 +1,89 @@
+# Wrap-up
+
+<div class="wb-meta" markdown>
+
+- :material-clock-outline: About 10 min
+
+</div>
+
+## Key Achievements
+
+You have become four personas and built an end-to-end data & AI platform for {{ s.lab.company }}, from raw source data through to an AI that {{ s.wrapup.audience }} can ask questions directly.
+
+| Step | Persona | Built |
+|---|---|---|
+| 1 | {{ de.name }} · {{ de.title }} | Lakeflow pipeline, 7 Bronze, Silver, and Gold tables |
+| 2 | {{ da.name }} · {{ da.title }} | {{ s.dashboard.title }} AI/BI dashboard |
+| 3 | {{ da.name }} · {{ da.title }} | 2 Metric Views (`{{ mv1.name }}`, `{{ mv2.name }}`), Domain |
+| 4 | {{ ai.name }} · {{ ai.title }} | Genie Agent, Benchmark, {{ s.improve.pages | length }} Pages ({{ s.improve.pages | map(attribute='name') | join(', ') }}){{ ', Volume' if s.options.volumes else '' }} |
+| 5 | {{ bu.name }} · {{ bu.title }} | Ask business questions in Genie One |
+
+## Learning highlights
+
+- **Declarative pipelines:** Implemented data collection, quality validation, and incremental processing with just a few lines of SQL.
+- **Define KPI once:** Once you define a KPI in Metric View, the dashboard, SQL, and Genie all use the same number.
+- **Standardize terminology:** Domain and Pages ensure the business team uses business terms with consistent meaning across the organization.
+- **Measurable AI quality:** Monitoring and Benchmark help you find why the AI is wrong, and measure the improvement with numbers.
+{% if s.options.volumes %}
+- **Structured + unstructured:** Volumes enable analyzing documents alongside data.
+{% endif %}
+
+## Next steps
+
+| Topic | Documentation |
+|---|---|
+| Lakeflow Spark Declarative Pipelines | [docs.databricks.com/aws/en/ldp](https://docs.databricks.com/aws/en/ldp/) |
+| AI/BI Dashboard | [docs.databricks.com/aws/en/dashboards](https://docs.databricks.com/aws/en/dashboards/) |
+| Unity Catalog Semantics (Metric View, Domain, Page) | [docs.databricks.com/aws/en/uc-semantics](https://docs.databricks.com/aws/en/uc-semantics/) |
+| Genie Agent | [docs.databricks.com/aws/en/genie](https://docs.databricks.com/aws/en/genie/) |
+{% if s.options.volumes %}
+| Genie Agent Volumes | [docs.databricks.com/aws/en/genie-agents/volumes](https://docs.databricks.com/aws/en/genie-agents/volumes) |
+{% endif %}
+
+## Clean up resources
+
+After completing the lab, delete your assets in the order shown below. The deletion order is designed to delete dependent assets before the assets they depend on.
+
+!!! warning "Delete only your own assets"
+    In a shared workspace, delete only the assets with `<your_name>` in their names.
+
+1. **Genie Agent:** Open `<your_name> - {{ s.naming.agent }}` in **Genie Agents**, click the kebab menu (⋮) in the top-right corner, and select **Move to trash**.
+
+    {{ shot('99-wrap-up/99-01-delete-genie-agent.png', 'Delete Genie Agent') }}
+
+2. **Dashboard:** Open `<your_name> - {{ s.naming.dashboard }}` in **Dashboards**, click the kebab menu (⋮) in the top-right corner, select **File actions** → **Move to trash**.
+
+    {{ shot('99-wrap-up/99-02-delete-dashboard.png', 'Delete dashboard') }}
+
+3. **Page:** Go to **Discover** → **Pages** and open each of {{ s.improve.pages | map(attribute='name') | map('code') | oxford }} Pages, then click the kebab menu (⋮) → **Delete**.
+
+    {{ shot('99-wrap-up/99-03-delete-page.png', 'Delete Page') }}
+
+4. **Domain:** Open the `{{ cat }}` Domain in **Discover**, click **Edit** → **Remove domain**.
+
+    {{ shot('99-wrap-up/99-04-delete-domain.png', 'Delete Domain') }}
+
+5. **Governed Tag:** Search for `{{ cat }}` in **Catalog** → **Govern** → **Governed Tags**, open it, and click **Delete** in the top-right corner.
+
+    {{ shot('99-wrap-up/99-05-delete-governed-tag.png', 'Delete Governed Tag') }}
+
+6. **Pipeline:** Click the kebab menu (⋮) next to `<your_name>_{{ s.naming.pipeline }}` in **Jobs & Pipelines** and select **Delete**.
+
+    {{ shot('99-wrap-up/99-06-delete-pipeline.png', 'Delete pipeline') }}
+
+7. **Catalog:** Open `{{ cat }}` in **Catalog**, click the kebab menu (⋮) to the right of the catalog name, and select **Delete**. All tables{{ ', Metric Views, and Volumes' if s.options.volumes else ' and Metric Views' }} in the catalog will be deleted together.
+
+    {{ shot('99-wrap-up/99-07-delete-catalog.png', 'Delete catalog') }}
+
+??? tip "Delete catalog with SQL"
+    You can also delete the catalog and all assets inside it by running the following query in SQL Editor. Confirm the catalog name carefully: deletion cannot be undone.
+
+    ```sql
+    DROP CATALOG {{ cat }} CASCADE;
+    ```
+
+## Feedback
+
+If you have feedback or suggestions for improvement about this lab, please leave it on [GitHub Issues]({{ s.lab.repo_url }}/issues).
+
+Thank you for your hard work!

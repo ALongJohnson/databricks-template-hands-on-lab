@@ -1,0 +1,2 @@
+# Optional: only needed to generate Step 4.5 PDFs (scripts/make_documents.py)
+fpdf2>=2.7

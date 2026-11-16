@@ -1,0 +1,149 @@
+{% set w = s.dashboard.widgets %}{% set hm = w.heatmap %}{% set hg = w.histogram %}{% set sb = w.stacked_bar %}{% set bb = w.bubble %}
+# 2.2) Build Core Widgets
+
+On this page, you will manually create four **segment and distribution** widgets on the `① Build It Yourself` tab that show {{ s.dashboard.subject }} from multiple angles.
+
+| # | Widget | Type | Shows |
+|---|---|---|---|
+| 1 | {{ hm.title }} | Heatmap | {{ hm.shows }} |
+| 2 | {{ hg.title }} | Histogram | {{ hg.shows }} |
+| 3 | {{ sb.title }} | Bar (stacked, horizontal) | {{ sb.shows }} |
+| 4 | {{ bb.title }} | Scatter (bubble) | {{ bb.shows }} |
+
+!!! info "Chart colors"
+    Chart colors in the screenshots depend on the dashboard theme. With the default theme, charts use blue and orange.
+
+## Task 1 - Add datasets for segment and distribution widgets
+
+Histograms and bubble charts require data at a different row granularity than the `{{ ds_main.name }}` dataset. Create two more datasets.
+
+| Dataset | Row unit | Row count | Used by widget |
+|---|---|---|---|
+| `{{ ds_hist.name }}` | {{ ds_hist.row_unit }} | {{ ds_hist.rows | num }} | {{ hg.title_short }} (Histogram) |
+| `{{ ds_bubble.name }}` | {{ ds_bubble.row_unit }} | {{ ds_bubble.rows | num }} | {{ bb.title }} (Scatter) |
+
+1. Use the same method as [Task 2 in 2.1)](2-1-dataset.md#task-2): click **Data** tab → **Add SQL dataset**, paste the query below, run it, and rename the dataset to `{{ ds_hist.name }}`.
+
+    ```sql title="{{ ds_hist.name }} dataset"
+    --8<-- "lab-files/eng/step2/{{ ds_hist.file }}"
+    ```
+
+2. Create another dataset using the query below and rename it to `{{ ds_bubble.name }}`.
+
+    ```sql title="{{ ds_bubble.name }} dataset"
+    --8<-- "lab-files/eng/step2/{{ ds_bubble.file }}"
+    ```
+
+3. Click the `① Build It Yourself` tab at the top to switch to the first tab.
+
+    {{ shot('02-aibi-dashboard/2-2-01-page-1.png', '① Build It Yourself tab') }}
+{% if ds_hist.note %}
+
+!!! info "{{ ds_hist.note.title }}"
+    {{ ds_hist.note.body | indent(4) }}
+{% endif %}
+
+## Task 2 - {{ hm.title_short }}
+
+{{ hm.intro }}
+
+1. Click **Add a visualization** (chart icon) in the toolbar at the bottom, then click an empty area on the canvas to place the widget. A new widget appears with an input box (**Ask Genie Code to edit this chart...**), but on this tab you'll configure directly in the right panel. If an **All your data in one place** message appears the first time, close it.
+
+    {{ shot('02-aibi-dashboard/2-2-18-add-segment-widget.png', 'Place segment widget') }}
+
+2. Open the **Visualization** dropdown and scroll down to select **Heatmap**.
+
+    {{ shot('02-aibi-dashboard/2-2-19-heatmap-type.png', 'Select Heatmap') }}
+
+3. Click the **+** button next to **X axis**. Since there are multiple datasets, the field list is grouped by dataset. Expand **{{ ds_main.name }}** and select `{{ hm.x }}`.
+
+    {{ shot('02-aibi-dashboard/2-2-20-heatmap-dataset.png', 'Expand dataset and select field') }}
+
+4. Select `{{ hm.y }}` for **Y axis** and `{{ hm.color }}` for **Color**.
+
+    {{ shot('02-aibi-dashboard/2-2-21-heatmap-fields.png', 'Configure Heatmap fields') }}
+
+5. Click `SUM({{ hm.color }})` under **Color** and select **{{ hm.color_agg }}** under **Transform**. {{ hm.color_agg_note }}
+
+    {{ shot('02-aibi-dashboard/2-2-22-heatmap-avg.png', 'Change Color aggregation to ' ~ hm.color_agg) }}
+
+6. Enable **Labels** at the bottom of the panel to show values in cells. Check **Title** at the top to add a title input. Enter the title `{{ hm.title }}`.
+
+    {{ shot('02-aibi-dashboard/2-2-23-heatmap-result.png', 'Heatmap complete') }}
+
+7. {{ hm.verify }}
+{% if hm.tip %}
+
+!!! tip "{{ hm.tip.title }}"
+    {{ hm.tip.body | indent(4) }}
+{% endif %}
+
+## Task 3 - {{ hg.title_short }}
+
+1. Click **Add a visualization** and place another widget to the right of the heatmap. Select **Histogram** from **Visualization**.
+
+2. Click the **+** button next to **X axis**. This time, expand **{{ ds_hist.name }}** and select `{{ hg.x }}`.
+
+    {{ shot('02-aibi-dashboard/2-2-24-histogram-dataset.png', 'Select field from ' ~ ds_hist.name ~ ' dataset') }}
+
+3. Select **COUNT(\*)** for **Y axis**.
+
+4. Click `BIN({{ hg.x }})` on the X axis and make sure **Bin size** is `{{ hg.bin_size }}` (change it if it isn't). {{ hg.bin_note }}
+
+    {{ shot('02-aibi-dashboard/2-2-25-histogram-bin.png', 'Bin size ' ~ hg.bin_size) }}
+
+5. Check **Title** and enter the title `{{ hg.title }}`.
+
+    {{ shot('02-aibi-dashboard/2-2-26-histogram-result.png', hg.title_short ~ ' widget') }}
+
+6. {{ hg.verify }}
+
+## Task 4 - {{ sb.title }}
+
+1. Click **Add a visualization** and place another widget below the heatmap. Keep **Visualization** as the default **Bar**.
+
+2. Select `{{ sb.x }}` from **{{ ds_main.name }}** for **X axis**, **COUNT(\*)** for **Y axis**, and `{{ sb.color }}` for **Color**. {{ sb.color_note }}
+
+    {{ shot('02-aibi-dashboard/2-2-27-stacked-fields.png', 'Configure stacked bar fields') }}
+
+3. Click the **⇅** (swap axes) icon between **X axis** and **Y axis** to switch to horizontal bars. {{ sb.swap_note }}
+
+    {{ shot('02-aibi-dashboard/2-2-28-stacked-swap.png', 'Swap axes') }}
+
+4. Check **Title** and enter the title `{{ sb.title }}`.
+
+    {{ shot('02-aibi-dashboard/2-2-29-stacked-result.png', sb.title ~ ' widget') }}
+{% if sb.verify %}
+
+5. {{ sb.verify }}
+{% endif %}
+
+## Task 5 - {{ bb.title }}
+
+1. Click **Add a visualization** and place another widget to the right of the stacked bar. Select **Scatter** from **Visualization**.
+
+    {{ shot('02-aibi-dashboard/2-2-30-bubble-type.png', 'Select Scatter') }}
+
+2. Click the **+** button next to **X axis**. Expand **{{ ds_bubble.name }}** and select `{{ bb.x }}`. Select `{{ bb.y }}` for **Y axis**. {{ bb.point_note }}
+
+3. Select `{{ bb.size }}` for **Size** and `{{ bb.color }}` for **Color**. {{ bb.size_note }}
+
+    {{ shot('02-aibi-dashboard/2-2-31-bubble-fields.png', 'Configure bubble chart fields') }}
+
+4. Check **Title** and enter the title `{{ bb.title }}`.
+
+5. {{ bb.verify }}
+{% if bb.tip %}
+
+!!! tip "{{ bb.tip.title }}"
+    {{ bb.tip.body | indent(4) }}
+{% endif %}
+
+## Task 6 - Review the segment and distribution section
+
+1. Arrange the four widgets in a 2×2 layout.
+
+    {{ shot('02-aibi-dashboard/2-2-32-segment-result.png', 'Completed segment and distribution') }}
+
+!!! success "Congratulations!"
+    You have manually created four segment and distribution widgets. On the next page, you will use Genie Code to create dashboard widgets with a single prompt.

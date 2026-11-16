@@ -1,0 +1,69 @@
+{% set g = s.dashboard.genie_code %}
+# 2.3) Build with Genie Code
+
+On this page, you will use **Genie Code** to create dashboard widgets with a single natural-language prompt on the `② Build with Genie Code` tab.
+
+## Task 1 - Open Genie Code
+
+1. Click the `② Build with Genie Code` tab at the top.
+
+    {{ shot('02-aibi-dashboard/2-3-01-page-2.png', '② Build with Genie Code tab') }}
+
+2. Click the **Genie Code** icon in the top right. The Genie Code panel opens on the right with an input field at the bottom.
+
+    {{ shot('02-aibi-dashboard/2-3-02-open-genie-code.png', 'Open Genie Code panel') }}
+
+## Task 2 - Enter a prompt
+
+1. Paste the prompt below into the Genie Code input field and submit.
+
+    !!! prompt "Prompt"
+        ```text
+        {{ g.prompt | trim | indent(8) }}
+        ```
+
+    !!! tip "Why include definitions in the prompt?"
+        {{ g.prompt_tip | trim | indent(8) }}
+
+    {{ shot('02-aibi-dashboard/2-3-03-prompt.png', 'Enter prompt') }}
+
+2. Genie Code reads the dashboard configuration and data, then creates widgets and places them on the canvas. The step names shown in the panel may vary. This takes about a minute. Wait until a summary appears in the panel.
+
+    {{ shot('02-aibi-dashboard/2-3-04-generating.png', 'Genie Code creating widgets') }}
+
+## Task 3 - Review results and refine
+
+1. Check the widgets Genie Code created. Verify that all requested items appear:
+
+    | Item | Widget type (example) |
+    |---|---|
+{% for r in g.expected %}
+    | {{ r.item }} | {{ r.widget }} |
+{% endfor %}
+
+    {{ shot('02-aibi-dashboard/2-3-05-result.png', 'Widgets created by Genie Code') }}
+
+2. Widgets created by Genie Code are automatically applied to the canvas. If any widget has an error (**Unable to render visualization**) or needs adjusting, enter a follow-up request in the same panel. {{ g.followup_intro }}
+
+    !!! prompt "Prompt"
+        ```text
+        {{ g.followup_prompt | trim | indent(8) }}
+        ```
+
+    {{ shot('02-aibi-dashboard/2-3-06-accept.png', 'Update a widget with a follow-up request') }}
+
+!!! tip "Results may vary slightly"
+    Since Genie Code is a generative AI, the same prompt can produce slightly different widget types, layouts, and titles for each user. If the result doesn't match expectations, refine with follow-up requests like "{{ g.refine_example }}"
+
+## Task 4 - Publish the dashboard
+
+1. Click **Publish** in the top right.
+
+    {{ shot('02-aibi-dashboard/2-3-07-publish.png', 'Publish') }}
+
+2. Keep the **Share data permission** option at default and click **Publish**. After the sharing settings window appears, close it and click **View published** at the top to see the published dashboard. The published version shows only the two page tabs without the **Data** tab.
+
+    {{ shot('02-aibi-dashboard/2-3-08-published.png', 'Published dashboard') }}
+
+!!! success "Congratulations!"
+    You have completed the {{ s.dashboard.title }} dashboard. However, metrics like {{ g.local_metrics }} are defined only in this dashboard's SQL, so if someone calculates them elsewhere, the numbers might differ. In the next Step, {{ da.name }} will define business metrics using **Unity Catalog Semantics** so the whole organization sees the same numbers.

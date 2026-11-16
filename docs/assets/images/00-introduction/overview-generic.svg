@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 520" font-family="DM Sans, Helvetica, Arial, sans-serif">
+  <title>From raw source data to AI agents on Databricks</title>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#9AA5A9"/></marker>
+  </defs>
+  <rect width="640" height="520" rx="28" fill="#F9F7F4"/>
+  <!-- sources -->
+  <g font-size="15" fill="#1B3139">
+    <text x="48" y="70" font-size="13" font-weight="700" letter-spacing="1.5" fill="#6B777C">YOUR DATA</text>
+    <rect x="40" y="88" width="150" height="58" rx="12" fill="#fff" stroke="#E7E3DC"/>
+    <text x="58" y="122" font-weight="600">Dimension</text>
+    <rect x="40" y="160" width="150" height="58" rx="12" fill="#fff" stroke="#E7E3DC"/>
+    <text x="58" y="194" font-weight="600">Fact table A</text>
+    <rect x="40" y="232" width="150" height="58" rx="12" fill="#fff" stroke="#E7E3DC"/>
+    <text x="58" y="266" font-weight="600">Fact table B</text>
+  </g>
+  <path d="M200 189 H246" stroke="#9AA5A9" stroke-width="3" marker-end="url(#a)"/>
+  <!-- medallion -->
+  <g font-size="15" font-weight="600">
+    <text x="262" y="70" font-size="13" font-weight="700" letter-spacing="1.5" fill="#6B777C">LAKEFLOW</text>
+    <rect x="256" y="88" width="150" height="58" rx="12" fill="#CD7F32" opacity=".9"/>
+    <text x="300" y="122" fill="#fff">Bronze</text>
+    <rect x="256" y="160" width="150" height="58" rx="12" fill="#9EA7AD"/>
+    <text x="304" y="194" fill="#fff">Silver</text>
+    <rect x="256" y="232" width="150" height="58" rx="12" fill="#E0B23A"/>
+    <text x="309" y="266" fill="#fff">Gold</text>
+  </g>
+  <path d="M416 189 H462" stroke="#9AA5A9" stroke-width="3" marker-end="url(#a)"/>
+  <!-- consumption -->
+  <g font-size="15" font-weight="600" fill="#1B3139">
+    <text x="478" y="70" font-size="13" font-weight="700" letter-spacing="1.5" fill="#6B777C">ANALYTICS &amp; AI</text>
+    <rect x="472" y="88" width="128" height="58" rx="12" fill="#fff" stroke="#E7E3DC"/>
+    <text x="490" y="122">Dashboard</text>
+    <rect x="472" y="160" width="128" height="58" rx="12" fill="#fff" stroke="#E7E3DC"/>
+    <text x="490" y="194">Genie Agent</text>
+    <rect x="472" y="232" width="128" height="58" rx="12" fill="#FF3621"/>
+    <text x="490" y="266" fill="#fff">Genie One</text>
+  </g>
+  <!-- semantic layer band -->
+  <rect x="40" y="330" width="560" height="74" rx="14" fill="#1B3139"/>
+  <text x="64" y="362" font-size="13" font-weight="700" letter-spacing="1.5" fill="#FF8A7A">UNITY CATALOG SEMANTICS</text>
+  <text x="64" y="388" font-size="16" fill="#fff">Metric Views · Domain · Pages: one definition for every KPI</text>
+  <path d="M331 300 V322" stroke="#9AA5A9" stroke-width="3" marker-end="url(#a)"/>
+  <!-- personas row -->
+  <g font-size="13" fill="#3A4A50">
+    <circle cx="96" cy="458" r="14" fill="#FF3621"/><text x="118" y="463">Data engineer</text>
+    <circle cx="246" cy="458" r="14" fill="#1B3139"/><text x="268" y="463">Analyst</text>
+    <circle cx="358" cy="458" r="14" fill="#E0B23A"/><text x="380" y="463">AI engineer</text>
+    <circle cx="492" cy="458" r="14" fill="#9EA7AD"/><text x="514" y="463">Business user</text>
+  </g>
+</svg>

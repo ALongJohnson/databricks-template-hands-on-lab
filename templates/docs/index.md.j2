@@ -1,0 +1,275 @@
+---
+hide:
+  - navigation
+  - toc
+---
+
+<div class="wb-hero" markdown>
+
+<div class="wb-hero__text" markdown>
+
+<p class="wb-hero__eyebrow">Lakeflow · AI/BI · Unity Catalog · Genie</p>
+
+# {{ s.lab.company }} <span>Hands-on Lab</span>
+
+<p class="wb-hero__lead">Build an end-to-end data & AI platform on Databricks, from raw source data all the way to AI agents.</p>
+
+<div class="wb-hero__actions" markdown>
+
+[Start the lab :material-arrow-right:](00-introduction/index.md){ .md-button .md-button--primary }
+[Check prerequisites](00-introduction/prerequisites.md){ .md-button }
+
+</div>
+
+<div class="wb-hero__facts" markdown>
+
+- :material-stairs: 5 hands-on steps
+- :material-account-group: 4 personas
+- :material-database-check: {{ s.lab.hero_data_fact }}
+- :material-clock-outline: About 3 hours
+
+</div>
+
+</div>
+
+<div class="wb-hero__art" markdown>
+
+![{{ s.lab.overview_alt }}](assets/images/{{ s.lab.overview_image }})
+
+</div>
+
+</div>
+
+## Workshop overview
+
+{{ s.company.summary }} In this lab, you step into the roles of four personas on the {{ s.lab.company }} data team and, each in their own role, use Databricks to complete a single data & AI platform.
+
+<div class="wb-personas" markdown>
+{% for key in ['data_engineer', 'data_analyst', 'ai_engineer', 'business_user'] %}{% set p = s.personas[key] %}
+
+<div class="wb-persona" markdown>
+
+![{{ p.name }}](assets/images/{{ p.avatar }})
+
+<p class="wb-persona__name">{{ p.name }}<span>{{ p.title }}</span></p>
+
+{{ p.home_role }}
+{ .wb-persona__role }
+
+</div>
+{% endfor %}
+
+</div>
+
+!!! tip "{{ s.source.home_tip_title }}"
+    {{ s.source.home_tip | indent(4) }}
+
+## Lab journey
+
+<div class="wb-journey" markdown>
+
+<div class="wb-step" markdown>
+
+<div class="wb-step__num">1</div>
+
+<div class="wb-step__main" markdown>
+
+[Build a Lakeflow Pipeline](01-lakeflow-pipeline/index.md)
+{ .wb-step__title }
+
+{{ s.text.journey_step1 }}
+{ .wb-step__task }
+
+Implement streaming ingestion, data quality checks (Expectations), and incremental processing declaratively with just a few lines of SQL.
+{ .wb-step__desc }
+
+<p class="wb-step__tags"><span>Lakeflow Spark Declarative Pipelines</span></p>
+
+</div>
+
+<div class="wb-step__who" markdown>
+
+![{{ de.name }}](assets/images/{{ de.avatar }})
+<span>{{ de.name }}<small>{{ de.title }}</small></span>
+
+<p class="wb-step__time">About 30 min</p>
+
+</div>
+
+</div>
+
+<div class="wb-step" markdown>
+
+<div class="wb-step__num">2</div>
+
+<div class="wb-step__main" markdown>
+
+[Build an AI/BI Dashboard](02-aibi-dashboard/index.md)
+{ .wb-step__title }
+
+Build a {{ s.dashboard.title }} dashboard.
+{ .wb-step__task }
+
+Configure the widgets yourself, or have Genie Code build the dashboard from a single prompt.
+{ .wb-step__desc }
+
+<p class="wb-step__tags"><span>AI/BI Dashboards</span><span>Genie Code</span></p>
+
+</div>
+
+<div class="wb-step__who" markdown>
+
+![{{ da.name }}](assets/images/{{ da.avatar }})
+<span>{{ da.name }}<small>{{ da.title }}</small></span>
+
+<p class="wb-step__time">About 35 min</p>
+
+</div>
+
+</div>
+
+<div class="wb-step" markdown>
+
+<div class="wb-step__num">3</div>
+
+<div class="wb-step__main" markdown>
+
+[Build Unity Catalog Semantics](03-uc-semantics/index.md)
+{ .wb-step__title }
+
+Define business metrics with Domains and Metric Views.
+{ .wb-step__task }
+
+Define KPIs once with Metric Views, and share business context across the organization with Domains and Pages.
+{ .wb-step__desc }
+
+<p class="wb-step__tags"><span>Metric View</span><span>Domain</span></p>
+
+</div>
+
+<div class="wb-step__who" markdown>
+
+![{{ da.name }}](assets/images/{{ da.avatar }})
+<span>{{ da.name }}<small>{{ da.title }}</small></span>
+
+<p class="wb-step__time">About 25 min</p>
+
+</div>
+
+</div>
+
+<div class="wb-step" markdown>
+
+<div class="wb-step__num">4</div>
+
+<div class="wb-step__main" markdown>
+
+[Build and Improve a Genie Agent](04-genie-agent/index.md)
+{ .wb-step__title }
+
+Build a Genie Agent for the {{ s.genie_agent.team }} and improve it.
+{ .wb-step__task }
+
+A natural-language analytics agent configured for specific data. Manage its accuracy with Monitoring and Benchmarks.
+{ .wb-step__desc }
+
+<p class="wb-step__tags"><span>Genie Agent</span><span>Monitoring</span><span>Benchmark</span><span>Page</span>{% if s.options.volumes %}<span>Volumes</span>{% endif %}</p>
+
+</div>
+
+<div class="wb-step__who wb-step__who--pair" markdown>
+
+![{{ ai.name }}](assets/images/{{ ai.avatar }})
+![{{ bu.name }}](assets/images/{{ bu.avatar }})
+<span>{{ ai.name }} · {{ bu.name }}<small>{{ ai.title }} · {{ bu.title }}</small></span>
+
+<p class="wb-step__time">About 50 min</p>
+
+</div>
+
+</div>
+
+<div class="wb-step" markdown>
+
+<div class="wb-step__num">5</div>
+
+<div class="wb-step__main" markdown>
+
+[Ask with Genie One](05-genie-one/index.md)
+{ .wb-step__title }
+
+Ask business questions in natural language.
+{ .wb-step__task }
+
+A conversational interface that answers questions using data and business definitions from across the workspace.
+{ .wb-step__desc }
+
+<p class="wb-step__tags"><span>Genie One</span></p>
+
+</div>
+
+<div class="wb-step__who" markdown>
+
+![{{ bu.name }}](assets/images/{{ bu.avatar }})
+<span>{{ bu.name }}<small>{{ bu.title }}</small></span>
+
+<p class="wb-step__time">About 15 min</p>
+
+</div>
+
+</div>
+
+</div>
+
+## Architecture
+
+<div class="wb-arch">
+{% for col in s.architecture.upstream %}
+  <div class="wb-arch__col wb-arch__col--center">
+    <p class="wb-arch__label">{{ col.label }}</p>
+{% for node in col.nodes %}
+    <div class="wb-arch__node wb-arch__node--source"><strong>{{ node.name }}</strong><span>{{ node.detail }}</span></div>
+{% endfor %}
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+{% endfor %}
+  <div class="wb-arch__col wb-arch__col--center">
+    <p class="wb-arch__label">Data source</p>
+    <div class="wb-arch__node wb-arch__node--source"><strong>{{ s.architecture.source_label }}</strong><span>{{ s.sources | map(attribute='name') | join(' · ') }}</span></div>
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col">
+    <p class="wb-arch__label">Lakeflow pipeline</p>
+    <div class="wb-arch__node"><strong>Bronze</strong><span>Ingest source data</span><em>Step 1</em></div>
+    <div class="wb-arch__node"><strong>Silver</strong><span>Cleanse and check quality</span><em>Step 1</em></div>
+    <div class="wb-arch__node"><strong>Gold</strong><span>{{ s.gold.table }}</span><em>Step 1</em></div>
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col wb-arch__col--uc">
+    <p class="wb-arch__label">Unity Catalog · Domain</p>
+    <div class="wb-arch__node"><strong>Metric View</strong><span>{{ mv1.name }} · {{ mv2.name }} (built on Silver)</span><em>Step 3</em></div>
+    <div class="wb-arch__node"><strong>Page</strong><span>{{ s.improve.pages | map(attribute='name') | join(' · ') }}</span><em>Step 4</em></div>
+{% if s.options.volumes %}
+    <div class="wb-arch__node"><strong>Volume</strong><span>{{ s.volume.label }}</span><em>Step 4</em></div>
+{% endif %}
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col">
+    <p class="wb-arch__label">Analytics & AI</p>
+    <div class="wb-arch__node"><strong>AI/BI Dashboard</strong><span>Built on the Gold table</span><em>Step 2</em></div>
+    <div class="wb-arch__node"><strong>Genie Agent</strong><span>Metric View{% if s.options.volumes %} + Volume{% endif %}</span><em>Step 4</em></div>
+    <div class="wb-arch__node wb-arch__node--accent"><strong>Genie One</strong><span>Genie Agent + Page</span><em>Step 5</em></div>
+  </div>
+</div>
+
+## Ready to start?
+
+<div class="wb-ready" markdown>
+
+- [ ] You can sign in to a Databricks workspace.
+- [ ] You have permission to create a catalog, or you have already asked your admin for it. See [Prerequisites](00-introduction/prerequisites.md) for details.
+- [ ] You can focus on the lab for about 3 hours.
+
+[Go to the introduction and start :material-arrow-right:](00-introduction/index.md){ .md-button .md-button--primary }
+
+</div>

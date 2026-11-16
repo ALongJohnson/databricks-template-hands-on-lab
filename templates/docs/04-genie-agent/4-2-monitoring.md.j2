@@ -1,0 +1,85 @@
+# 4.2) Monitoring: Collect Business Feedback
+
+On this page, you'll become {{ bu.title | role }} {{ bu.name }}, ask a business question of the Genie Agent, leave feedback when the answer is wrong, then switch back to {{ ai.name }} to review that feedback in the **Monitor** tab.
+
+## Task 1 - Ask a question as {{ bu.name }}
+
+<div class="wb-persona wb-persona--side wb-persona--switch" markdown>
+
+![{{ bu.name }}](../assets/images/{{ bu.avatar }})
+
+<p class="wb-persona__name">{{ bu.name }}<span>{{ bu.title }}</span></p>
+
+*"{{ t1.persona_quote }}"*
+
+</div>
+
+1. Click the **New chat** icon (square with a pencil) in the top right of the Genie Agent screen to start a new conversation.
+
+    {{ shot('04-genie-agent/4-2-01-new-chat.png', 'New chat') }}
+
+2. Enter and send the question below.
+
+    !!! prompt "Prompt"
+        ```text
+        {{ t1.question }}
+        ```
+
+    {{ shot('04-genie-agent/4-2-02-ask-question.png', 'Enter question') }}
+
+3. Review the result table and generated SQL via **Show code**. {{ t1.verify_wrong }}
+
+    {{ shot('04-genie-agent/4-2-03-wrong-answer.png', t1.term | capitalize ~ ' question answer') }}
+
+!!! warning "What went wrong?"
+    {{ t1.explanation | trim | indent(4) }}
+
+    | {{ t1.table.key_header }} | Genie's answer ({{ t1.wrong_measure }}) | Correct {{ t1.term }} |
+    |---|---|---|
+{% for r in t1.table.rows %}
+    | {{ r.key }} | {{ r.wrong }} | {{ r.right }} |
+{% endfor %}
+
+## Task 2 - Leave feedback
+
+1. Click the 👎 button next to **Is this useful?** below the answer.
+
+    {{ shot('04-genie-agent/4-2-04-thumbs-down.png', 'Click 👎') }}
+
+2. Select **Drew wrong conclusions** from the reasons, enter the text below in the **What went wrong?** field, then click **Submit**.
+
+    ```text
+    {{ t1.feedback | trim | indent(4) }}
+    ```
+
+    {{ shot('04-genie-agent/4-2-05-feedback-comment.png', 'Enter feedback comment') }}
+
+## Task 3 - Review feedback as {{ ai.name }} in the Monitor tab
+
+<div class="wb-persona wb-persona--side wb-persona--switch" markdown>
+
+![{{ ai.name }}](../assets/images/{{ ai.avatar }})
+
+<p class="wb-persona__name">{{ ai.name }}<span>{{ ai.title }}</span></p>
+
+*"Let me see what questions the business team asked and which answers they weren't satisfied with."*
+
+</div>
+
+1. Click **Monitor** at the top of the Genie Agent screen.
+
+    {{ shot('04-genie-agent/4-2-06-monitor-tab.png', 'Monitor tab') }}
+
+2. In **Activity digest**, verify **Thumbs down** shows 1. In the list below, find the question **{{ t1.question }}** where **Rating** is **Bad** and **Comment** contains {{ bu.name | poss }} comment, then click it.
+
+    {{ shot('04-genie-agent/4-2-07-feedback-list.png', 'Question with feedback') }}
+
+3. In the panel that opens on the right, you can see the user's question, Genie's answer (**Show code** displays the generated SQL), and {{ bu.name | poss }} comment at the bottom.
+
+    {{ shot('04-genie-agent/4-2-08-feedback-detail.png', 'Feedback detail') }}
+
+!!! tip "What Monitoring reveals"
+    Monitoring shows how real users phrase their questions and which answers don't satisfy them. From this feedback, you discovered a key problem: **the business term "{{ t1.term }}" is not defined in the Metric View**. We'll fix this problem in 4.4.
+
+!!! success "Congratulations!"
+    You've discovered one problem with the Genie Agent through user feedback. On the next page, you'll find another problem using Benchmark.
