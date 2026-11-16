@@ -13,6 +13,9 @@ one. Strings are markdown unless noted. `${catalog}` expands to `<your_name>_<na
 | `lab.hero_data_fact` | home hero fact | e.g. "Anonymized retail data" |
 | `lab.overview_image`, `overview_alt`, `scenario_image_alt` | home hero art, scenario page | optional; defaults to the generic `00-introduction/overview-generic.svg` |
 | `options.genie_code_pipeline`, `options.volumes` | include Step 1.4 / 4.5 | default true |
+| `lab.inherit_images`, `lab.inherit_exclude[]` | reuse another workshop's screenshots and PDFs (e.g. while the data is still the reference data), minus listed paths | |
+| `lab.allow_reference_terms` | lets the validator accept reference terms (Wanderbricks) while the data is unchanged | set false when the real data arrives |
+| `pipeline.engine`, `pipeline.dbt` | Step 1 as a declarative pipeline (`sdp`) or dbt Core on a Lakeflow Job (`dbt`) | see `architecture-modes.md` |
 | `naming.*` | every asset name | `catalog` doubles as Domain and Governed Tag name; `example_user` is the sample learner name |
 
 ## Story (Introduction pages)

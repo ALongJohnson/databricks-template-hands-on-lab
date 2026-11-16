@@ -67,6 +67,26 @@ def load_spec(path: Path, catalog_override: str | None = None) -> dict:
         src.setdefault("bronze", f"bronze_{src['name']}")
     # optional keys (templates test them with {% if %}; StrictUndefined needs them present)
     s.setdefault("pipeline", {}).setdefault("expectations_note", None)
+    pl = s["pipeline"]
+    pl.setdefault("engine", "sdp")            # sdp = Lakeflow Spark Declarative Pipeline; dbt = Lakeflow Job running dbt Core
+    if pl["engine"] == "dbt":
+        d = pl.setdefault("dbt", {})
+        d.setdefault("project_name", naming["catalog"])
+        d.setdefault("project_dir", f"{naming['catalog']}_dbt")
+        d.setdefault("commands", ["dbt deps", "dbt build"])
+        d.setdefault("adapter_version", "dbt-databricks>=1.8.0,<2.0.0")
+    s["lab"].setdefault("inherit_images", "")
+    s["lab"].setdefault("inherit_exclude", [])   # inherited screenshots that do not fit this workshop   # e.g. workshops/wanderbricks: reuse another workshop's screenshots
+    s["architecture"].setdefault("show_in_intro", False)
+    s["source"].setdefault("setup_code", "")
+    s["source"].setdefault("setup_intro", "")
+    s["source"].setdefault("format_note", "")
+    s["architecture"].setdefault("intro_text", "")
+    s["lab"].setdefault("allow_reference_terms", False)   # true while a workshop still reuses the reference data
+    for src in s["sources"]:
+        src.setdefault("origin", "")
+        src.setdefault("kinesis", None)
+        src["silver"].setdefault("dbt_tests", [])
     for k in ("sql_note", "total_note", "rows_note"):
         s["gold"].setdefault(k, "")
     for c in s["gold"]["columns"]:
@@ -129,6 +149,9 @@ def validate(path: Path, forbid: list[str] | None = None) -> tuple[list[str], li
         return [f"spec failed to load: {exc!r}"], []
 
     need(s["architecture"]["mode"] in MODES, f"architecture.mode must be one of {MODES}")
+    need(s["pipeline"]["engine"] in ("sdp", "dbt"), "pipeline.engine must be sdp or dbt")
+    if s["pipeline"]["engine"] == "dbt":
+        need(s["architecture"]["mode"] == "files", "pipeline.engine dbt currently supports architecture.mode files (Auto Loader via read_files)")
     need(len(s["sources"]) == 3, "sources: exactly 3 (1 dimension + 2 facts)")
     roles = [src.get("role") for src in s["sources"]]
     need(roles == ["dimension", "fact", "fact"], "sources[].role must be [dimension, fact, fact] in that order")
@@ -190,7 +213,10 @@ def validate(path: Path, forbid: list[str] | None = None) -> tuple[list[str], li
         need(len(s["volume"]["docs"]) == 2, "volume.docs: exactly 2 documents")
         need(len(s["volume"]["questions"]) == 2, "volume.questions: exactly 2 questions")
         for d in s["volume"]["docs"]:
-            if not (path.parent / "files" / d["file"]).is_file():
+            inherit = s["lab"].get("inherit_images")
+            here = (path.parent / "files" / d["file"]).is_file()
+            there = bool(inherit) and (path.parent.parent.parent / inherit / "files" / d["file"]).is_file()
+            if not (here or there):
                 warns.append(f"volume document not built yet: files/{d['file']} (run scripts/make_documents.py)")
 
     if forbid:

@@ -110,6 +110,10 @@ def main() -> None:
     wdir = (ROOT / args.workshop).resolve()
     cat = args.catalog or "hol_dryrun_" + wdir.name.replace("-", "_")
     s = load_spec(wdir / "workshop.yaml", catalog_override=cat)
+    if s["pipeline"]["engine"] != "sdp":
+        raise SystemExit("dryrun.py builds Step 1 as a Lakeflow Spark Declarative Pipeline. For pipeline.engine: dbt, "
+                         "run the rendered dbt project (lab-files/eng/step1/dbt) as a Lakeflow Job dbt task first, "
+                         "then measure with the Step 1.3 queries. dbt support in the dry run is not built yet.")
     cli = Cli(args.profile, args.warehouse_id)
     m: dict = {"catalog": cat, "sources": {}, "bronze": {}, "silver": {}, "datasets": {},
                "metric_views": {}, "checks": {}}

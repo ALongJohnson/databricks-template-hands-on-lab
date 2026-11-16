@@ -1,0 +1,6 @@
+-- {{ s.lab.company }} HOL · Step 1 · Gold: {{ s.gold.title }}
+{% if s.gold.sql_note %}
+{{ s.gold.sql_note | trim | prefix_lines('-- ') }}
+{% endif %}
+-- Column types, comments and the primary key are declared in models/schema.yml (enforced contract).
+{{ s.gold.sql | trim | dbt_refs(s) }}

@@ -1,0 +1,75 @@
+{% set d = s.pipeline.dbt %}{% set proj = '<your_name>_' ~ d.project_dir %}
+# 1.1) Bronze: Ingest Source Data
+
+On this page, you'll create a dbt project in your workspace and write Bronze models that ingest the 3 landed datasets ({{ s.sources | map(attribute='name') | map('code') | join(', ') }}) as-is with Auto Loader.
+
+## Task 1 - Create the dbt project { #task-1 }
+
+1. Click **Workspace** in the left sidebar, open your user folder (**Users** → your email), then click **Create** → **Folder**. Name it `{{ proj }}`. For example, if your name is {{ s.naming.example_user | capitalize }}, enter `{{ s.naming.example_user }}_{{ d.project_dir }}`.
+
+    {{ shot('01-lakeflow-pipeline/1-1-dbt-01-create-folder.png', 'Create the dbt project folder') }}
+
+2. Inside `{{ proj }}`, click **Create** → **Folder** and create a folder named `models`. Inside `models`, create three folders: `bronze`, `silver`, and `gold`.
+
+    {{ shot('01-lakeflow-pipeline/1-1-dbt-02-folders.png', 'dbt project folders') }}
+
+3. In `{{ proj }}`, click **Create** → **File**, name it `dbt_project.yml`, and paste the content below.
+
+    ```yaml title="dbt_project.yml"
+    --8<-- "lab-files/eng/step1/dbt/dbt_project.yml"
+    ```
+
+    {{ shot('01-lakeflow-pipeline/1-1-dbt-03-project-file.png', 'Write dbt_project.yml') }}
+
+!!! info "No profiles.yml needed"
+    A dbt project normally needs a `profiles.yml` with connection details. When a **Lakeflow Job** runs the project with a dbt task, Databricks generates the connection from the SQL warehouse, catalog, and schema you pick in the task, and injects a short-lived token. You'll set those in [1.3)](1-3-run.md).
+
+## Task 2 - Write the Bronze models
+
+Create one file per Bronze table in `models/bronze`: click **Create** → **File** in that folder, enter the file name, and paste the code.
+{% for src in s.sources %}
+
+{{ loop.index }}. `{{ src.bronze }}.sql`{{ ': ' ~ src.origin if src.origin else '' }}
+
+    ```sql title="models/bronze/{{ src.bronze }}.sql"
+    --8<-- "lab-files/eng/step1/dbt/models/bronze/{{ src.bronze }}.sql"
+    ```
+{% endfor %}
+
+    {{ shot('01-lakeflow-pipeline/1-1-dbt-04-bronze-models.png', 'Bronze models in the dbt project') }}
+
+{{ s.sources | length + 1 }}. Do not run anything yet. Wait until you've written the Silver and Gold models, then run everything together as a job in [1.3)](1-3-run.md).
+
+## Understanding the code
+
+| Syntax | Description |
+|---|---|
+| `+materialized: streaming_table` (in `dbt_project.yml`) | Every Bronze model becomes a Streaming Table. Each job run processes only newly arrived files. |
+| `from stream read_files('/Volumes/...', format => ...)` | **Auto Loader**: discovers and reads new files in the landing Volume. {{ s.source.format_note }} |
+| `{{ '{{' }} target.catalog {{ '}}' }}` | Resolves to the catalog you select in the dbt task, so the same project runs in every learner's catalog. |
+| `_ingested_at`, `_source` | Audit columns that record when data was ingested and which file it came from (`_metadata.file_path`). |
+{% for src in s.sources if src.kinesis %}
+
+!!! tip "In production: read {{ src.name }} straight from Kinesis"
+    In this lab, the {{ src.name }} events from Amazon Kinesis have already been landed as JSON files in the Volume. In production, the same Bronze model can read the stream directly with the `read_kinesis` streaming table function and a Unity Catalog service credential, then parse the payload:
+
+    ```sql
+    select
+      from_json(cast(data as string), '{{ src.kinesis.schema_hint }}') as event,
+      approximateArrivalTimestamp as _ingested_at,
+      stream as _source
+    from stream read_kinesis(
+      streamName => '{{ src.kinesis.stream_name }}',
+      initialPosition => 'trim_horizon',
+      serviceCredential => '<service_credential_name>'
+    )
+    ```
+
+    See [read_kinesis](https://docs.databricks.com/aws/en/sql/language-manual/functions/read_kinesis) for the options.
+{% endfor %}
+
+!!! tip "Role of the Bronze layer"
+    The Bronze layer preserves source data **unchanged**. If cleansing logic changes later, you can reprocess from Bronze without re-ingesting the raw data.
+
+!!! success "Congratulations!"
+    You've created the dbt project and defined 3 Bronze models. On the next page, you'll write the Silver and Gold models.

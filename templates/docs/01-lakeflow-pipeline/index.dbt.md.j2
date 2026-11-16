@@ -1,0 +1,84 @@
+{% set d = s.pipeline.dbt %}
+# 1) Build a Lakeflow Job with dbt
+
+<div class="wb-meta" markdown>
+
+- :material-clock-outline: About 35 min
+- :material-account-outline: {{ de.name }}
+- :material-file-document-multiple-outline: 3 pages
+
+</div>
+
+## Lab overview
+
+{{ s.pipeline.overview }} In this lab, you'll ingest the landed files incrementally with **Auto Loader** and transform them with **dbt Core**, then run the whole dbt project as a **Lakeflow Job**, creating tables that the analytics team can trust.
+
+## Your role in this lab
+
+<div class="wb-roles" markdown>
+
+<div class="wb-persona wb-persona--side" markdown>
+
+![{{ de.name }}](../assets/images/{{ de.avatar }})
+
+<p class="wb-persona__name">{{ de.name }}<span>{{ de.title }}</span></p>
+
+You are {{ de.name }}, a {{ de.title | role }} at {{ s.lab.company }}. You will write a dbt project that cleanses source data through Bronze → Silver → Gold stages and schedule it as a Lakeflow Job, delivering trusted tables to the next analyst, {{ da.name }}.
+
+</div>
+
+</div>
+
+## Lab architecture
+
+One dbt task in one Lakeflow Job builds 7 tables across 3 medallion layers.
+
+<div class="wb-arch">
+  <div class="wb-arch__col">
+    <p class="wb-arch__label">{{ s.architecture.source_label }}</p>
+{% for src in s.sources %}
+    <div class="wb-arch__node"><strong>{{ src.name }}</strong>{% if src.origin %}<span>{{ src.origin }}</span>{% endif %}</div>
+{% endfor %}
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col">
+    <p class="wb-arch__label">Bronze · Auto Loader</p>
+{% for src in s.sources %}
+    <div class="wb-arch__node"><strong>{{ src.bronze | wbr }}</strong><span>streaming table</span></div>
+{% endfor %}
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col">
+    <p class="wb-arch__label">Silver · dbt models + tests</p>
+{% for src in s.sources %}
+    <div class="wb-arch__node"><strong>{{ src.silver.table | wbr }}</strong></div>
+{% endfor %}
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col wb-arch__col--center">
+    <p class="wb-arch__label">Gold · dbt contract</p>
+    <div class="wb-arch__node"><strong>{{ s.gold.table | wbr }}</strong></div>
+  </div>
+</div>
+
+| Page | Content |
+|---|---|
+| [1.1) Bronze: Ingest Source Data](1-1-bronze.md) | Create the dbt project and Bronze models that ingest the 3 landed datasets as-is with Auto Loader. |
+| [1.2) Silver & Gold: Cleanse and {{ s.gold.title }}](1-2-silver-gold.md) | Write Silver models with data quality filters, a Gold model with {{ s.gold.grain }}, and the dbt tests and contract in `schema.yml`. |
+| [1.3) Run the Job and Check Results](1-3-run.md) | Create a Lakeflow Job with a dbt task, run it, and check the dbt output, data quality results and lineage. |
+
+## Features used in this lab
+
+| Feature | Description |
+|---|---|
+| **Lakeflow Jobs** (dbt task) | Runs `dbt` commands on serverless compute against a SQL warehouse, with logs and artifacts in the run page. |
+| **dbt Core** (`dbt-databricks`) | Transformations as SQL `select` models, connected with `ref()`; `dbt build` runs models and tests in dependency order. |
+| **Auto Loader** (`read_files` streaming table) | Incrementally discovers and reads new files as they land. Used in the Bronze layer. |
+| **dbt tests** | Data quality checks declared in `schema.yml`. A failing test stops the build; a `warn` test only reports. |
+| **dbt contract** | Enforces Gold column names and types and adds a primary key and column comments in Unity Catalog. |
+
+## Learning objectives
+
+- Ingest landing-zone files incrementally with Auto Loader from a dbt model.
+- Transform Bronze → Silver → Gold with dbt models, filters and tests.
+- Orchestrate the dbt project as a Lakeflow Job and read its results and lineage.

@@ -1,0 +1,89 @@
+{% set d = s.pipeline.dbt %}{% set proj = '<your_name>_' ~ d.project_dir %}{% set n_tests = (s.sources | map(attribute='silver.dbt_tests') | map('dbt_test_count') | sum) + 2 %}
+# 1.3) Run the Job and Check Results
+
+On this page, you'll create a Lakeflow Job with a dbt task, run it, and verify the dbt output, data quality results, lineage, and the final Gold table.
+
+## Task 1 - Create the job
+
+1. Click **Jobs & Pipelines** in the left sidebar, then click **Create** → **Job**.
+
+    {{ shot('01-lakeflow-pipeline/1-3-dbt-01-create-job.png', 'Create > Job') }}
+
+2. Click the job name at the top and enter `<your_name>_{{ s.naming.pipeline }}`. For example, if your name is {{ s.naming.example_user | capitalize }}, enter `{{ s.naming.example_user }}_{{ s.naming.pipeline }}`.
+
+3. Configure the first task with the values below, then click **Create task**.
+
+    | Field | Value |
+    |---|---|
+    | **Task name** | `dbt_build` |
+    | **Type** | **dbt** |
+    | **Source** | **Workspace**, then select your `{{ proj }}` folder |
+    | **dbt commands** | Replace the defaults with {{ d.commands | map('code') | join(' and ') }} (one per line) |
+    | **SQL warehouse** | Your **Serverless** SQL Warehouse (e.g., **Serverless Starter Warehouse**) |
+    | **Catalog** | `{{ cat }}` |
+    | **Schema** | `default` |
+    | **Compute** | Serverless (leave **dbt-default** selected under **Environment and Libraries**) |
+
+    {{ shot('01-lakeflow-pipeline/1-3-dbt-02-dbt-task.png', 'Configure the dbt task') }}
+
+!!! info "Why a serverless SQL warehouse?"
+    The Bronze models are Streaming Tables. dbt creates Streaming Tables and Materialized Views on a **serverless** SQL warehouse; the dbt task's own compute only runs the `dbt` CLI and sends the SQL to the warehouse.
+
+## Task 2 - Run the job and read the dbt output
+
+1. Click **Run now** at the top right. Click the run in the **Runs** tab to follow it.
+
+    {{ shot('01-lakeflow-pipeline/1-3-dbt-03-run-now.png', 'Run now') }}
+
+2. Wait until the `dbt_build` task shows **Succeeded**. The first run takes a few minutes while the warehouse and the Streaming Tables start.
+
+3. Click the `dbt_build` task to see the dbt output. `dbt build` runs each model and then the tests that depend on it, in dependency order. Verify that the last line reports **ERROR=0** and **TOTAL={{ s.sources | length * 2 + 1 + n_tests }}** (7 models and {{ n_tests }} tests).
+
+    {{ shot('01-lakeflow-pipeline/1-3-dbt-04-dbt-output.png', 'dbt output in the task run') }}
+
+!!! tip "Run it when files land"
+    In **Schedules & Triggers**, add a **File arrival** trigger on the landing Volume path. The job then runs, and Auto Loader picks up only the new files, each time new data lands in the landing zone.
+
+## Task 3 - Check results and data quality by table
+
+1. Click **SQL Editor** in the left sidebar and run the query below to compare Bronze and Silver row counts.
+
+    ```sql
+{% for src in s.sources %}
+    {{ 'SELECT' if loop.first else 'UNION ALL SELECT' }} '{{ src.name }}'{{ ' AS table_name' if loop.first else '' }},
+      (SELECT count(*) FROM {{ cat }}.default.{{ src.bronze }}){{ ' AS bronze_rows' if loop.first else '' }},
+      (SELECT count(*) FROM {{ cat }}.default.{{ src.silver.table }}){{ ' AS silver_rows' if loop.first else '' }}
+{% endfor %}
+    ```
+
+2. Verify that the results match below. The difference is the rows filtered out by the data quality rules.
+
+    | Table | Bronze rows | Silver rows | Removed |
+    |---|---|---|---|
+{% for src in s.sources %}
+    | {{ src.name }} | {{ src.rows | num }} | {{ src.silver.rows | num }} | {{ (src.rows - src.silver.rows) | num }} |
+{% endfor %}
+{% if s.pipeline.expectations_note %}
+
+    !!! info "{{ s.pipeline.expectations_note.title }}"
+        {{ s.pipeline.expectations_note.body | replace('rules show', 'conditions match') | indent(8) }}
+{% endif %}
+
+## Task 4 - View the Gold table and lineage in Catalog Explorer
+
+1. Click **Catalog** in the left sidebar, then expand `{{ cat }}` → `default`. Verify that all 7 tables created by the job are present.
+
+    {{ shot('01-lakeflow-pipeline/1-3-dbt-05-catalog-tables.png', '7 tables in Catalog Explorer') }}
+
+2. Click `{{ s.gold.table }}` and verify in the **Overview** tab that column comments and primary key (`{{ s.gold.primary_key }}`) are registered.
+
+    {{ shot('01-lakeflow-pipeline/1-3-dbt-06-gold-overview.png', s.gold.table ~ ' Overview') }}
+
+3. Click the **Lineage** tab, then **See lineage graph**. Verify the flow from the Bronze tables through Silver to `{{ s.gold.table }}`.
+
+    {{ shot('01-lakeflow-pipeline/1-3-dbt-07-lineage.png', 'Lineage graph') }}
+
+4. Click the **Sample Data** tab to view data summarized as {{ s.gold.grain }}. Total row count is {{ s.gold.rows | num }}{{ s.gold.rows_note }}.
+
+!!! success "Congratulations!"
+    You've completed {{ de.name | poss }} work. You've ingested the landed data and transformed it with dbt into Silver and Gold tables the analytics team can trust, running as a Lakeflow Job. In the next Step, you'll become {{ da.title | role }} {{ da.name }} and build a dashboard using `{{ s.gold.table }}`.

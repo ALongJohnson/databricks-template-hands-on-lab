@@ -1,0 +1,45 @@
+<div class="wb-arch{{ ' wb-arch--wide' if s.architecture.upstream else '' }}">
+{% for col in s.architecture.upstream %}
+  <div class="wb-arch__col wb-arch__col--center">
+    <p class="wb-arch__label">{{ col.label }}</p>
+{% for node in col.nodes %}
+    <div class="wb-arch__node wb-arch__node--source"><strong>{{ node.name }}</strong><span>{{ node.detail }}</span></div>
+{% endfor %}
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+{% endfor %}
+  <div class="wb-arch__col wb-arch__col--center">
+{% if s.sources | selectattr('origin') | list %}
+    <p class="wb-arch__label">{{ s.architecture.source_label }}</p>
+{% for src in s.sources %}
+    <div class="wb-arch__node wb-arch__node--source"><strong>{{ src.name }}</strong><span>{{ src.origin }}</span></div>
+{% endfor %}
+{% else %}
+    <p class="wb-arch__label">Data source</p>
+    <div class="wb-arch__node wb-arch__node--source"><strong>{{ s.architecture.source_label }}</strong><span>{{ s.sources | map(attribute='name') | join(' · ') }}</span></div>
+{% endif %}
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col">
+    <p class="wb-arch__label">{{ step1.arch_label }}</p>
+    <div class="wb-arch__node"><strong>Bronze</strong><span>{{ step1.bronze }}</span><em>Step 1</em></div>
+    <div class="wb-arch__node"><strong>Silver</strong><span>{{ step1.silver }}</span><em>Step 1</em></div>
+    <div class="wb-arch__node"><strong>Gold</strong><span>{{ (s.gold.table | wbr) if s.architecture.upstream else s.gold.table }}</span><em>Step 1</em></div>
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col wb-arch__col--uc">
+    <p class="wb-arch__label">Unity Catalog · Domain</p>
+    <div class="wb-arch__node"><strong>Metric View</strong><span>{{ mv1.name }} · {{ mv2.name }} (built on Silver)</span><em>Step 3</em></div>
+    <div class="wb-arch__node"><strong>Page</strong><span>{{ s.improve.pages | map(attribute='name') | join(' · ') }}</span><em>Step 4</em></div>
+{% if s.options.volumes %}
+    <div class="wb-arch__node"><strong>Volume</strong><span>{{ s.volume.label }}</span><em>Step 4</em></div>
+{% endif %}
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col">
+    <p class="wb-arch__label">Analytics & AI</p>
+    <div class="wb-arch__node"><strong>AI/BI Dashboard</strong><span>Built on the Gold table</span><em>Step 2</em></div>
+    <div class="wb-arch__node"><strong>Genie Agent</strong><span>Metric View{% if s.options.volumes %} + Volume{% endif %}</span><em>Step 4</em></div>
+    <div class="wb-arch__node wb-arch__node--accent"><strong>Genie One</strong><span>Genie Agent + Page</span><em>Step 5</em></div>
+  </div>
+</div>

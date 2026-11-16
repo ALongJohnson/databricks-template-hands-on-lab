@@ -1,0 +1,13 @@
+{% set fmt = src.format | default(s.architecture.files.format) %}{% set opts = (src.options | default(s.architecture.files.options) | default({})) %}
+-- {{ s.lab.company }} HOL · Step 1 · Bronze: {{ src.name }}{{ ' (' ~ src.origin ~ ')' if src.origin else '' }}
+-- Ingests the landed files as-is with Auto Loader (read_files on a streaming table) and adds audit columns.
+select
+  *,
+  current_timestamp() as _ingested_at,
+  _metadata.file_path as _source
+from stream read_files(
+  '{{ dbt_path(src.path) }}',
+  format => '{{ fmt }}'{% for k, v in opts.items() %},
+  {{ k }} => {{ v | sqlval }}{% endfor %}
+
+)

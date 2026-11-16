@@ -36,7 +36,7 @@ This pipeline creates 7 datasets across 3 medallion layers.
   <div class="wb-arch__col">
     <p class="wb-arch__label">{{ s.architecture.source_label }}</p>
 {% for src in s.sources %}
-    <div class="wb-arch__node"><strong>{{ src.name }}</strong></div>
+    <div class="wb-arch__node"><strong>{{ src.name }}</strong>{% if src.origin %}<span>{{ src.origin }}</span>{% endif %}</div>
 {% endfor %}
   </div>
   <div class="wb-arch__flow" aria-hidden="true"></div>

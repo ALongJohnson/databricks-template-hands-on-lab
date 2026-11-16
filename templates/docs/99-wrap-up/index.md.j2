@@ -12,7 +12,7 @@ You have become four personas and built an end-to-end data & AI platform for {{ 
 
 | Step | Persona | Built |
 |---|---|---|
-| 1 | {{ de.name }} · {{ de.title }} | Lakeflow pipeline, 7 Bronze, Silver, and Gold tables |
+| 1 | {{ de.name }} · {{ de.title }} | {{ step1.built }} |
 | 2 | {{ da.name }} · {{ da.title }} | {{ s.dashboard.title }} AI/BI dashboard |
 | 3 | {{ da.name }} · {{ da.title }} | 2 Metric Views (`{{ mv1.name }}`, `{{ mv2.name }}`), Domain |
 | 4 | {{ ai.name }} · {{ ai.title }} | Genie Agent, Benchmark, {{ s.improve.pages | length }} Pages ({{ s.improve.pages | map(attribute='name') | join(', ') }}){{ ', Volume' if s.options.volumes else '' }} |
@@ -20,7 +20,7 @@ You have become four personas and built an end-to-end data & AI platform for {{ 
 
 ## Learning highlights
 
-- **Declarative pipelines:** Implemented data collection, quality validation, and incremental processing with just a few lines of SQL.
+- {{ step1.highlight }}
 - **Define KPI once:** Once you define a KPI in Metric View, the dashboard, SQL, and Genie all use the same number.
 - **Standardize terminology:** Domain and Pages ensure the business team uses business terms with consistent meaning across the organization.
 - **Measurable AI quality:** Monitoring and Benchmark help you find why the AI is wrong, and measure the improvement with numbers.
@@ -32,7 +32,12 @@ You have become four personas and built an end-to-end data & AI platform for {{ 
 
 | Topic | Documentation |
 |---|---|
+{% if engine == 'dbt' %}
+| dbt Core on Lakeflow Jobs | [docs.databricks.com/aws/en/jobs/dbt](https://docs.databricks.com/aws/en/jobs/dbt) |
+| Auto Loader | [docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader](https://docs.databricks.com/aws/en/ingestion/cloud-object-storage/auto-loader/) |
+{% else %}
 | Lakeflow Spark Declarative Pipelines | [docs.databricks.com/aws/en/ldp](https://docs.databricks.com/aws/en/ldp/) |
+{% endif %}
 | AI/BI Dashboard | [docs.databricks.com/aws/en/dashboards](https://docs.databricks.com/aws/en/dashboards/) |
 | Unity Catalog Semantics (Metric View, Domain, Page) | [docs.databricks.com/aws/en/uc-semantics](https://docs.databricks.com/aws/en/uc-semantics/) |
 | Genie Agent | [docs.databricks.com/aws/en/genie](https://docs.databricks.com/aws/en/genie/) |
@@ -67,7 +72,8 @@ After completing the lab, delete your assets in the order shown below. The delet
 
     {{ shot('99-wrap-up/99-05-delete-governed-tag.png', 'Delete Governed Tag') }}
 
-6. **Pipeline:** Click the kebab menu (⋮) next to `<your_name>_{{ s.naming.pipeline }}` in **Jobs & Pipelines** and select **Delete**.
+{% if engine == 'dbt' %}6. **Job and dbt project:** Click the kebab menu (⋮) next to `<your_name>_{{ s.naming.pipeline }}` in **Jobs & Pipelines** and select **Delete**. Then delete the `<your_name>_{{ s.pipeline.dbt.project_dir }}` folder in **Workspace**.{% else %}6. **Pipeline:** Click the kebab menu (⋮) next to `<your_name>_{{ s.naming.pipeline }}` in **Jobs & Pipelines** and select **Delete**.{% endif %}
+
 
     {{ shot('99-wrap-up/99-06-delete-pipeline.png', 'Delete pipeline') }}
 

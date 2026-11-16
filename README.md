@@ -78,7 +78,12 @@ contract, and why each piece is needed, is in
 | `files` | a Volume or S3 / ADLS / GCS path | Auto Loader `read_files()` |
 | `federation` | Redshift, Snowflake, BigQuery, PostgreSQL... via Lakehouse Federation | batch Materialized Views |
 
-`architecture.upstream` draws the customer's own systems on the home-page diagram. Details:
+`architecture.upstream` draws the customer's own systems on the home-page diagram, and
+`sources[].origin` labels where each dataset comes from (e.g. Kinesis events landed as JSON).
+
+Step 1 runs on one of two engines (`pipeline.engine`): `sdp`, a Lakeflow Spark Declarative Pipeline
+(the reference), or `dbt`, a dbt Core project run by a Lakeflow Job dbt task, with Auto Loader in
+Bronze, tested Silver models and a contract-enforced Gold model. Details:
 [`references/architecture-modes.md`](.claude/skills/adapt-hands-on-lab/references/architecture-modes.md).
 
 ### Screenshots

@@ -80,6 +80,26 @@ def f_prefix_lines(text: str, prefix: str) -> str:
     return "\n".join((prefix + line).rstrip() for line in str(text).splitlines())
 
 
+def f_dq(v: str) -> str:
+    return str(v).replace("\\", "\\\\").replace('"', '\\"')
+
+
+def f_to_yaml(v) -> str:
+    return yaml.safe_dump(v, sort_keys=False, allow_unicode=True, default_flow_style=False).rstrip()
+
+
+def f_dbt_refs(sql: str, s: dict) -> str:
+    """Point bare Silver table names at dbt refs so dbt builds the lineage; drop the trailing semicolon."""
+    for src in s["sources"]:
+        t = src["silver"]["table"]
+        sql = re.sub(rf"(?<![\w.`]){re.escape(t)}(?![\w`])", "{{ ref('" + t + "') }}", sql)
+    return sql.rstrip().rstrip(";")
+
+
+def f_dbt_test_count(tests) -> int:
+    return sum(len(t.get("tests", [])) for t in (tests or []))
+
+
 def f_oxford(items) -> str:
     items = list(items)
     if len(items) <= 1:
@@ -96,7 +116,7 @@ def source_count_sql(spec: dict) -> str:
     for i, src in enumerate(spec["sources"]):
         if mode == "files":
             fmt = src.get("format", spec["architecture"]["files"].get("format", "csv"))
-            opts = {**spec["architecture"]["files"].get("options", {}), **src.get("options", {})}
+            opts = src["options"] if "options" in src else spec["architecture"]["files"].get("options", {})
             args = "".join(f", {k} => {f_sqlval(v)}" for k, v in opts.items())
             frm = f"read_files('{src['path']}', format => '{fmt}'{args})"
         else:
@@ -118,18 +138,55 @@ def source_access_permission(spec: dict) -> str:
     return ""
 
 
+STEP1 = {
+    "sdp": {
+        "title": "Build a Lakeflow Pipeline",
+        "desc": "Implement streaming ingestion, data quality checks (Expectations), and incremental processing declaratively with just a few lines of SQL.",
+        "tags": ["Lakeflow Spark Declarative Pipelines"],
+        "flow": "Lakeflow Pipeline",
+        "arch_label": "Lakeflow pipeline",
+        "bronze": "Ingest source data",
+        "silver": "Cleanse and check quality",
+        "built": "Lakeflow pipeline, 7 Bronze, Silver, and Gold tables",
+        "highlight": "**Declarative pipelines:** Implemented data collection, quality validation, and incremental processing with just a few lines of SQL.",
+    },
+    "dbt": {
+        "title": "Build a Lakeflow Job with dbt",
+        "desc": "Ingest files incrementally with Auto Loader, transform Bronze to Gold with dbt Core models and tests, and orchestrate it all as a Lakeflow Job.",
+        "tags": ["Lakeflow Jobs", "dbt Core", "Auto Loader"],
+        "flow": "Lakeflow Job · dbt",
+        "arch_label": "Lakeflow Job · dbt Core",
+        "bronze": "Auto Loader streaming tables",
+        "silver": "dbt models + tests",
+        "built": "Lakeflow Job running dbt Core, 7 Bronze, Silver, and Gold tables",
+        "highlight": "**dbt on Lakeflow Jobs:** Ingested landing-zone files with Auto Loader and turned them into tested, documented tables with dbt Core, orchestrated as a Lakeflow Job.",
+    },
+}
+
+
+def dbt_where(constraints) -> str:
+    """WHERE clause equivalent of the drop/fail Expectations (warn rules become dbt tests)."""
+    conds = [c["expr"] for c in constraints if c.get("action", "drop") != "warn"]
+    return "\n  and ".join(f"({c})" for c in conds)
+
+
 class Shots:
     """Resolves screenshot references. A shot renders only if the image exists in the
     shared UI set (docs/assets/images) or in the workshop's own images/ folder."""
 
-    def __init__(self, workshop_dir: Path):
+    def __init__(self, workshop_dir: Path, inherit: str = "", exclude=()):
         self.dirs = [workshop_dir / "images", SHARED_ASSETS / "images"]
+        self.inherit_dir = ROOT / inherit / "images" if inherit else None
+        self.exclude = set(exclude or ())
         self.missing: dict[str, list[tuple[str, str]]] = {}
         self.page = ""
         self.prefix = "../"
 
     def __call__(self, rel: str, alt: str) -> str:
-        if any((d / rel).is_file() for d in self.dirs):
+        dirs = list(self.dirs)
+        if self.inherit_dir and rel not in self.exclude:
+            dirs.append(self.inherit_dir)
+        if any((d / rel).is_file() for d in dirs):
             return f"![{alt}]({self.prefix}assets/images/{rel})"
         self.missing.setdefault(self.page, []).append((rel, alt))
         return ""
@@ -146,7 +203,8 @@ def build_env() -> Environment:
         autoescape=False,
     )
     env.filters.update(role=f_role, num=f_num, poss=f_poss, wbr=f_wbr, code=f_code, bold=f_bold, sq=f_sq,
-                       sqlval=f_sqlval, prefix_lines=f_prefix_lines, oxford=f_oxford)
+                       sqlval=f_sqlval, prefix_lines=f_prefix_lines, oxford=f_oxford,
+                       dq=f_dq, to_yaml=f_to_yaml, dbt_refs=f_dbt_refs, dbt_test_count=f_dbt_test_count)
     return env
 
 
@@ -174,6 +232,10 @@ def build_context(s: dict, shots) -> dict:
         source_access_permission=source_access_permission(s),
         upstream=lambda name: name if mode == "federation" else f"STREAM({name})",
         shot=shots,
+        engine=s["pipeline"]["engine"],
+        step1=STEP1[s["pipeline"]["engine"]],
+        dbt_where=dbt_where,
+        dbt_path=lambda path: path.replace(s["_derived"]["catalog"], "{{ target.catalog }}"),
     )
 
 
@@ -186,8 +248,16 @@ def render_lab_files(env: Environment, ctx: dict, out_dir: Path) -> None:
         out.parent.mkdir(parents=True, exist_ok=True)
         out.write_text(text)
 
-    for name in ("bronze", "silver", "gold"):
-        lab(f"step1/{name}.sql.j2", f"step1/{name}.sql")
+    if s["pipeline"]["engine"] == "dbt":
+        lab("dbt/dbt_project.yml.j2", "step1/dbt/dbt_project.yml")
+        lab("dbt/schema.yml.j2", "step1/dbt/models/schema.yml")
+        for src in s["sources"]:
+            lab("dbt/bronze.sql.j2", f"step1/dbt/models/bronze/{src['bronze']}.sql", src=src)
+            lab("dbt/silver.sql.j2", f"step1/dbt/models/silver/{src['silver']['table']}.sql", src=src)
+        lab("dbt/gold.sql.j2", f"step1/dbt/models/gold/{s['gold']['table']}.sql")
+    else:
+        for name in ("bronze", "silver", "gold"):
+            lab(f"step1/{name}.sql.j2", f"step1/{name}.sql")
     for ds in s["dashboard"]["datasets"].values():
         lab("step2/dataset.sql.j2", f"step2/{ds['file']}", ds=ds)
     for mv in s["metric_views"]:
@@ -196,7 +266,7 @@ def render_lab_files(env: Environment, ctx: dict, out_dir: Path) -> None:
 
 def render(workshop_dir: Path) -> None:
     s = load_spec(workshop_dir / "workshop.yaml")
-    shots = Shots(workshop_dir)
+    shots = Shots(workshop_dir, s["lab"]["inherit_images"], s["lab"]["inherit_exclude"])
     env = build_env()
     ctx = build_context(s, shots)
     mode = ctx["mode"]
@@ -220,11 +290,20 @@ def render(workshop_dir: Path) -> None:
     if not s["options"]["volumes"]:
         skip.add("04-genie-agent/4-5-volumes.md.j2")
 
+    engine = s["pipeline"]["engine"]
     for tpl in sorted((TEMPLATES / "docs").rglob("*.md.j2")):
         rel = tpl.relative_to(TEMPLATES / "docs").as_posix()
         if rel in skip:
             continue
-        out_rel = page_names.get(rel, rel[: -len(".j2")])
+        if rel.endswith(".dbt.md.j2"):
+            if engine != "dbt":
+                continue
+            out_name = rel[: -len(".dbt.md.j2")] + ".md"
+        else:
+            if engine == "dbt" and (TEMPLATES / "docs" / (rel[: -len(".md.j2")] + ".dbt.md.j2")).is_file():
+                continue
+            out_name = rel[: -len(".j2")]
+        out_rel = page_names.get(rel, out_name)
         shots.page = out_rel
         shots.prefix = "../" * out_rel.count("/")
         text = env.get_template(f"docs/{rel}").render(**ctx)
@@ -243,12 +322,17 @@ def render(workshop_dir: Path) -> None:
     # assets: shared, then workshop overrides
     assets_out = DOCS_OUT / "assets"
     shutil.copytree(SHARED_ASSETS, assets_out)
+    if s["lab"]["inherit_images"] and (ROOT / s["lab"]["inherit_images"] / "images").is_dir():
+        shutil.copytree(ROOT / s["lab"]["inherit_images"] / "images", assets_out / "images", dirs_exist_ok=True,
+                        ignore=lambda d, names: [n for n in names if any(Path(d, n).as_posix().endswith("/" + x) for x in s["lab"]["inherit_exclude"])])
     if (workshop_dir / "images").is_dir():
         shutil.copytree(workshop_dir / "images", assets_out / "images", dirs_exist_ok=True)
     (assets_out / "files").mkdir(exist_ok=True)
     if s["options"]["volumes"]:
         for d in s["volume"]["docs"]:
             src = workshop_dir / "files" / d["file"]
+            if not src.is_file() and s["lab"]["inherit_images"]:
+                src = ROOT / s["lab"]["inherit_images"] / "files" / d["file"]
             if not src.is_file():
                 raise SystemExit(f"Missing Step 4.5 document: {src} (run scripts/make_documents.py)")
             shutil.copy2(src, assets_out / "files" / d["file"])

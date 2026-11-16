@@ -74,16 +74,16 @@ hide:
 
 <div class="wb-step__main" markdown>
 
-[Build a Lakeflow Pipeline](01-lakeflow-pipeline/index.md)
+[{{ step1.title }}](01-lakeflow-pipeline/index.md)
 { .wb-step__title }
 
 {{ s.text.journey_step1 }}
 { .wb-step__task }
 
-Implement streaming ingestion, data quality checks (Expectations), and incremental processing declaratively with just a few lines of SQL.
+{{ step1.desc }}
 { .wb-step__desc }
 
-<p class="wb-step__tags"><span>Lakeflow Spark Declarative Pipelines</span></p>
+<p class="wb-step__tags">{% for t in step1.tags %}<span>{{ t }}</span>{% endfor %}</p>
 
 </div>
 
@@ -223,44 +223,7 @@ A conversational interface that answers questions using data and business defini
 
 ## Architecture
 
-<div class="wb-arch">
-{% for col in s.architecture.upstream %}
-  <div class="wb-arch__col wb-arch__col--center">
-    <p class="wb-arch__label">{{ col.label }}</p>
-{% for node in col.nodes %}
-    <div class="wb-arch__node wb-arch__node--source"><strong>{{ node.name }}</strong><span>{{ node.detail }}</span></div>
-{% endfor %}
-  </div>
-  <div class="wb-arch__flow" aria-hidden="true"></div>
-{% endfor %}
-  <div class="wb-arch__col wb-arch__col--center">
-    <p class="wb-arch__label">Data source</p>
-    <div class="wb-arch__node wb-arch__node--source"><strong>{{ s.architecture.source_label }}</strong><span>{{ s.sources | map(attribute='name') | join(' · ') }}</span></div>
-  </div>
-  <div class="wb-arch__flow" aria-hidden="true"></div>
-  <div class="wb-arch__col">
-    <p class="wb-arch__label">Lakeflow pipeline</p>
-    <div class="wb-arch__node"><strong>Bronze</strong><span>Ingest source data</span><em>Step 1</em></div>
-    <div class="wb-arch__node"><strong>Silver</strong><span>Cleanse and check quality</span><em>Step 1</em></div>
-    <div class="wb-arch__node"><strong>Gold</strong><span>{{ s.gold.table }}</span><em>Step 1</em></div>
-  </div>
-  <div class="wb-arch__flow" aria-hidden="true"></div>
-  <div class="wb-arch__col wb-arch__col--uc">
-    <p class="wb-arch__label">Unity Catalog · Domain</p>
-    <div class="wb-arch__node"><strong>Metric View</strong><span>{{ mv1.name }} · {{ mv2.name }} (built on Silver)</span><em>Step 3</em></div>
-    <div class="wb-arch__node"><strong>Page</strong><span>{{ s.improve.pages | map(attribute='name') | join(' · ') }}</span><em>Step 4</em></div>
-{% if s.options.volumes %}
-    <div class="wb-arch__node"><strong>Volume</strong><span>{{ s.volume.label }}</span><em>Step 4</em></div>
-{% endif %}
-  </div>
-  <div class="wb-arch__flow" aria-hidden="true"></div>
-  <div class="wb-arch__col">
-    <p class="wb-arch__label">Analytics & AI</p>
-    <div class="wb-arch__node"><strong>AI/BI Dashboard</strong><span>Built on the Gold table</span><em>Step 2</em></div>
-    <div class="wb-arch__node"><strong>Genie Agent</strong><span>Metric View{% if s.options.volumes %} + Volume{% endif %}</span><em>Step 4</em></div>
-    <div class="wb-arch__node wb-arch__node--accent"><strong>Genie One</strong><span>Genie Agent + Page</span><em>Step 5</em></div>
-  </div>
-</div>
+{% include 'docs/_arch.html.j2' %}
 
 ## Ready to start?
 

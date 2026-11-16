@@ -26,3 +26,11 @@ Before the main lab, this section will prepare your lab environment and introduc
     Learn about {{ s.lab.company }}, the business problem it faces, and meet the data team that will solve it.
 
 </div>
+{% if s.architecture.show_in_intro %}
+
+## Architecture
+
+{{ s.architecture.intro_text }}
+
+{% include 'docs/_arch.html.j2' %}
+{% endif %}

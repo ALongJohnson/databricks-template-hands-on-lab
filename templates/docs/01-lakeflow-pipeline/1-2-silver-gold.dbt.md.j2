@@ -1,0 +1,78 @@
+{% set d = s.pipeline.dbt %}{% set proj = '<your_name>_' ~ d.project_dir %}
+# 1.2) Silver & Gold: Cleanse and {{ s.gold.title }}
+
+On this page, you'll write 3 Silver models that cleanse Bronze data with data quality filters, a Gold model `{{ s.gold.table }}` that summarizes {{ s.gold.grain }}, and a `schema.yml` that declares dbt tests and the Gold contract.
+
+## Task 1 - Write the Silver models
+
+Create one file per Silver table in `models/silver` and paste the code.
+{% for src in s.sources %}
+
+{{ loop.index }}. `{{ src.silver.table }}.sql`
+
+    ```sql title="models/silver/{{ src.silver.table }}.sql"
+    --8<-- "lab-files/eng/step1/dbt/models/silver/{{ src.silver.table }}.sql"
+    ```
+{% endfor %}
+
+    {{ shot('01-lakeflow-pipeline/1-2-dbt-01-silver-models.png', 'Silver models in the dbt project') }}
+
+### Understanding the code: data quality in dbt
+
+Each Silver model reads its Bronze table with `{{ '{{' }} ref('...') {{ '}}' }}`, which also tells dbt the build order. Rows that break a data quality rule are filtered out in `WHERE`, and the tests in `schema.yml` (Task 2) check what is left.
+
+| Table | Main rules | Rows removed |
+|---|---|---|
+{% for src in s.sources %}
+| `{{ src.silver.table }}` | {{ src.silver.rules_summary }} | {{ src.silver.removed_text }} |
+{% endfor %}
+
+!!! info "Filter, test, or warn"
+    A `WHERE` condition removes bad rows. A dbt test with default severity stops `dbt build` when it fails, the same as `ON VIOLATION FAIL UPDATE` in a declarative pipeline.{% for w in warn_rules %} The `{{ w.rule }}` rule on `{{ w.table }}` is a test with `severity: warn`: it reports violations without removing rows.{% endfor %}
+
+## Task 2 - Write the Gold model and schema.yml
+
+1. In `models/gold`, create `{{ s.gold.table }}.sql` and paste the code below.
+
+    ```sql title="models/gold/{{ s.gold.table }}.sql"
+    --8<-- "lab-files/eng/step1/dbt/models/gold/{{ s.gold.table }}.sql"
+    ```
+
+2. In `models`, create `schema.yml` and paste the code below. It documents every model, declares the dbt tests, and enforces the Gold contract.
+
+    ```yaml title="models/schema.yml"
+    --8<-- "lab-files/eng/step1/dbt/models/schema.yml"
+    ```
+
+    {{ shot('01-lakeflow-pipeline/1-2-dbt-02-schema-yml.png', 'Write schema.yml') }}
+
+3. Verify your project looks like this:
+
+    ```text
+    {{ proj }}/
+    ├── dbt_project.yml
+    └── models/
+        ├── schema.yml
+        ├── bronze/   {{ s.sources | map(attribute='bronze') | join('.sql, ') }}.sql
+        ├── silver/   {{ s.sources | map(attribute='silver.table') | join('.sql, ') }}.sql
+        └── gold/     {{ s.gold.table }}.sql
+    ```
+
+### Understanding the code: {{ s.gold.title }}
+
+{{ s.gold.intro }}
+
+| Column | Description |
+|---|---|
+{% for c in s.gold.key_columns %}
+| `{{ c.name }}` | {{ c.desc }} |
+{% endfor %}
+
+!!! tip "{{ s.gold.tip_title }}"
+    {{ s.gold.tip | indent(4) }}
+
+!!! info "Contract, comments, and primary key"
+    `contract: enforced: true` makes dbt check that the model returns exactly the declared columns and types before it writes the table. The `primary_key` constraint and the column `description`s (written to Unity Catalog by `persist_docs`) give AI features like Genie the metadata they need to understand the table.
+
+!!! success "Congratulations!"
+    You've written 3 Silver models, 1 Gold model, and the tests and contract. On the next page, you'll run the project as a Lakeflow Job and verify the results.

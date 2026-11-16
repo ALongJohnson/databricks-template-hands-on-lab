@@ -1,0 +1,42 @@
+# {{ s.lab.company }} HOL · Step 1 · dbt sources of truth for docs, tests and the Gold contract
+version: 2
+
+models:
+{% for src in s.sources %}
+  - name: {{ src.bronze }}
+    description: "{{ src.bronze_comment | dq }}"
+{% endfor %}
+{% for src in s.sources %}{% set sv = src.silver %}
+
+  - name: {{ sv.table }}
+    description: "{{ sv.comment | dq }}"
+{% if sv.dbt_tests %}
+    columns:
+{% for t in sv.dbt_tests %}
+      - name: {{ t.column }}
+        data_tests:
+{{ t.tests | to_yaml | indent(10, first=True) }}
+{% endfor %}
+{% endif %}
+{% endfor %}
+
+  - name: {{ s.gold.table }}
+    description: "{{ s.gold.comment | dq }}"
+    config:
+      contract:
+        enforced: true
+    columns:
+{% for c in s.gold.columns %}
+      - name: {{ c.name }}
+        data_type: {{ c.type | lower }}
+        description: "{{ c.comment | dq }}"
+{% if c.name == s.gold.primary_key %}
+        constraints:
+          - type: not_null
+          - type: primary_key
+        data_tests: [unique, not_null]
+{% elif c.not_null %}
+        constraints:
+          - type: not_null
+{% endif %}
+{% endfor %}

@@ -27,7 +27,11 @@ def main() -> None:
     ap.add_argument("--workshop", default=os.environ.get("WORKSHOP", "workshops/wanderbricks"))
     args = ap.parse_args()
     wdir = (ROOT / args.workshop).resolve()
-    forbid = [] if wdir.name == REFERENCE else REFERENCE_TERMS
+    import yaml
+    allow = (yaml.safe_load((wdir / "workshop.yaml").read_text()).get("lab") or {}).get("allow_reference_terms", False)
+    forbid = [] if wdir.name == REFERENCE or allow else REFERENCE_TERMS
+    if allow and wdir.name != REFERENCE:
+        print("WARN  lab.allow_reference_terms is true: reference (Wanderbricks) terms are allowed; set false once the data changes")
     errors, warns = validate(wdir / "workshop.yaml", forbid=forbid)
     for w in warns:
         print(f"WARN  {w}")

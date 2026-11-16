@@ -324,6 +324,10 @@ html[lang="ko"] .md-nav {
   border-radius: 0.5rem;
   background: #fff;
 }
+/* Wide diagrams (upstream systems drawn): step badges sit above the title instead of beside it */
+.md-typeset .wb-arch--wide .wb-arch__node { padding-right: 0.6rem; }
+.md-typeset .wb-arch--wide .wb-arch__node em { position: static; display: block; margin-bottom: 0.15rem; }
+.md-typeset .wb-arch--wide .wb-arch__node strong { overflow-wrap: anywhere; }
 .md-typeset .wb-arch__node strong {
   display: block;
   font-size: 0.68rem;

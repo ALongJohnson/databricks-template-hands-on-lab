@@ -44,6 +44,11 @@ Confirm you have the following {{ 'four' if mode == 'uc_table' else 'five' }} pe
 2. Click the SQL Warehouse you want to use, then click **Permissions** in the top-right corner. Confirm that you or your group has **Can use** or higher permission.
 
     {{ shot('00-introduction/prereq-04-warehouse-permissions.png', 'SQL Warehouse Permissions') }}
+{% if engine == 'dbt' %}
+
+!!! warning "Use a serverless SQL warehouse"
+    In Step 1, dbt creates Streaming Tables for the Bronze layer, which needs a **Serverless** SQL warehouse. Pick a warehouse whose type is **Serverless** (the **Serverless Starter Warehouse** is).
+{% endif %}
 
 ### 1.3) Governed Tag creation permission { #13-governed-tag }
 
@@ -147,7 +152,25 @@ Create a catalog that will be used throughout the lab. All pipeline tables, Metr
 
     {{ shot('00-introduction/prereq-15-catalog-default-schema.png', 'Catalog and default schema') }}
 
-## Task 4 - Verify {{ s.source.noun }}
+{% if s.source.setup_code %}
+## Task 4 - Prepare the landing zone
+
+{{ s.source.setup_intro }}
+
+1. Click **New** → **Notebook** in the left sidebar. Click **Connect** at the top and select **Serverless**.
+
+2. Paste the code below into the first cell. Replace `<your_name>` in `CATALOG` with your name, then click **Run cell**.
+
+    ```python
+    {{ s.source.setup_code | trim | indent(4) }}
+    ```
+
+3. When the cell finishes, click **Catalog** → `{{ cat }}` → `default` → **Volumes** and verify that the landing Volume contains one folder per source.
+
+    {{ shot('00-introduction/prereq-15b-landing-volume.png', 'Landing Volume folders') }}
+
+{% endif %}
+## Task {{ 5 if s.source.setup_code else 4 }} - Verify {{ s.source.noun }}
 
 {{ s.source.intro }}
 

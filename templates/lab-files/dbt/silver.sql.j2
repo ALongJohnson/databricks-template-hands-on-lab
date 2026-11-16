@@ -1,0 +1,8 @@
+{% set sv = src.silver %}
+-- {{ s.lab.company }} HOL · Step 1 · Silver: {{ sv.table }}
+-- {{ sv.header }}
+-- Rows that break a data quality rule are filtered out in WHERE; schema.yml tests check the result.
+select
+{{ sv.select | trim | indent(2, first=True) }}
+from {{ '{{' }} ref('{{ src.bronze }}') {{ '}}' }}
+where {{ dbt_where(sv.constraints) }}

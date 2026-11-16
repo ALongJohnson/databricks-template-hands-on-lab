@@ -48,8 +48,30 @@ grants to the learner group, and the warehouse. Also set:
 ## Streaming sources (Kinesis, Kafka, Event Hubs)
 
 Not a mode yet. Land them to files (most customers already do: Firehose to S3, Kafka Connect
-sink) and use `files`. A native `read_kinesis` / `read_kafka` Bronze needs a service credential
-per learner and is a template change: propose it before doing it.
+sink) and use `files` with a per-source `format: json`. Label where each source comes from with
+`sources[].origin` (e.g. "Kinesis events · JSON"); it shows on every architecture diagram. Add
+`sources[].kinesis: {stream_name, schema_hint}` and Step 1.1 shows a "read it straight from
+Kinesis with `read_kinesis`" production tip. A native `read_kinesis` Bronze needs a service
+credential per learner and is a template change: propose it before doing it.
+
+## Transformation engine: Lakeflow pipeline or dbt on Lakeflow Jobs
+
+`pipeline.engine: sdp` (default) builds Step 1 as a Lakeflow Spark Declarative Pipeline.
+`pipeline.engine: dbt` (files mode only) replaces Steps 1.1 to 1.3 with a dbt Core project run by a
+Lakeflow Job dbt task:
+
+- Bronze: `streaming_table` models with `stream read_files(...)` (Auto Loader); paths use `{{ target.catalog }}`
+- Silver: `table` models; drop/fail Expectations become `WHERE` filters, warn rules become `severity: warn` tests
+- Gold: `table` model with an enforced contract (types, primary key, comments via `persist_docs`)
+- `sources[].silver.dbt_tests`: `[{column, tests: [not_null, unique, {accepted_values: ...}]}]`
+- `pipeline.dbt`: `project_name`, `project_dir`, `commands` (default `dbt deps`, `dbt build`)
+- Needs a **serverless** SQL warehouse (dbt creates Streaming Tables). Step 1.4 is SDP-only: set
+  `options.genie_code_pipeline: false`.
+
+If the data must first be landed as files (e.g. sample data exported to a Volume), put the code in
+`source.setup_code` (+ `setup_intro`): Prerequisites gets a "Prepare the landing zone" task.
+`architecture.show_in_intro: true` (+ `intro_text`) adds the architecture diagram to the
+Introduction page.
 
 ## Region notes worth checking in the target workspace
 
