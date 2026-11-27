@@ -13,6 +13,14 @@ one. Strings are markdown unless noted. `${catalog}` expands to `<your_name>_<na
 | `lab.hero_data_fact` | home hero fact | e.g. "Anonymized retail data" |
 | `lab.overview_image`, `overview_alt`, `scenario_image_alt` | home hero art, scenario page | optional; defaults to the generic `00-introduction/overview-generic.svg` |
 | `options.genie_code_pipeline`, `options.volumes` | include Step 1.4 / 4.5 | default true |
+| `options.dashboard`, `options.genie_one` | include the AI/BI dashboard step / the Genie One UI step | default true. When `dashboard` is false, `dashboard:` can be omitted and `semantics_intro` is required |
+| `options.mcp`, `options.byod` | add "Serve your Genie Agent as an MCP" (needs `mcp:`) / "Bring your own data" | default false |
+| `lab.assets_from` | reuse `images/` and `files/` of another workshop folder (for example `wanderbricks`); also allows that workshop's terms | optional |
+| `lab.hero_eyebrow`, `hero_title`, `hero_lead`, `duration` | home-page hero text | default to the reference lab's text |
+
+Steps switched off by options are skipped and the rest are renumbered in order (templates use `N.pipe`, `N.dash`,
+`N.sem`, `N.agent`, `N.one`, `N.mcp`, `N.byod`, `N.count`). Page folders keep their names (`03-uc-semantics/` is
+Step 2 when there is no dashboard). Example: `workshops/genie-agent-mcp`.
 | `naming.*` | every asset name | `catalog` doubles as Domain and Governed Tag name; `example_user` is the sample learner name |
 
 ## Story (Introduction pages)
@@ -112,3 +120,16 @@ Metric View 1 also needs `why_silver` and `explain {source, joins, synonyms_exam
 
 `checks[] {id, stage: base | improved, sql}`: any extra number quoted in prose (top-N answers,
 the trap's wrong and right values, totals). The dry run writes results to `measured.yaml`.
+
+## MCP (optional step, `options.mcp: true`)
+
+| Field | Drives |
+|---|---|
+| `mcp.overview`, `journey_task`, `product` | step intro, home-page card, the product the agent sits behind |
+| `mcp.cli_profile`, `model` | profile and model endpoint in the Python lab file `lab-files/eng/mcp/genie_mcp_agent.py` |
+| `mcp.agent_question`, `agent_verify` | question asked through the Genie Agent MCP and the measured answer (reuse the Monitoring trap question after the fix) |
+| `mcp.genie_one_question`, `genie_one_verify` | question asked through the Genie One MCP (reuse the Benchmark trap term) |
+| `mcp.consumers` | "Your product" column on the home-page architecture |
+
+Ask both questions live through both servers before you publish, and quote only measured numbers.
+

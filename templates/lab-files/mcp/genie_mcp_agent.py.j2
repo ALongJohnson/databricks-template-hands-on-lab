@@ -1,0 +1,71 @@
+"""{{ s.lab.company }} HOL · Step {{ N.mcp }} · A product agent that calls your Genie Agent over MCP.
+
+The agent runs on your laptop (or in your product backend). It has no SQL and no table
+access of its own: every data question goes to Genie over MCP, so answers use the
+Metric Views, instructions and Pages you built in Steps {{ N.sem }} and {{ N.agent }}.
+
+Setup:
+    pip install --upgrade databricks-sdk databricks-openai openai-agents "mcp>=1.24,<2"
+    databricks auth login --host https://<workspace-hostname> --profile {{ s.mcp.cli_profile }}
+
+Run:
+    export GENIE_SPACE_ID=<your Genie space ID>
+    python genie_mcp_agent.py "{{ s.mcp.agent_question }}"
+    python genie_mcp_agent.py --server genie-one "{{ s.mcp.genie_one_question }}"
+"""
+import argparse
+import asyncio
+import os
+
+from agents import Agent, Runner, set_default_openai_api, set_default_openai_client
+from agents.mcp import MCPServerStreamableHttpParams
+from agents.tracing import set_trace_processors
+from databricks.sdk import WorkspaceClient
+from databricks_openai import AsyncDatabricksOpenAI
+from databricks_openai.agents.mcp_server import McpServer
+
+PROFILE = os.environ.get("DATABRICKS_CONFIG_PROFILE", "{{ s.mcp.cli_profile }}")
+MODEL = os.environ.get("AGENT_MODEL", "{{ s.mcp.model }}")  # a tool-calling model endpoint in your workspace
+
+INSTRUCTIONS = """You are the {{ s.lab.company }} assistant inside our product.
+Answer data questions only by calling the Genie tools. Never guess numbers.
+Genie answers asynchronously: after you ask, keep calling the poll tool with the
+returned IDs until the status is completed, then answer in two or three sentences
+and say which measure Genie used."""
+
+
+def server_url(w: WorkspaceClient, server: str) -> str:
+    if server == "genie-one":
+        # Databricks-provided MCP, governed by Unity Gateway (grants, rate limits, usage)
+        return f"{w.config.host}/ai-gateway/mcp-services/system.ai.genie_one_mcp?o={w.get_workspace_id()}"
+    # Genie Agent MCP: scoped to one curated Genie Agent, governed by the agent's permissions
+    return f"{w.config.host}/api/2.0/mcp/genie/{os.environ['GENIE_SPACE_ID']}"
+
+
+async def main(server: str, question: str) -> None:
+    w = WorkspaceClient(profile=PROFILE)
+    set_default_openai_client(AsyncDatabricksOpenAI(workspace_client=w))
+    set_default_openai_api("chat_completions")
+    set_trace_processors([])  # keep traces local for this lab
+
+    async with McpServer(
+        name=f"genie-{server}",
+        params=MCPServerStreamableHttpParams(url=server_url(w, server), timeout=60),
+        workspace_client=w,
+        client_session_timeout_seconds=120,
+    ) as mcp:
+        tools = await mcp.list_tools()
+        print("MCP tools:", ", ".join(t.name for t in tools))
+        agent = Agent(name="{{ s.lab.company }} assistant", instructions=INSTRUCTIONS, model=MODEL, mcp_servers=[mcp])
+        result = await Runner.run(agent, question, max_turns=30)
+        calls = [i.raw_item.name for i in result.new_items if i.type == "tool_call_item"]
+        print("Tool calls:", ", ".join(calls) or "none")
+        print("\nAnswer:\n" + result.final_output)
+
+
+if __name__ == "__main__":
+    ap = argparse.ArgumentParser()
+    ap.add_argument("question")
+    ap.add_argument("--server", choices=["genie-agent", "genie-one"], default="genie-agent")
+    args = ap.parse_args()
+    asyncio.run(main(args.server, args.question))

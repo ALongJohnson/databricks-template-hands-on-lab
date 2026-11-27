@@ -1,5 +1,5 @@
 {% set mv = mv1 %}
-# 3.1) Metric View: {{ mv.title }}
+# {{ N.sem }}.1) Metric View: {{ mv.title }}
 
 On this page, you'll create `{{ mv.name }}`, a Metric View that defines KPIs for {{ mv.subject }}, and query it with SQL.
 
@@ -86,7 +86,7 @@ Metric View measures are queried using the `MEASURE()` function. Regardless of w
     {{ shot('03-uc-semantics/3-1-07-query-by-segment.png', mv.queries[1].shot_alt) }}
 
 !!! warning "Use `ALTER VIEW` when modifying a Metric View"
-    After linking a Governed Tag to the Metric View in 3.3), do not use `CREATE OR REPLACE VIEW` to modify it, as this will remove the Tag and break the Domain connection. Instead, use the UI **Edit** button or `ALTER VIEW ... AS $$ ... $$` to modify.
+    After linking a Governed Tag to the Metric View in {{ N.sem }}.3), do not use `CREATE OR REPLACE VIEW` to modify it, as this will remove the Tag and break the Domain connection. Instead, use the UI **Edit** button or `ALTER VIEW ... AS $$ ... $$` to modify.
 
 !!! success "Congratulations!"
     You've created `{{ mv.name }}`, a Metric View that defines {{ mv.kpi_noun }}. Next, you'll create `{{ mv2.name }}` to define {{ mv2.kpi_noun }}.

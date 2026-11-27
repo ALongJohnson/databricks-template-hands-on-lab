@@ -1,0 +1,80 @@
+{% set m = s.mcp %}
+# {{ N.mcp }}.3) Call Genie from Your Product Agent
+
+On this page, you'll run a small Python agent built with the **OpenAI Agents SDK**. It is the kind of agent that would sit behind the AI assistant in {{ m.product }}: it has no SQL and no table access of its own, and it answers every data question by calling Genie over MCP. The model runs on a Databricks model serving endpoint (`{{ m.model }}`).
+
+## Task 1 - Save the agent
+
+1. Save the following file as `genie_mcp_agent.py` in the folder where you created the Python environment in {{ N.mcp }}.1.
+
+    ```python title="genie_mcp_agent.py"
+    --8<-- "lab-files/eng/mcp/genie_mcp_agent.py"
+    ```
+
+2. Read the three parts that matter:
+
+    | Part | What it does |
+    |---|---|
+    | `server_url()` | Builds the Genie Agent MCP URL from `GENIE_SPACE_ID`, or the Genie One MCP URL from your workspace ID. |
+    | `McpServer(...)` | Connects to the MCP server with your Databricks sign-in and lists its tools. |
+    | `INSTRUCTIONS` | Tells the model to answer only through the Genie tools and to keep polling until Genie finishes. |
+
+    !!! tip "Use another model"
+        Set `AGENT_MODEL` to any tool-calling model serving endpoint in your workspace. Find them under **Serving** in the left sidebar.
+
+## Task 2 - Ask through the Genie Agent MCP
+
+You're {{ bu.title | role }} {{ bu.name }} for a moment. You type your question into the assistant, and the agent calls the Genie Agent for you.
+
+1. Make sure `GENIE_SPACE_ID` is still set (see {{ N.mcp }}.1 Task 2), then run:
+
+    ```bash
+    python genie_mcp_agent.py "{{ m.agent_question }}"
+    ```
+
+2. Verify the output starts with `MCP tools: query_space_<space-id>, poll_response_<space-id>`.
+
+3. {{ m.agent_verify }}
+
+    ```text title="Example output"
+    MCP tools: query_space_<space-id>, poll_response_<space-id>
+    Tool calls: query_space_<space-id>
+
+    Answer:
+    Here are the top 5 countries by revenue in 2024:
+    1. India - $818,028.54
+    2. China - $806,678.00
+    ...
+    Genie used the Revenue measure from the bookings data to calculate these totals.
+    ```
+
+## Task 3 - Ask through the Genie One MCP
+
+1. Run the agent against the Genie One MCP:
+
+    ```bash
+    python genie_mcp_agent.py --server genie-one "{{ m.genie_one_question }}"
+    ```
+
+2. {{ m.genie_one_verify }}
+
+    !!! info "Why so many tool calls?"
+        Genie answers asynchronously. `genie_ask` starts the answer and returns a `conversation_id` and a `response_id`; the agent then calls `genie_poll_response` until the status is `completed`. To fetch the full result table, an agent can call `genie_get_query_result`. To ask a follow-up in the same conversation, pass the same `conversation_id` to the next `genie_ask`.
+
+    !!! info "Shared workspace"
+        If other people ran this lab in the same workspace, add `Use the {{ mv1.name }} metric view in {{ cat }}.default.` to the question.
+
+## Task 4 - Plan how your product will call Genie
+
+The script runs as **you**, with your Databricks sign-in. Before you ship an agent like this inside your product, decide which identity calls Genie:
+
+| Identity | When to use it | What it needs |
+|---|---|---|
+| **Service principal** (OAuth machine-to-machine) | A shared assistant where every user may see the same data | Can Run on the Genie Agent, `SELECT` on the Metric Views, `EXECUTE` on `system.ai.genie_one_mcp` |
+| **The signed-in user** (on-behalf-of user OAuth) | Each user must only see the data they are allowed to see | The same grants per user or group. Request the `genie` scope for the Genie Agent MCP and the `ai-gateway` scope for the Genie One MCP |
+
+!!! tip "Deploy it on Databricks"
+    When you're ready, you can host an agent like this on Databricks instead of your own servers, and record every step with MLflow Tracing. Track 2 of this programme covers that path.
+
+!!! success "Done"
+    {{ bu.name }} asked business questions inside the product and got the governed answers, without ever opening Genie. Next, you'll see how Unity Gateway governs and records those calls.

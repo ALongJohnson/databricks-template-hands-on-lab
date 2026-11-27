@@ -8,24 +8,38 @@
 
 ## Key Achievements
 
-You have become four personas and built an end-to-end data & AI platform for {{ s.lab.company }}, from raw source data through to an AI that {{ s.wrapup.audience }} can ask questions directly.
+{{ s.wrapup.summary }}
 
 | Step | Persona | Built |
 |---|---|---|
 | 1 | {{ de.name }} · {{ de.title }} | Lakeflow pipeline, 7 Bronze, Silver, and Gold tables |
-| 2 | {{ da.name }} · {{ da.title }} | {{ s.dashboard.title }} AI/BI dashboard |
-| 3 | {{ da.name }} · {{ da.title }} | 2 Metric Views (`{{ mv1.name }}`, `{{ mv2.name }}`), Domain |
-| 4 | {{ ai.name }} · {{ ai.title }} | Genie Agent, Benchmark, {{ s.improve.pages | length }} Pages ({{ s.improve.pages | map(attribute='name') | join(', ') }}){{ ', Volume' if s.options.volumes else '' }} |
-| 5 | {{ bu.name }} · {{ bu.title }} | Ask business questions in Genie One |
+{% if N.dash %}
+| {{ N.dash }} | {{ da.name }} · {{ da.title }} | {{ s.dashboard.title }} AI/BI dashboard |
+{% endif %}
+| {{ N.sem }} | {{ da.name }} · {{ da.title }} | 2 Metric Views (`{{ mv1.name }}`, `{{ mv2.name }}`), Domain |
+| {{ N.agent }} | {{ ai.name }} · {{ ai.title }} | Genie Agent, Benchmark, {{ s.improve.pages | length }} Pages ({{ s.improve.pages | map(attribute='name') | join(', ') }}){{ ', Volume' if s.options.volumes else '' }} |
+{% if N.one %}
+| {{ N.one }} | {{ bu.name }} · {{ bu.title }} | Ask business questions in Genie One |
+{% endif %}
+{% if N.mcp %}
+| {{ N.mcp }} | {{ ai.name }} · {{ bu.name }} | Genie Agent MCP and Genie One MCP connected to a coding agent and to a Python product agent, governed in Unity Gateway |
+{% endif %}
+{% if N.byod %}
+| {{ N.byod }} | Your team | A plan for your own sources, Genie Agent and MCP integration |
+{% endif %}
 
 ## Learning highlights
 
 - **Declarative pipelines:** Implemented data collection, quality validation, and incremental processing with just a few lines of SQL.
-- **Define KPI once:** Once you define a KPI in Metric View, the dashboard, SQL, and Genie all use the same number.
+- **Define KPI once:** Once you define a KPI in Metric View, {{ 'the dashboard, SQL, and Genie' if N.dash else 'SQL, Genie, and every agent that calls Genie over MCP' }} all use the same number.
 - **Standardize terminology:** Domain and Pages ensure the business team uses business terms with consistent meaning across the organization.
 - **Measurable AI quality:** Monitoring and Benchmark help you find why the AI is wrong, and measure the improvement with numbers.
 {% if s.options.volumes %}
 - **Structured + unstructured:** Volumes enable analyzing documents alongside data.
+{% endif %}
+{% if N.mcp %}
+- **Genie as a tool:** Over MCP, your product, your own agents and coding agents reuse the same governed answers, with Unity Catalog permissions on every call.
+- **Governed AI traffic:** Unity Gateway controls who can call the Genie One MCP, caps call volume, and records every call in `system.ai_gateway.usage`.
 {% endif %}
 
 ## Next steps
@@ -33,11 +47,21 @@ You have become four personas and built an end-to-end data & AI platform for {{ 
 | Topic | Documentation |
 |---|---|
 | Lakeflow Spark Declarative Pipelines | [docs.databricks.com/aws/en/ldp](https://docs.databricks.com/aws/en/ldp/) |
+{% if N.dash %}
 | AI/BI Dashboard | [docs.databricks.com/aws/en/dashboards](https://docs.databricks.com/aws/en/dashboards/) |
+{% endif %}
 | Unity Catalog Semantics (Metric View, Domain, Page) | [docs.databricks.com/aws/en/uc-semantics](https://docs.databricks.com/aws/en/uc-semantics/) |
 | Genie Agent | [docs.databricks.com/aws/en/genie](https://docs.databricks.com/aws/en/genie/) |
 {% if s.options.volumes %}
 | Genie Agent Volumes | [docs.databricks.com/aws/en/genie-agents/volumes](https://docs.databricks.com/aws/en/genie-agents/volumes) |
+{% endif %}
+{% if N.mcp %}
+| MCPs on Databricks | [docs.databricks.com/aws/en/agents/mcp-tools](https://docs.databricks.com/aws/en/agents/mcp-tools/) |
+| Genie One MCP server | [docs.databricks.com/aws/en/agents/mcp-tools/genie-mcp](https://docs.databricks.com/aws/en/agents/mcp-tools/genie-mcp) |
+| Genie Agent MCP server | [docs.databricks.com/aws/en/agents/mcp-tools/genie-agent](https://docs.databricks.com/aws/en/agents/mcp-tools/genie-agent) |
+| Call MCP tools from a Python agent | [docs.databricks.com/aws/en/agents/custom-agents/use-mcp-tools](https://docs.databricks.com/aws/en/agents/custom-agents/use-mcp-tools) |
+| Govern an MCP in Unity Gateway | [docs.databricks.com/aws/en/ai-gateway/govern-mcp-service](https://docs.databricks.com/aws/en/ai-gateway/govern-mcp-service) |
+| Lakeflow Connect | [docs.databricks.com/aws/en/ingestion/overview](https://docs.databricks.com/aws/en/ingestion/overview) |
 {% endif %}
 
 ## Clean up resources
@@ -47,13 +71,19 @@ After completing the lab, delete your assets in the order shown below. The delet
 !!! warning "Delete only your own assets"
     In a shared workspace, delete only the assets with `<your_name>` in their names.
 
+{% if N.mcp %}
+1. **MCP connections:** In your terminal, run `ug mcp remove` and select the Genie connections you added in Step {{ N.mcp }}. If you added them with `claude mcp add`, run `claude mcp remove genie-one` instead. The MCP servers themselves stay in the workspace.
+
+{% endif %}
 1. **Genie Agent:** Open `<your_name> - {{ s.naming.agent }}` in **Genie Agents**, click the kebab menu (⋮) in the top-right corner, and select **Move to trash**.
 
     {{ shot('99-wrap-up/99-01-delete-genie-agent.png', 'Delete Genie Agent') }}
 
+{% if N.dash %}
 2. **Dashboard:** Open `<your_name> - {{ s.naming.dashboard }}` in **Dashboards**, click the kebab menu (⋮) in the top-right corner, select **File actions** → **Move to trash**.
 
     {{ shot('99-wrap-up/99-02-delete-dashboard.png', 'Delete dashboard') }}
+{% endif %}
 
 3. **Page:** Go to **Discover** → **Pages** and open each of {{ s.improve.pages | map(attribute='name') | map('code') | oxford }} Pages, then click the kebab menu (⋮) → **Delete**.
 

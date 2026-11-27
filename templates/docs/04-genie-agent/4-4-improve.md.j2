@@ -1,14 +1,14 @@
 {% set im = s.improve %}{% set circ = ['①', '②', '③', '④', '⑤', '⑥'] %}{% set mvt = mv1 %}
-# 4.4) Improve: Update Metric View and Create Pages
+# {{ N.agent }}.4) Improve: Update Metric View and Create Pages
 
-Both problems found in 4.2 and 4.3 stem from the same root cause: **business terms are not defined in the Metric View**. On this page, you'll use two approaches to define these terms.
+Both problems found in {{ N.agent }}.2 and {{ N.agent }}.3 stem from the same root cause: **business terms are not defined in the Metric View**. On this page, you'll use two approaches to define these terms.
 
 | Approach | Target | Effect |
 |---|---|---|
 | **① Update Metric View** | Add {{ (im.measures + im.fields) | map(attribute='name') | map('code') | join(', ') }} to `{{ mvt.name }}` | Genie Agent generates accurate SQL. |
 | **② Create Pages** | Add {{ im.pages | map(attribute='name') | map('code') | join(', ') }} Pages to Domain | Standardize term definitions across the organization, and Genie One references Pages when answering definitions. |
 
-Finally, you'll rerun Benchmark and ask the 4.2 question again to verify the improvement.
+Finally, you'll rerun Benchmark and ask the {{ N.agent }}.2 question again to verify the improvement.
 
 ## Task 1 - Add terms to the Metric View
 
@@ -119,7 +119,7 @@ Finally, you'll rerun Benchmark and ask the 4.2 question again to verify the imp
     {{ shot('04-genie-agent/4-4-13-verify-query.png', 'Verify query result') }}
 
 !!! info "UI edits preserve Tags"
-    When you edit a Metric View via **Edit** in the UI, Governed Tags connected in 3.3 are retained. When editing via SQL, use `ALTER VIEW` instead of `CREATE OR REPLACE VIEW` to preserve Tags.
+    When you edit a Metric View via **Edit** in the UI, Governed Tags connected in {{ N.sem }}.3 are retained. When editing via SQL, use `ALTER VIEW` instead of `CREATE OR REPLACE VIEW` to preserve Tags.
 
 ## Task 2 - Create business term Pages
 
@@ -140,7 +140,7 @@ Finally, you'll rerun Benchmark and ask the 4.2 question again to verify the imp
 
 3. Enter the content for **Page {{ circ[0] }} {{ im.pages[0].name }}** below:
     - Click **Click to set page name** at the top to enter the name.
-    - For **Domain**, select `{{ cat }}` created in 3.3.
+    - For **Domain**, select `{{ cat }}` created in {{ N.sem }}.3.
     - For **Synonyms**, click the **+** button to add each one, then press Enter.
     - The body has **Definition** and **Business use** headings pre-filled. Add content under each. Use the table button in the toolbar to insert a table, then delete extra rows and columns.
 
@@ -189,7 +189,7 @@ Finally, you'll rerun Benchmark and ask the 4.2 question again to verify the imp
 
 ### 3.2) Ask the Monitoring question again
 
-1. Click **Chat** at the top, then click the **New chat** icon in the top right and enter the same question as 4.2.
+1. Click **Chat** at the top, then click the **New chat** icon in the top right and enter the same question as {{ N.agent }}.2.
 
     !!! prompt "Prompt"
         ```text
@@ -211,4 +211,4 @@ Finally, you'll rerun Benchmark and ask the 4.2 question again to verify the imp
     {{ im.iteration_tip | trim | indent(4) }}
 
 !!! success "Congratulations!"
-    You've solved the problems found in Monitoring and Benchmark by updating the Metric View, and standardized business terms with Pages.{{ ' The next page is Optional: you\'ll connect ' ~ s.volume.docs_noun ~ ' to Genie Agent.' if s.options.volumes else ' In the next Step, you\'ll ask questions in Genie One.' }}
+    You've solved the problems found in Monitoring and Benchmark by updating the Metric View, and standardized business terms with Pages.{{ ' The next page is Optional: you\'ll connect ' ~ s.volume.docs_noun ~ ' to Genie Agent.' if s.options.volumes else (' In the next Step, you\'ll ask questions in Genie One.' if N.one else ' In the next Step, you\'ll serve this Genie Agent as an MCP so your product and coding agents can use it.') }}

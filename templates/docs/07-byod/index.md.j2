@@ -1,0 +1,61 @@
+# {{ N.byod }}) Bring Your Own Data
+
+<div class="wb-meta" markdown>
+
+- :material-clock-outline: About 20 min
+- :material-account-group-outline: Your team
+- :material-pencil-outline: Planning exercise, no workspace steps
+
+</div>
+
+## Lab overview
+
+You built the whole pattern on {{ s.lab.company }} sample data: a pipeline into Unity Catalog, Metric Views that define your business terms, a Genie Agent that answers in plain language, and an MCP connection that puts Genie inside a product. On this page, you'll plan the same pattern for **your** product and **your** data, so you arrive at the next session with a scope your mentor can review.
+
+## Task 1 - Map each source to an ingestion path
+
+List every system that holds data your users will ask about. For each one, pick the ingestion path from the table below.
+
+| If your data is in | Bring it into Unity Catalog with | In this lab |
+|---|---|---|
+| SaaS apps (for example Salesforce, HubSpot, ServiceNow, Workday Reports, Google Analytics 4) | **Lakeflow Connect** managed connectors | |
+| Databases (for example PostgreSQL, MySQL, SQL Server) | **Lakeflow Connect** database connectors with change data capture | |
+| Files in Amazon S3, Google Cloud Storage or Azure storage | **Auto Loader** (`read_files()` or `STREAM read_files()`) in a Lakeflow pipeline | Same Bronze → Silver → Gold pattern as Step 1 |
+| Event streams and app events | Lakeflow Connect streaming connectors, or **Zerobus Ingest** to write events straight into Delta tables | |
+| Tables you already have in Unity Catalog | `STREAM(catalog.schema.table)` in a Lakeflow pipeline | Step 1 reads `{{ s.architecture.source_label }}` this way |
+| PDFs and other documents | A Unity Catalog **Volume**, parsed into tables with AI Functions such as `ai_parse_document` and `ai_extract` | {% if s.options.volumes %}Step {{ N.agent }}.5 attaches PDFs to the Genie Agent{% endif %} |
+| Spreadsheets | Upload to start, then replace with a scheduled pipeline from the system of record | |
+
+!!! warning "Keep sensitive data protected"
+    Decide early which columns hold personal or regulated data. Mask them or filter rows with Unity Catalog row filters and column masks before you connect a Genie Agent. Genie and every MCP client only see what the caller is allowed to see, so the rules you set in Unity Catalog follow your data into your product.
+
+## Task 2 - Fill in your plan
+
+Copy this worksheet into your notes and fill in one row per item.
+
+```text title="My Genie Agent plan"
+Product feature:     <where the AI assistant appears in your product, and who uses it>
+5 to 10 questions:   <the questions your users ask most often>
+Sources:             <system → ingestion path from Task 1 → refresh frequency>
+Gold tables:         <the cleaned tables your questions need>
+Metric Views:        <measures and dimensions, with the business definition of each>
+Ambiguous terms:     <terms like "revenue" or "active customer" that need one agreed definition>
+Genie Agent:         <name, Metric Views it uses, instructions, sample questions, benchmark questions>
+MCP server:          <Genie Agent MCP, Genie One MCP, or both, and why>
+Caller identity:     <service principal, or on-behalf-of user>
+Governance:          <who gets EXECUTE and Can Run, masked columns, rate limit>
+```
+
+!!! tip "Start from the traps"
+    Your best benchmark questions are the ones where people in your company disagree today, like "{{ t1.term }}" and "{{ t2.term }}" in this lab. Write the ground-truth SQL for each one before you build the Genie Agent.
+
+## Task 3 - Check your plan against the target
+
+Before your next mentor session, check your plan against these three conditions. A plan that meets all three can go to an enterprise buyer.
+
+- [ ] **Production data, on a schedule.** Your production sources reach Unity Catalog through scheduled Lakeflow Connect or Lakeflow pipelines, not a one-off file upload.
+- [ ] **A Genie Agent on those tables.** It is built on your Metric Views, with instructions, sample questions and benchmark questions that pass.
+- [ ] **Served over MCP and called from your product.** Your product's agent calls the Genie Agent MCP or the Genie One MCP with the right identity, and the calls show up in Unity Gateway.
+
+!!! success "Congratulations!"
+    You have a plan to move the pattern from {{ s.lab.company }} to your own product. Bring it to your next mentor session.

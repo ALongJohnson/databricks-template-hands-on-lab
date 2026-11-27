@@ -1,0 +1,84 @@
+{% set m = s.mcp %}
+# {{ N.mcp }}) Serve Your Genie Agent as an MCP
+
+<div class="wb-meta" markdown>
+
+- :material-clock-outline: About 45 min
+- :material-account-outline: {{ ai.name }}, {{ bu.name }}
+- :material-file-document-multiple-outline: 4 pages
+
+</div>
+
+## Lab overview
+
+{{ m.overview }}
+
+The **Model Context Protocol (MCP)** is an open standard that lets an AI agent discover and call tools. Databricks provides MCP servers for Genie, so any MCP client (your product's agent, an agent you write in Python, or a coding agent such as Claude Code or Cursor) can ask Genie a question in plain language and get back an answer, the SQL it ran, and the result.
+
+!!! tip "Why not let the agent write SQL itself?"
+    An agent that writes SQL against raw tables has to guess what "{{ t1.term }}" or "{{ t2.term }}" means, and it sees every table its credentials can reach. When it calls Genie instead, it gets the definitions you agreed in Step {{ N.sem }} and Step {{ N.agent }}, and Unity Catalog still checks the caller's permissions on every query.
+
+## Your role in this lab
+
+<div class="wb-roles" markdown>
+
+<div class="wb-persona wb-persona--side" markdown>
+
+![{{ ai.name }}](../assets/images/{{ ai.avatar }})
+
+<p class="wb-persona__name">{{ ai.name }}<span>{{ ai.title }}</span></p>
+
+You continue as {{ ai.title | role }} {{ ai.name }}. You connect the Genie Agent to a coding agent, build a small product agent in Python that calls it, and check how Unity Gateway governs and records the calls.
+
+</div>
+
+<div class="wb-persona wb-persona--side" markdown>
+
+![{{ bu.name }}](../assets/images/{{ bu.avatar }})
+
+<p class="wb-persona__name">{{ bu.name }}<span>{{ bu.title }}</span></p>
+
+In {{ N.mcp }}.3, {{ bu.name }} asks the same questions through the product agent instead of opening Genie, and gets the same governed answers.
+
+</div>
+
+</div>
+
+## Two MCP servers for Genie
+
+| | Genie Agent MCP | Genie One MCP |
+|---|---|---|
+| Answers from | One curated Genie Agent: its Metric Views, instructions and examples | Everything you can access in the workspace, grounded in Genie Ontology (Metric Views, Domains, **Pages**) |
+| URL | `https://<workspace-hostname>/api/2.0/mcp/genie/<space-id>` | `https://<workspace-hostname>/ai-gateway/mcp-services/system.ai.genie_one_mcp?o=<workspace-id>` |
+| Tools | `query_space_<space-id>`, `poll_response_<space-id>` | `genie_ask`, `genie_poll_response`, `genie_get_query_result`, `genie_cancel_response` |
+| Access | Permissions on the Genie Agent and its data | `EXECUTE` on `system.ai.genie_one_mcp`, plus permissions on the data |
+| Unity Gateway | Calls **bypass** Unity Gateway | Calls go **through** Unity Gateway: grants, rate limits, policies, usage records |
+| OAuth scope | `genie` | `ai-gateway` |
+| Status | Public Preview (needs the **Managed MCP Servers** preview) | Generally available |
+| Best for | A product feature scoped to one business area, such as the {{ s.genie_agent.team }} | Open questions and business-term definitions across the workspace |
+
+Both servers are read-only. They query data and never write to your tables.
+
+<div class="wb-flow">
+<div class="wb-flow__track">
+<div class="wb-flow__item"><small>Client</small><strong>Product agent · coding agent</strong><span>Asks in plain language</span></div>
+<div class="wb-flow__arrow" aria-hidden="true"></div>
+<div class="wb-flow__item"><small>MCP</small><strong>Genie Agent MCP · Genie One MCP</strong><span>Tool call</span></div>
+<div class="wb-flow__arrow" aria-hidden="true"></div>
+<div class="wb-flow__item"><small>Genie</small><strong>Writes and runs SQL</strong><span>Uses Metric Views and Pages</span></div>
+<div class="wb-flow__arrow" aria-hidden="true"></div>
+<div class="wb-flow__item"><small>Unity Catalog</small><strong>{{ mv1.name }} · {{ mv2.name }}</strong><span>Permissions checked</span></div>
+</div>
+</div>
+
+## Lab structure
+
+| Page | Content |
+|---|---|
+| [{{ N.mcp }}.1) Get Access and the Server URLs](6-1-access.md) | Install the local tools, find your Genie space ID and workspace ID, and confirm you can call both servers. |
+| [{{ N.mcp }}.2) Connect a Coding Agent](6-2-coding-agent.md) | Add both MCP servers to Claude Code or Cursor and ask the {{ N.agent }}.2 question again. |
+| [{{ N.mcp }}.3) Call Genie from Your Product Agent](6-3-product-agent.md) | Run a small Python agent, the kind that would sit behind {{ m.product }}, against each server. |
+| [{{ N.mcp }}.4) Govern and Observe in Unity Gateway](6-4-govern.md) | Review who can call the Genie One MCP, cap its call volume, and query every call in a system table. |
+
+!!! info "Before you start"
+    You need the Genie Agent from Step {{ N.agent }} with the {{ N.agent }}.4 improvements in place, Python 3.12 on your computer, and a terminal. A coding agent (Claude Code or Cursor) is optional for {{ N.mcp }}.2.

@@ -122,8 +122,8 @@ class Shots:
     """Resolves screenshot references. A shot renders only if the image exists in the
     shared UI set (docs/assets/images) or in the workshop's own images/ folder."""
 
-    def __init__(self, workshop_dir: Path):
-        self.dirs = [workshop_dir / "images", SHARED_ASSETS / "images"]
+    def __init__(self, workshop_dir: Path, extra_dirs: list[Path] | None = None):
+        self.dirs = [workshop_dir / "images", *(extra_dirs or []), SHARED_ASSETS / "images"]
         self.missing: dict[str, list[tuple[str, str]]] = {}
         self.page = ""
         self.prefix = "../"
@@ -163,9 +163,10 @@ def build_context(s: dict, shots) -> dict:
         bu=s["personas"]["business_user"],
         mv1=s["metric_views"][0],
         mv2=s["metric_views"][1],
-        ds_main=s["dashboard"]["datasets"]["main"],
-        ds_hist=s["dashboard"]["datasets"]["histogram"],
-        ds_bubble=s["dashboard"]["datasets"]["bubble"],
+        N=s["_derived"]["steps"],
+        ds_main=s["dashboard"]["datasets"]["main"] if s["options"]["dashboard"] else None,
+        ds_hist=s["dashboard"]["datasets"]["histogram"] if s["options"]["dashboard"] else None,
+        ds_bubble=s["dashboard"]["datasets"]["bubble"] if s["options"]["dashboard"] else None,
         t1=s["traps"]["monitoring"],
         t2=s["traps"]["benchmark"],
         warn_rules=s["_derived"]["warn_rules"],
@@ -188,15 +189,19 @@ def render_lab_files(env: Environment, ctx: dict, out_dir: Path) -> None:
 
     for name in ("bronze", "silver", "gold"):
         lab(f"step1/{name}.sql.j2", f"step1/{name}.sql")
-    for ds in s["dashboard"]["datasets"].values():
-        lab("step2/dataset.sql.j2", f"step2/{ds['file']}", ds=ds)
+    if s["options"]["dashboard"]:
+        for ds in s["dashboard"]["datasets"].values():
+            lab("step2/dataset.sql.j2", f"step2/{ds['file']}", ds=ds)
     for mv in s["metric_views"]:
         lab("step3/mv.yaml.j2", f"step3/{mv['name']}.yaml", mv=mv)
+    if s["options"]["mcp"]:
+        lab("mcp/genie_mcp_agent.py.j2", "mcp/genie_mcp_agent.py")
 
 
 def render(workshop_dir: Path) -> None:
     s = load_spec(workshop_dir / "workshop.yaml")
-    shots = Shots(workshop_dir)
+    base = (ROOT / "workshops" / s["lab"]["assets_from"]) if s["lab"]["assets_from"] else None
+    shots = Shots(workshop_dir, [base / "images"] if base else None)
     env = build_env()
     ctx = build_context(s, shots)
     mode = ctx["mode"]
@@ -219,10 +224,12 @@ def render(workshop_dir: Path) -> None:
         skip.add("01-lakeflow-pipeline/1-4-optional-genie-code-vdp.md.j2")
     if not s["options"]["volumes"]:
         skip.add("04-genie-agent/4-5-volumes.md.j2")
+    skip_dirs = [d for d, on in (("02-aibi-dashboard/", s["options"]["dashboard"]), ("05-genie-one/", s["options"]["genie_one"]),
+                                 ("06-mcp/", s["options"]["mcp"]), ("07-byod/", s["options"]["byod"])) if not on]
 
     for tpl in sorted((TEMPLATES / "docs").rglob("*.md.j2")):
         rel = tpl.relative_to(TEMPLATES / "docs").as_posix()
-        if rel in skip:
+        if rel in skip or any(rel.startswith(d) for d in skip_dirs):
             continue
         out_rel = page_names.get(rel, rel[: -len(".j2")])
         shots.page = out_rel
@@ -243,12 +250,15 @@ def render(workshop_dir: Path) -> None:
     # assets: shared, then workshop overrides
     assets_out = DOCS_OUT / "assets"
     shutil.copytree(SHARED_ASSETS, assets_out)
-    if (workshop_dir / "images").is_dir():
-        shutil.copytree(workshop_dir / "images", assets_out / "images", dirs_exist_ok=True)
+    for img_dir in ([base / "images"] if base else []) + [workshop_dir / "images"]:
+        if img_dir.is_dir():
+            shutil.copytree(img_dir, assets_out / "images", dirs_exist_ok=True)
     (assets_out / "files").mkdir(exist_ok=True)
     if s["options"]["volumes"]:
         for d in s["volume"]["docs"]:
             src = workshop_dir / "files" / d["file"]
+            if not src.is_file() and base:
+                src = base / "files" / d["file"]
             if not src.is_file():
                 raise SystemExit(f"Missing Step 4.5 document: {src} (run scripts/make_documents.py)")
             shutil.copy2(src, assets_out / "files" / d["file"])

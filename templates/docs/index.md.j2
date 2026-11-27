@@ -8,11 +8,11 @@ hide:
 
 <div class="wb-hero__text" markdown>
 
-<p class="wb-hero__eyebrow">Lakeflow · AI/BI · Unity Catalog · Genie</p>
+<p class="wb-hero__eyebrow">{{ s.lab.hero_eyebrow }}</p>
 
-# {{ s.lab.company }} <span>Hands-on Lab</span>
+# {{ s.lab.company }} <span>{{ s.lab.hero_title }}</span>
 
-<p class="wb-hero__lead">Build an end-to-end data & AI platform on Databricks, from raw source data all the way to AI agents.</p>
+<p class="wb-hero__lead">{{ s.lab.hero_lead }}</p>
 
 <div class="wb-hero__actions" markdown>
 
@@ -23,10 +23,10 @@ hide:
 
 <div class="wb-hero__facts" markdown>
 
-- :material-stairs: 5 hands-on steps
+- :material-stairs: {{ N.count }} hands-on steps
 - :material-account-group: 4 personas
 - :material-database-check: {{ s.lab.hero_data_fact }}
-- :material-clock-outline: About 3 hours
+- :material-clock-outline: {{ s.lab.duration }}
 
 </div>
 
@@ -98,9 +98,10 @@ Implement streaming ingestion, data quality checks (Expectations), and increment
 
 </div>
 
+{% if N.dash %}
 <div class="wb-step" markdown>
 
-<div class="wb-step__num">2</div>
+<div class="wb-step__num">{{ N.dash }}</div>
 
 <div class="wb-step__main" markdown>
 
@@ -128,9 +129,10 @@ Configure the widgets yourself, or have Genie Code build the dashboard from a si
 
 </div>
 
+{% endif %}
 <div class="wb-step" markdown>
 
-<div class="wb-step__num">3</div>
+<div class="wb-step__num">{{ N.sem }}</div>
 
 <div class="wb-step__main" markdown>
 
@@ -160,7 +162,7 @@ Define KPIs once with Metric Views, and share business context across the organi
 
 <div class="wb-step" markdown>
 
-<div class="wb-step__num">4</div>
+<div class="wb-step__num">{{ N.agent }}</div>
 
 <div class="wb-step__main" markdown>
 
@@ -189,9 +191,10 @@ A natural-language analytics agent configured for specific data. Manage its accu
 
 </div>
 
+{% if N.one %}
 <div class="wb-step" markdown>
 
-<div class="wb-step__num">5</div>
+<div class="wb-step__num">{{ N.one }}</div>
 
 <div class="wb-step__main" markdown>
 
@@ -219,6 +222,72 @@ A conversational interface that answers questions using data and business defini
 
 </div>
 
+{% endif %}
+{% if N.mcp %}
+<div class="wb-step" markdown>
+
+<div class="wb-step__num">{{ N.mcp }}</div>
+
+<div class="wb-step__main" markdown>
+
+[Serve your Genie Agent as an MCP](06-mcp/index.md)
+{ .wb-step__title }
+
+{{ s.mcp.journey_task }}
+{ .wb-step__task }
+
+Connect the Genie Agent MCP and the Genie One MCP to Claude Code or Cursor and to a Python agent, then govern and observe every call in Unity Gateway.
+{ .wb-step__desc }
+
+<p class="wb-step__tags"><span>Genie Agent MCP</span><span>Genie One MCP</span><span>Unity Gateway</span></p>
+
+</div>
+
+<div class="wb-step__who wb-step__who--pair" markdown>
+
+![{{ ai.name }}](assets/images/{{ ai.avatar }})
+![{{ bu.name }}](assets/images/{{ bu.avatar }})
+<span>{{ ai.name }} · {{ bu.name }}<small>{{ ai.title }} · {{ bu.title }}</small></span>
+
+<p class="wb-step__time">About 45 min</p>
+
+</div>
+
+</div>
+
+{% endif %}
+{% if N.byod %}
+<div class="wb-step" markdown>
+
+<div class="wb-step__num">{{ N.byod }}</div>
+
+<div class="wb-step__main" markdown>
+
+[Bring Your Own Data](07-byod/index.md)
+{ .wb-step__title }
+
+Map your own sources to the same pattern.
+{ .wb-step__task }
+
+Plan how your production data reaches Unity Catalog, which Genie Agent you build on it, and how your product calls it over MCP.
+{ .wb-step__desc }
+
+<p class="wb-step__tags"><span>Lakeflow Connect</span><span>Auto Loader</span><span>Zerobus Ingest</span><span>AI Functions</span></p>
+
+</div>
+
+<div class="wb-step__who" markdown>
+
+![{{ de.name }}](assets/images/{{ de.avatar }})
+<span>Your team<small>Planning exercise</small></span>
+
+<p class="wb-step__time">About 20 min</p>
+
+</div>
+
+</div>
+
+{% endif %}
 </div>
 
 ## Architecture
@@ -247,18 +316,32 @@ A conversational interface that answers questions using data and business defini
   <div class="wb-arch__flow" aria-hidden="true"></div>
   <div class="wb-arch__col wb-arch__col--uc">
     <p class="wb-arch__label">Unity Catalog · Domain</p>
-    <div class="wb-arch__node"><strong>Metric View</strong><span>{{ mv1.name }} · {{ mv2.name }} (built on Silver)</span><em>Step 3</em></div>
-    <div class="wb-arch__node"><strong>Page</strong><span>{{ s.improve.pages | map(attribute='name') | join(' · ') }}</span><em>Step 4</em></div>
+    <div class="wb-arch__node"><strong>Metric View</strong><span>{{ mv1.name }} · {{ mv2.name }} (built on Silver)</span><em>Step {{ N.sem }}</em></div>
+    <div class="wb-arch__node"><strong>Page</strong><span>{{ s.improve.pages | map(attribute='name') | join(' · ') }}</span><em>Step {{ N.agent }}</em></div>
 {% if s.options.volumes %}
-    <div class="wb-arch__node"><strong>Volume</strong><span>{{ s.volume.label }}</span><em>Step 4</em></div>
+    <div class="wb-arch__node"><strong>Volume</strong><span>{{ s.volume.label }}</span><em>Step {{ N.agent }}</em></div>
 {% endif %}
   </div>
   <div class="wb-arch__flow" aria-hidden="true"></div>
   <div class="wb-arch__col">
     <p class="wb-arch__label">Analytics & AI</p>
-    <div class="wb-arch__node"><strong>AI/BI Dashboard</strong><span>Built on the Gold table</span><em>Step 2</em></div>
-    <div class="wb-arch__node"><strong>Genie Agent</strong><span>Metric View{% if s.options.volumes %} + Volume{% endif %}</span><em>Step 4</em></div>
-    <div class="wb-arch__node wb-arch__node--accent"><strong>Genie One</strong><span>Genie Agent + Page</span><em>Step 5</em></div>
+{% if N.dash %}
+    <div class="wb-arch__node"><strong>AI/BI Dashboard</strong><span>Built on the Gold table</span><em>Step {{ N.dash }}</em></div>
+{% endif %}
+    <div class="wb-arch__node"><strong>Genie Agent</strong><span>Metric View{% if s.options.volumes %} + Volume{% endif %}</span><em>Step {{ N.agent }}</em></div>
+{% if N.one %}
+    <div class="wb-arch__node wb-arch__node--accent"><strong>Genie One</strong><span>Genie Agent + Page</span><em>Step {{ N.one }}</em></div>
+{% endif %}
+{% if N.mcp %}
+    <div class="wb-arch__node wb-arch__node--accent"><strong>MCP</strong><span>Genie Agent MCP · Genie One MCP</span><em>Step {{ N.mcp }}</em></div>
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col">
+    <p class="wb-arch__label">Your product</p>
+{% for node in s.mcp.consumers %}
+    <div class="wb-arch__node wb-arch__node--source"><strong>{{ node.name }}</strong><span>{{ node.detail }}</span></div>
+{% endfor %}
+{% endif %}
   </div>
 </div>
 
@@ -268,7 +351,7 @@ A conversational interface that answers questions using data and business defini
 
 - [ ] You can sign in to a Databricks workspace.
 - [ ] You have permission to create a catalog, or you have already asked your admin for it. See [Prerequisites](00-introduction/prerequisites.md) for details.
-- [ ] You can focus on the lab for about 3 hours.
+- [ ] You can focus on the lab for {{ s.lab.duration | lower }}.
 
 [Go to the introduction and start :material-arrow-right:](00-introduction/index.md){ .md-button .md-button--primary }
 

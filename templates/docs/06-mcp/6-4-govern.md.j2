@@ -1,0 +1,63 @@
+{% set m = s.mcp %}
+# {{ N.mcp }}.4) Govern and Observe in Unity Gateway
+
+Your product is about to send real traffic to Genie. On this page, you'll see who can call the Genie One MCP, cap how often it can be called, and query a record of every call. These are the controls an enterprise buyer will ask about.
+
+!!! info "Which server does Unity Gateway govern?"
+    **Unity Gateway** governs the Genie One MCP (`system.ai.genie_one_mcp`): grants, rate limits, service policies and usage records all apply. The Genie Agent MCP is a workspace endpoint that **bypasses** Unity Gateway. You govern it with the Genie Agent's sharing settings and the Unity Catalog grants on its Metric Views, as in {{ N.mcp }}.1 Task 4.
+
+## Task 1 - Review who can call the Genie One MCP
+
+1. Click **Unity Gateway** in the left sidebar, then click **MCPs**.
+
+2. Open `system.ai.genie_one_mcp` and click the **Permissions** tab.
+
+3. Verify which principals have `EXECUTE`. Databricks-provided MCPs often inherit `EXECUTE` from the `system.ai` schema, for example through `account users`.
+
+    !!! tip "Restrict access for production"
+        Before you point a product at it, decide who should call the Genie One MCP. A workspace admin can replace a broad inherited grant with grants to specific groups and service principals. See [Govern an MCP](https://docs.databricks.com/aws/en/ai-gateway/govern-mcp-service).
+
+## Task 2 - (Admin) Cap the call volume
+
+A rate limit protects your workspace from a runaway agent loop. You need `MANAGE` on the MCP, so this is usually a workspace admin task.
+
+1. On the MCP's **Overview** tab, find **Rate limits** and click **Set up** or **Edit**.
+
+2. Enter `60` in **Service QPM** and click **Save**. Calls above 60 tool calls per minute now return HTTP 429.
+
+## Task 3 - Query every call you made
+
+Every call through Unity Gateway is recorded in the `system.ai_gateway.usage` system table.
+
+1. Open **SQL Editor** and run:
+
+    ```sql
+    SELECT mcp_metadata.tool_name AS tool_name,
+           COUNT(*)                AS calls,
+           ROUND(AVG(latency_ms))  AS avg_latency_ms
+    FROM system.ai_gateway.usage
+    WHERE service_type = 'MCP_SERVICE'
+      AND service_name = 'system.ai.genie_one_mcp'
+      AND requester = current_user()
+      AND event_time >= current_timestamp() - INTERVAL 1 DAY
+    GROUP BY ALL
+    ORDER BY calls DESC;
+    ```
+
+2. Verify you see one row per tool you used in {{ N.mcp }}.2 and {{ N.mcp }}.3, such as `genie_ask` and `genie_poll_response`, with many more polls than asks.
+
+    !!! info "No rows yet?"
+        Usage records can take a while to arrive. If the result is empty, rerun the query later. You need access to system tables; if you don't have it, ask your admin.
+
+## Task 4 - (Optional, Beta) Block sensitive data in tool calls
+
+**Service policies** check each MCP tool call before it runs and its result before it returns. They are in Beta and need the **Unity Gateway Service Policies** preview.
+
+1. Open `system.ai.genie_one_mcp` in **Unity Gateway** → **MCPs** and click the **Policies** tab.
+
+2. Click **New policy**, enter `block_sensitive_data`, and select **Sensitive Data Detection** for **Guardrail type**.
+
+3. Select the categories to block, such as `class.credit_card`, set the action to **Deny**, select both **Input** and **Output** for **Phase**, then click **Create policy**.
+
+!!! success "Congratulations!"
+    You've completed {{ ai.name | poss }} work. Your Genie Agent now serves {{ m.product }} and your coding agents over MCP, with Unity Catalog permissions on every query and Unity Gateway controls and usage records on the Genie One MCP.{% if N.byod %} In the next Step, you'll map your own data to the same pattern.{% endif %}

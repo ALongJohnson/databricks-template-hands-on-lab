@@ -1,0 +1,88 @@
+{% set m = s.mcp %}
+# {{ N.mcp }}.1) Get Access and the Server URLs
+
+On this page, you'll install the local tools, collect the two values that make up the MCP server URLs, and confirm you have permission to call both servers.
+
+## Task 1 - Install the local tools
+
+1. Install the Databricks CLI if you don't have it yet. On macOS or Linux, run:
+
+    ```bash
+    curl -fsSL https://raw.githubusercontent.com/databricks/setup-cli/main/install.sh | sh
+    ```
+
+    For Windows and other options, see [Install the Databricks CLI](https://docs.databricks.com/aws/en/dev-tools/cli/install).
+
+2. Sign in to your workspace. Replace `<workspace-hostname>` with the host in your browser's address bar (for example `dbc-1234abcd-5678.cloud.databricks.com`).
+
+    ```bash
+    databricks auth login --host https://<workspace-hostname> --profile {{ m.cli_profile }}
+    ```
+
+3. Create a Python 3.12 environment for this Step and install the packages:
+
+    ```bash
+    python3.12 -m venv .venv-mcp && source .venv-mcp/bin/activate
+    pip install --upgrade databricks-sdk databricks-openai openai-agents "mcp>=1.24,<2"
+    ```
+
+## Task 2 - Find your Genie space ID
+
+The Genie Agent MCP URL ends with the ID of your Genie Agent (its *space ID*).
+
+1. Click **Genie Agents** in the left sidebar and open `<your_name> - {{ s.naming.agent }}`.
+
+2. Copy the space ID. It is the 32-character value after `/rooms/` in your browser's address bar, and it is also shown in the agent's **Settings**.
+
+    ```text title="Example"
+    https://<workspace-hostname>/genie/rooms/01ef0123456789abcdef0123456789ab
+    ```
+
+3. Save it as an environment variable in your terminal:
+
+    ```bash
+    export GENIE_SPACE_ID=<your-space-id>
+    ```
+
+## Task 3 - Find your workspace ID
+
+The Genie One MCP URL needs your **workspace ID** in the `o=` query parameter.
+
+1. Run the following command. It prints the numeric workspace ID of the workspace you signed in to in Task 1.
+
+    ```bash
+    python -c "from databricks.sdk import WorkspaceClient; print(WorkspaceClient(profile='{{ m.cli_profile }}').get_workspace_id())"
+    ```
+
+    You can also find it as the `o=` value in your workspace URL.
+
+## Task 4 - Confirm your access
+
+1. **Genie Agent MCP.** You created the Genie Agent, so you can already call it. Anyone else (a teammate, or the service principal your product runs as) needs **Can Run** on the Genie Agent, `SELECT` on `{{ mv1.name }}` and `{{ mv2.name }}`, `USE CATALOG` and `USE SCHEMA` on `{{ cat }}.default`, and permission to use the Genie Agent's SQL warehouse. Share the Genie Agent with **Share** in its top-right corner.
+
+2. **Genie One MCP.** Check that you have `EXECUTE` on the Databricks-provided MCP `system.ai.genie_one_mcp`. Replace the email with yours:
+
+    ```bash
+    databricks grants get-effective mcp_service system.ai.genie_one_mcp \
+      --principal you@example.com --profile {{ m.cli_profile }}
+    ```
+
+3. Verify the output lists `EXECUTE`. In most workspaces it is inherited from the `system.ai` schema through the `account users` group, so `inherited_from_name` shows `system.ai`.
+
+    !!! warning "No EXECUTE?"
+        Ask your workspace admin to grant it. A metastore admin must first grant themselves `MANAGE` on the `system.ai` schema, then run `databricks grants update mcp_service system.ai.genie_one_mcp --json '{"changes": [{"principal": "you@example.com", "add": ["EXECUTE"]}]}'`. The securable type is `mcp_service`, not `function` or `mcp`.
+
+## Task 5 - Write down your two server URLs
+
+Fill in the values from Tasks 2 and 3. You'll use these URLs in {{ N.mcp }}.2 and {{ N.mcp }}.3.
+
+| Server | URL |
+|---|---|
+| Genie Agent MCP | `https://<workspace-hostname>/api/2.0/mcp/genie/<space-id>` |
+| Genie One MCP | `https://<workspace-hostname>/ai-gateway/mcp-services/system.ai.genie_one_mcp?o=<workspace-id>` |
+
+!!! info "Older Genie MCP endpoint"
+    If you find examples that use `https://<workspace-hostname>/api/2.0/mcp/genie` with no space ID, that is the deprecated Beta endpoint for Genie One. It stops working on November 30, 2026. Use the `system.ai.genie_one_mcp` URL above instead; the tool names are the same.
+
+!!! success "Ready"
+    You have the tools, both URLs and the permissions you need. Next, you'll connect them to a coding agent.

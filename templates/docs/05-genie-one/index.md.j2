@@ -1,5 +1,5 @@
 {% set go = s.genie_one %}
-# 5) Ask with Genie One
+# {{ N.one }}) Ask with Genie One
 
 <div class="wb-meta" markdown>
 
@@ -10,7 +10,7 @@
 
 ## Lab overview
 
-The Pages you created in Step 4 are referenced by **Genie One**, not by Genie Agent. In this lab, you'll ask questions with business terms in Genie One and verify that Genie One answers with the Pages you created as sources.
+The Pages you created in Step {{ N.agent }} are referenced by **Genie One**, not by Genie Agent. In this lab, you'll ask questions with business terms in Genie One and verify that Genie One answers with the Pages you created as sources.
 
 ## Your role in this lab
 
@@ -75,7 +75,7 @@ Genie One answers based on **Genie Ontology**. Genie Ontology combines Unity Cat
 
     {{ shot('05-genie-one/5-06-click-citation.png', 'Click citation') }}
 
-2. Verify the right panel shows the `{{ go.definition_question.pages[0] }}` Page you created in Step 4, displaying Domain, Synonyms, and Definition.
+2. Verify the right panel shows the `{{ go.definition_question.pages[0] }}` Page you created in Step {{ N.agent }}, displaying Domain, Synonyms, and Definition.
 
     {{ shot('05-genie-one/5-07-page-opened.png', go.definition_question.pages[0] ~ ' Page') }}
 
@@ -93,7 +93,7 @@ Genie One answers based on **Genie Ontology**. Genie Ontology combines Unity Cat
     {{ shot('05-genie-one/5-08-second-answer.png', go.second_question.shot_alt) }}
 
 !!! tip "Number-only questions might route to Genie Agent"
-    Questions like "{{ t1.question_short | default(t1.question) }}" that ask only for numbers might be routed by Genie One to the Genie Agent you created in Step 4, which shows the Genie Agent link as source instead of Pages. Including a definition request together makes it easier to see Pages as sources.
+    Questions like "{{ t1.question_short | default(t1.question) }}" that ask only for numbers might be routed by Genie One to the Genie Agent you created in Step {{ N.agent }}, which shows the Genie Agent link as source instead of Pages. Including a definition request together makes it easier to see Pages as sources.
 
 !!! info "Multiple Pages in shared workspace"
     If you practice in a shared workspace, other practitioners' {{ s.lab.company }}-related Pages might appear as sources. Verify the Pages belong to your Domain (`{{ cat }}`).

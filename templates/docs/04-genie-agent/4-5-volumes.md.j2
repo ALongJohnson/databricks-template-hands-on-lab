@@ -1,5 +1,5 @@
 {% set v = s.volume %}
-# 4.5) (Optional) Analyze Documents with Volumes
+# {{ N.agent }}.5) (Optional) Analyze Documents with Volumes
 
 On this page, you'll upload {{ v.docs_noun_long | default(v.docs_noun) }} (PDFs) to a Unity Catalog Volume and connect them to Genie Agent to answer questions that require both documents and data.
 
@@ -102,4 +102,4 @@ Download the {{ v.docs | length }} PDFs below.
     {{ shot('04-genie-agent/4-5-10-doc-answer-2.png', v.questions[1].shot_alt) }}
 
 !!! success "Congratulations!"
-    You've completed {{ ai.name | poss }} work. You've built a complete Genie Agent that analyzes both structured data (Metric View) and unstructured documents (PDFs). In the next Step, you'll become {{ bu.name }} and ask questions in Genie One.
+    You've completed {{ ai.name | poss }} work. You've built a complete Genie Agent that analyzes both structured data (Metric View) and unstructured documents (PDFs). {{ ('In the next Step, you\'ll become ' ~ bu.name ~ ' and ask questions in Genie One.') if N.one else 'In the next Step, you\'ll serve this Genie Agent as an MCP so your product and coding agents can use it.' }}

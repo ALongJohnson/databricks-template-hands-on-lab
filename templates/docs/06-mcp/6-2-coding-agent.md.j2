@@ -1,0 +1,106 @@
+{% set m = s.mcp %}
+# {{ N.mcp }}.2) Connect a Coding Agent
+
+On this page, you'll add both Genie MCP servers to a coding agent and ask it the question that tripped up Genie in {{ N.agent }}.2. A coding agent is the fastest way to try an MCP server before you write any code, and it lets your engineers use governed numbers while they build.
+
+This page is optional if you don't use a coding agent. You can go straight to [{{ N.mcp }}.3)](6-3-product-agent.md).
+
+## Task 1 - Install the Unity Gateway CLI
+
+The **Unity Gateway CLI** (`ug`) signs you in to Databricks and writes the MCP configuration for Claude Code, Cursor, Codex and other agents.
+
+1. Install `ug` with [uv](https://docs.astral.sh/uv/), then check the version:
+
+    ```bash
+    uv tool install git+https://github.com/databricks/unity-gateway
+    ug --version
+    ```
+
+2. Sign in to your workspace and let `ug` set up your agents:
+
+    ```bash
+    ug configure --workspace https://<workspace-hostname>
+    ```
+
+## Task 2 - Add the two MCP servers
+
+=== "Claude Code"
+
+    1. Add the Genie One MCP:
+
+        ```bash
+        ug mcp add --agents claude --names system.ai.genie_one_mcp
+        ```
+
+    2. Add your Genie Agent MCP with the `genie-space:` selector and your space ID from {{ N.mcp }}.1:
+
+        ```bash
+        ug mcp add --agents claude --names "genie-space:$GENIE_SPACE_ID"
+        ```
+
+    3. Start Claude Code through Unity Gateway, then enter `/mcp` and check that both servers are connected:
+
+        ```bash
+        ug claude
+        ```
+
+=== "Cursor"
+
+    1. Add both servers to Cursor. `ug` writes them to `~/.cursor/mcp.json`, which the Cursor IDE and Cursor Agent both read:
+
+        ```bash
+        ug mcp add --agents cursor --names system.ai.genie_one_mcp
+        ug mcp add --agents cursor --names "genie-space:$GENIE_SPACE_ID"
+        ```
+
+    2. Restart Cursor and check that both servers are listed in its MCP settings.
+
+=== "Claude Code without ug"
+
+    You can add the Genie One MCP to Claude Code by hand with Claude Code's default OAuth client:
+
+    ```bash
+    claude mcp add --transport http --scope user \
+      --client-id https://claude.ai/oauth/claude-code-client-metadata --callback-port 3118 \
+      genie-one \
+      "https://<workspace-hostname>/ai-gateway/mcp-services/system.ai.genie_one_mcp?o=<workspace-id>"
+    ```
+
+    Open Claude Code, enter `/mcp`, and sign in to `genie-one` with your Databricks account. For the Genie Agent MCP, use `ug` as shown in the other tabs.
+
+!!! info "Check and remove connections"
+    Run `ug mcp list` to see the servers `ug` configured, and `ug mcp remove` to remove them. Removing a connection doesn't delete anything in the workspace.
+
+## Task 3 - Ask the Genie Agent through the coding agent
+
+1. In your coding agent, ask the {{ N.agent }}.2 question and name the server so the agent picks the right tool:
+
+    ```text
+    Use the Genie Agent MCP to answer: {{ m.agent_question }}
+    ```
+
+2. Approve the tool call when the agent asks. {{ m.agent_verify }}
+
+3. Ask for the evidence:
+
+    ```text
+    Show me the SQL Genie ran.
+    ```
+
+    Verify the SQL uses `` MEASURE(`Revenue`) `` on `{{ cat }}.default.{{ mv1.name }}`.
+
+## Task 4 - Ask Genie One through the coding agent
+
+1. Ask a question that depends on a business-term definition:
+
+    ```text
+    Use the Genie One MCP to answer: {{ m.genie_one_question }}
+    ```
+
+2. Verify the agent called `genie_ask` and then polled with `genie_poll_response` until the answer was ready. Verify the answer explains peak season as check-in months 6, 7, 8 and 12 and gives **{{ t2.value | num }}** peak-season bookings in 2024.
+
+    !!! info "Shared workspace"
+        Genie One searches everything you can access. If other people ran this lab in the same workspace, add `Use the {{ mv1.name }} metric view in {{ cat }}.default.` to the question so Genie One picks your Metric View.
+
+!!! success "Done"
+    Your coding agent now answers business questions with the same governed definitions as the Genie Agent. Next, you'll build the agent that would run inside {{ m.product }}.

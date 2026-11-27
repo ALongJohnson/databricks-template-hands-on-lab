@@ -11,10 +11,20 @@ nav = [
   { "{{ s.lab.title }}" = "index.md" },
   { "Introduction" = ["00-introduction/index.md", { "Prerequisites" = "00-introduction/prerequisites.md" }, { "{{ s.lab.company }} Scenario & Personas" = "00-introduction/scenario.md" }] },
   { "1) Build a Lakeflow Pipeline" = ["01-lakeflow-pipeline/index.md", { "1.1) Bronze: Ingest Source Data" = "01-lakeflow-pipeline/1-1-bronze.md" }, { "1.2) Silver & Gold: Cleanse and {{ s.gold.title }}" = "01-lakeflow-pipeline/1-2-silver-gold.md" }, { "1.3) Run the Pipeline and Check Results" = "01-lakeflow-pipeline/1-3-run.md" }{% if s.options.genie_code_pipeline %}, { "1.4) (Optional) Genie Code and Visual Data Prep" = "01-lakeflow-pipeline/1-4-optional-genie-code-vdp.md" }{% endif %}] },
-  { "2) Build an AI/BI Dashboard" = ["02-aibi-dashboard/index.md", { "2.1) Create the Dataset and Tabs" = "02-aibi-dashboard/2-1-dataset.md" }, { "2.2) Build Core Widgets" = "02-aibi-dashboard/2-2-widgets.md" }, { "2.3) Build with Genie Code" = "02-aibi-dashboard/2-3-genie-code.md" }] },
-  { "3) Build Unity Catalog Semantics" = ["03-uc-semantics/index.md", { "3.1) Metric View: {{ mv1.title }}" = "03-uc-semantics/3-1-mv-{{ mv1.slug }}.md" }, { "3.2) Metric View: {{ mv2.title }}" = "03-uc-semantics/3-2-mv-{{ mv2.slug }}.md" }, { "3.3) Create and Link a Domain" = "03-uc-semantics/3-3-domain.md" }] },
-  { "4) Build and Improve a Genie Agent" = ["04-genie-agent/index.md", { "4.1) Create a Genie Agent" = "04-genie-agent/4-1-create.md" }, { "4.2) Monitoring: Collect Business Feedback" = "04-genie-agent/4-2-monitoring.md" }, { "4.3) Benchmark: Evaluate Accuracy" = "04-genie-agent/4-3-benchmark.md" }, { "4.4) Improve: Update Metric View and Create Pages" = "04-genie-agent/4-4-improve.md" }{% if s.options.volumes %}, { "4.5) (Optional) Analyze Documents with Volumes" = "04-genie-agent/4-5-volumes.md" }{% endif %}] },
-  { "5) Ask with Genie One" = ["05-genie-one/index.md"] },
+{% if N.dash %}
+  { "{{ N.dash }}) Build an AI/BI Dashboard" = ["02-aibi-dashboard/index.md", { "2.1) Create the Dataset and Tabs" = "02-aibi-dashboard/2-1-dataset.md" }, { "2.2) Build Core Widgets" = "02-aibi-dashboard/2-2-widgets.md" }, { "2.3) Build with Genie Code" = "02-aibi-dashboard/2-3-genie-code.md" }] },
+{% endif %}
+  { "{{ N.sem }}) Build Unity Catalog Semantics" = ["03-uc-semantics/index.md", { "{{ N.sem }}.1) Metric View: {{ mv1.title }}" = "03-uc-semantics/3-1-mv-{{ mv1.slug }}.md" }, { "{{ N.sem }}.2) Metric View: {{ mv2.title }}" = "03-uc-semantics/3-2-mv-{{ mv2.slug }}.md" }, { "{{ N.sem }}.3) Create and Link a Domain" = "03-uc-semantics/3-3-domain.md" }] },
+  { "{{ N.agent }}) Build and Improve a Genie Agent" = ["04-genie-agent/index.md", { "{{ N.agent }}.1) Create a Genie Agent" = "04-genie-agent/4-1-create.md" }, { "{{ N.agent }}.2) Monitoring: Collect Business Feedback" = "04-genie-agent/4-2-monitoring.md" }, { "{{ N.agent }}.3) Benchmark: Evaluate Accuracy" = "04-genie-agent/4-3-benchmark.md" }, { "{{ N.agent }}.4) Improve: Update Metric View and Create Pages" = "04-genie-agent/4-4-improve.md" }{% if s.options.volumes %}, { "{{ N.agent }}.5) (Optional) Analyze Documents with Volumes" = "04-genie-agent/4-5-volumes.md" }{% endif %}] },
+{% if N.one %}
+  { "{{ N.one }}) Ask with Genie One" = ["05-genie-one/index.md"] },
+{% endif %}
+{% if N.mcp %}
+  { "{{ N.mcp }}) Serve Your Genie Agent as an MCP" = ["06-mcp/index.md", { "{{ N.mcp }}.1) Get Access and the Server URLs" = "06-mcp/6-1-access.md" }, { "{{ N.mcp }}.2) Connect a Coding Agent" = "06-mcp/6-2-coding-agent.md" }, { "{{ N.mcp }}.3) Call Genie from Your Product Agent" = "06-mcp/6-3-product-agent.md" }, { "{{ N.mcp }}.4) Govern and Observe in Unity Gateway" = "06-mcp/6-4-govern.md" }] },
+{% endif %}
+{% if N.byod %}
+  { "{{ N.byod }}) Bring Your Own Data" = ["07-byod/index.md"] },
+{% endif %}
   { "Wrap-up" = "99-wrap-up/index.md" },
 ]
 

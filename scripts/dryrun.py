@@ -9,7 +9,7 @@ What it does (Databricks CLI, serverless pipeline, SQL warehouse):
   2. counts the source data (Prerequisites Task 4)
   3. uploads the rendered bronze/silver/gold SQL and runs them as a Lakeflow pipeline
   4. counts bronze, silver and gold tables (Steps 1.3 and 1.4)
-  5. counts the three dashboard datasets (Steps 2.1 and 2.2)
+  5. counts the three dashboard datasets (Steps 2.1 and 2.2; skipped when options.dashboard is false)
   6. creates both Metric Views and runs their queries (Steps 3.1 and 3.2)
   7. runs the benchmark ground-truth SQL on the base Metric View (Step 4.3)
   8. applies the Step 4.4 measures/fields/clarification and runs the verify query
@@ -141,7 +141,8 @@ def main() -> None:
                                 str(Path(tmp) / "step1" / f"{name}.sql"), "--format", "RAW",
                                 "--overwrite", "-p", args.profile], check=True, capture_output=True)
                 libs.append({"file": {"path": target}})
-            ds_sql = {k: (Path(tmp) / "step2" / v["file"]).read_text() for k, v in s["dashboard"]["datasets"].items()}
+            ds_sql = ({k: (Path(tmp) / "step2" / v["file"]).read_text() for k, v in s["dashboard"]["datasets"].items()}
+                      if s["options"]["dashboard"] else {})
         pipeline_id = cli.run("pipelines", "create", body={
             "name": f"hol-dryrun-{wdir.name}", "catalog": cat, "schema": "default", "serverless": True,
             "development": True, "libraries": libs})["pipeline_id"]
@@ -218,7 +219,7 @@ def main() -> None:
         report.append((f"sources.{src['name']}.rows", src["rows"], m["sources"].get(src["name"])))
         report.append((f"sources.{src['name']}.silver.rows", src["silver"]["rows"], m["silver"].get(src["silver"]["table"])))
     report.append(("gold.rows", s["gold"]["rows"], m["gold"]))
-    for k in ("histogram", "bubble"):
+    for k in (("histogram", "bubble") if s["options"]["dashboard"] else ()):
         report.append((f"dashboard.datasets.{k}.rows", s["dashboard"]["datasets"][k].get("rows"), m["datasets"].get(k)))
     report.append(("traps.benchmark.value", as_num(t2["value"]), m["benchmark_value"]))
     bad = [r for r in report if r[1] != r[2]]

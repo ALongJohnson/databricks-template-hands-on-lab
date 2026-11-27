@@ -16,6 +16,14 @@ A Claude skill, `.claude/skills/adapt-hands-on-lab`, adapts the template to new 
 architecture: it profiles the data, writes the spec, dry-runs it on a workspace to measure every
 number, and builds the site.
 
+## Track 1 on this branch (`genie_agent`)
+
+This branch publishes **Track 1: Create a Genie Agent and serve it as an MCP**
+(`workshops/genie-agent-mcp`, set in `.workshop`). It reuses the Wanderbricks data, story, numbers and
+screenshots, drops the AI/BI dashboard step, and adds two steps: serving the Genie Agent over the Genie Agent MCP
+and the Genie One MCP (coding agent, Python product agent, Unity Gateway governance), and a bring-your-own-data
+planning page. The reference workshop still renders exactly as on `main`.
+
 ## Repository layout
 
 ```

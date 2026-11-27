@@ -55,6 +55,21 @@ def load_spec(path: Path, catalog_override: str | None = None) -> dict:
     s.setdefault("options", {})
     s["options"].setdefault("genie_code_pipeline", True)
     s["options"].setdefault("volumes", True)
+    s["options"].setdefault("dashboard", True)    # Step: AI/BI dashboard
+    s["options"].setdefault("genie_one", True)    # Step: ask in Genie One (UI)
+    s["options"].setdefault("mcp", False)         # Step: serve the Genie Agent as an MCP
+    s["options"].setdefault("byod", False)        # Step: bring your own data (planning page)
+    lab = s["lab"]
+    lab.setdefault("assets_from", None)          # reuse images/ and files/ of another workshop folder
+    lab.setdefault("hero_eyebrow", "Lakeflow · AI/BI · Unity Catalog · Genie")
+    lab.setdefault("hero_title", "Hands-on Lab")
+    lab.setdefault("hero_lead", "Build an end-to-end data & AI platform on Databricks, from raw source data all the way to AI agents.")
+    lab.setdefault("duration", "About 3 hours")
+    s.setdefault("semantics_intro", "")
+    s.setdefault("wrapup", {}).setdefault(
+        "summary",
+        f"You have become four personas and built an end-to-end data & AI platform for {lab['company']}, "
+        f"from raw source data through to an AI that {s['wrapup'].get('audience', 'business users')} can ask questions directly.")
     arch = s["architecture"]
     arch.setdefault("upstream", [])
     if arch["mode"] == "files":
@@ -71,11 +86,12 @@ def load_spec(path: Path, catalog_override: str | None = None) -> dict:
         s["gold"].setdefault(k, "")
     for c in s["gold"]["columns"]:
         c.setdefault("not_null", False)
-    for ds in s["dashboard"]["datasets"].values():
-        ds.setdefault("note", None)
-    for wd in s["dashboard"]["widgets"].values():
-        wd.setdefault("tip", None)
-        wd.setdefault("verify", "")
+    if s["options"]["dashboard"]:
+        for ds in s["dashboard"]["datasets"].values():
+            ds.setdefault("note", None)
+        for wd in s["dashboard"]["widgets"].values():
+            wd.setdefault("tip", None)
+            wd.setdefault("verify", "")
     s["improve"].setdefault("clarify", None)
     for m in s["improve"]["measures"]:
         m.setdefault("format_ui", "")
@@ -105,7 +121,17 @@ def load_spec(path: Path, catalog_override: str | None = None) -> dict:
         mv["catalog_refs"] = mv["yaml"].count(cat)
         mv.setdefault("note", None)
 
+    # Step numbers: steps switched off by options are skipped, the rest are numbered in order.
+    steps, n = {}, 0
+    for key, on in (("pipe", True), ("dash", s["options"]["dashboard"]), ("sem", True), ("agent", True),
+                    ("one", s["options"]["genie_one"]), ("mcp", s["options"]["mcp"]), ("byod", s["options"]["byod"])):
+        if on:
+            n += 1
+        steps[key] = n if on else None
+    steps["count"] = n
+
     s["_derived"] = {
+        "steps": steps,
         "catalog": cat,
         "example_catalog": ex_cat,
         "warn_rules": warn_rules,
@@ -154,10 +180,13 @@ def validate(path: Path, forbid: list[str] | None = None) -> tuple[list[str], li
     need(g["primary_key"] in [c["name"] for c in g["columns"]], "gold.primary_key must be one of gold.columns")
     need(isinstance(g.get("rows"), int), "gold.rows must be an int")
 
-    ds = s["dashboard"]["datasets"]
-    need(set(ds) == {"main", "histogram", "bubble"}, "dashboard.datasets must have keys main, histogram, bubble")
-    need(set(s["dashboard"]["widgets"]) == {"heatmap", "histogram", "stacked_bar", "bubble"},
-         "dashboard.widgets must have keys heatmap, histogram, stacked_bar, bubble")
+    if s["options"]["dashboard"]:
+        ds = s["dashboard"]["datasets"]
+        need(set(ds) == {"main", "histogram", "bubble"}, "dashboard.datasets must have keys main, histogram, bubble")
+        need(set(s["dashboard"]["widgets"]) == {"heatmap", "histogram", "stacked_bar", "bubble"},
+             "dashboard.widgets must have keys heatmap, histogram, stacked_bar, bubble")
+    else:
+        need(bool(s["semantics_intro"]), "semantics_intro: required when options.dashboard is false (Step intro without a dashboard)")
 
     mvs = s["metric_views"]
     need(len(mvs) == 2, "metric_views: exactly 2 (one per fact table)")
@@ -183,14 +212,21 @@ def validate(path: Path, forbid: list[str] | None = None) -> tuple[list[str], li
         need(t1["wrong_measure"] in mvs[0]["measure_names"],
              "traps.monitoring.wrong_measure must be an existing measure of metric_views[0] (what Genie picks)")
     need(str(t2.get("value", "")) != "", "traps.benchmark.value: the ground-truth result")
-    gq = s["genie_one"]["definition_question"]["pages"]
-    need(all(p in [x["name"] for x in im["pages"]] for p in gq),
-         "genie_one.definition_question.pages must be names from improve.pages")
+    if s["options"]["genie_one"] or s["options"]["mcp"]:
+        gq = s["genie_one"]["definition_question"]["pages"]
+        need(all(p in [x["name"] for x in im["pages"]] for p in gq),
+             "genie_one.definition_question.pages must be names from improve.pages")
+    if s["options"]["mcp"]:
+        mcp = s.get("mcp", {})
+        for k in ("overview", "journey_task", "product", "cli_profile", "model", "agent_question",
+                  "agent_verify", "genie_one_question", "genie_one_verify", "consumers"):
+            need(k in mcp, f"mcp.{k} required when options.mcp is true")
     if s["options"]["volumes"]:
         need(len(s["volume"]["docs"]) == 2, "volume.docs: exactly 2 documents")
         need(len(s["volume"]["questions"]) == 2, "volume.questions: exactly 2 questions")
         for d in s["volume"]["docs"]:
-            if not (path.parent / "files" / d["file"]).is_file():
+            base = path.parent.parent / s["lab"]["assets_from"] if s["lab"]["assets_from"] else None
+            if not (path.parent / "files" / d["file"]).is_file() and not (base and (base / "files" / d["file"]).is_file()):
                 warns.append(f"volume document not built yet: files/{d['file']} (run scripts/make_documents.py)")
 
     if forbid:

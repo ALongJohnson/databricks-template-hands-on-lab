@@ -27,7 +27,11 @@ def main() -> None:
     ap.add_argument("--workshop", default=os.environ.get("WORKSHOP", "workshops/wanderbricks"))
     args = ap.parse_args()
     wdir = (ROOT / args.workshop).resolve()
-    forbid = [] if wdir.name == REFERENCE else REFERENCE_TERMS
+    # A workshop that reuses the reference data and story (lab.assets_from: wanderbricks) may use its terms.
+    import yaml
+    raw = yaml.safe_load((wdir / "workshop.yaml").read_text())
+    reuses_reference = (raw.get("lab") or {}).get("assets_from") == REFERENCE
+    forbid = [] if wdir.name == REFERENCE or reuses_reference else REFERENCE_TERMS
     errors, warns = validate(wdir / "workshop.yaml", forbid=forbid)
     for w in warns:
         print(f"WARN  {w}")

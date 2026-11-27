@@ -1,0 +1,840 @@
+# =============================================================================
+# Workshop spec: Track 1 · Create a Genie Agent and serve it as an MCP
+#
+# Built on the Wanderbricks reference lab (same data, story, measured numbers and
+# screenshots, reused through lab.assets_from). The AI/BI dashboard and Genie One UI
+# steps are switched off; a final step serves the Genie Agent over MCP to a coding
+# agent and to a Python product agent, governed in Unity Gateway, and a planning page
+# maps the learner's own data to the same pattern.
+#
+# Numbers were re-measured with scripts/dryrun.py (all OK). MCP answers were checked
+# live against the Genie Agent MCP and the Genie One MCP.
+# =============================================================================
+
+lab:
+  company: Wanderbricks
+  title: "Track 1: Genie Agent as MCP"
+  site_url: https://alongjohnson.github.io/databricks-template-hands-on-lab/genie_agent/eng/
+  repo_url: https://github.com/ALongJohnson/databricks-template-hands-on-lab
+  hero_data_fact: Built-in sample data
+  overview_image: 00-introduction/wanderbricks-overview.svg   # under docs/assets/images or this folder's images/
+  overview_alt: Wanderbricks connects travelers and hosts around the world
+  scenario_image_alt: "Wanderbricks: An online vacation rental marketplace that connects travelers worldwide with property hosts"
+  assets_from: wanderbricks       # reuse the reference screenshots and Step 3.5 PDFs
+  hero_eyebrow: Databricks Singapore AI Accelerator · Track 1
+  hero_title: "Track 1: Genie Agent as MCP"
+  hero_lead: Build a governed Genie Agent on trusted data, then serve it as an MCP so your product, your own agents and coding agents all get the same answers.
+  duration: About 3 hours
+
+options:
+  genie_code_pipeline: true   # Step 1.4 (Genie Code pipeline + Visual Data Prep)
+  volumes: true               # Step 3.5 (needs the Volumes preview + Lakebase)
+  dashboard: false            # lean path: no AI/BI dashboard step
+  genie_one: false            # Genie One is used through its MCP in Step 4 instead of the UI
+  mcp: true                   # Step 4: serve the Genie Agent as an MCP
+  byod: true                  # Step 5: bring your own data
+
+# Asset names. Learners prefix each with <your_name>.
+naming:
+  example_user: jiyu
+  catalog: wanderbricks_marketing          # catalog, Domain and Governed Tag name
+  pipeline: wanderbricks_customer_360
+  genie_code_pipeline: wanderbricks_genie_code
+  genie_code_schema: genie_code
+  dashboard: Wanderbricks Customer 360
+  agent: Wanderbricks Marketing Assistant
+  volume: marketing_docs
+
+# ----------------------------------------------------------------------------- story
+company:
+  summary: "**Wanderbricks** is a fictional online vacation-rental marketplace that connects travelers with property hosts around the world. Its product team wants an AI assistant inside the Wanderbricks app that answers business questions with the same numbers finance uses."
+  what_is: "**Wanderbricks** is an online vacation rental marketplace that connects travelers worldwide with property hosts. It is a fictional company modeled on platforms like Airbnb and Booking.com, with the following characteristics:"
+  traits:
+    - "**Global customers:** About 120,000 customers from 165 countries book accommodations on Wanderbricks."
+    - "**Two customer types:** Nearly half are **individual** customers booking for leisure, and half are **business** customers who book corporate accommodations for business travel and groups."
+    - "**Booking lifecycle:** A booking progresses through **pending** → **confirmed** → **completed**, and can be **cancelled** at any stage."
+    - "**Distinct seasonality:** Bookings concentrate in summer (June–August) and year-end (December)."
+  problem_intro: "Recently, at an executive meeting, the same question yielded different numbers each time:"
+  problem_quote: |-
+    > *"What was our revenue last quarter?"*
+    >
+    > The finance team brought numbers that counted only completed bookings, while the marketing team brought the total booking value including cancelled bookings. The two numbers differed by nearly tenfold.
+  problem_bullets:
+    - "**Scattered data:** Customer, booking, and review data sits in separate places in raw form, requiring repeated data cleaning every time you need to analyze."
+    - "**KPI defined per dashboard:** Metrics like \"VIP customer\" and \"booking conversion rate\" are buried inside dashboard SQL, leading different people to calculate them differently."
+    - "**Data team dependency:** Even a simple question from a marketing executive requires requesting from the data team and waiting days for a response."
+    - "**Unanswered questions:** In July 2025, after a refund policy change, cancellation rates spiked dramatically. But no one could immediately say whether it exceeded the range the policy document predicted."
+    - "**An AI assistant without guardrails:** The product team prototyped an in-app assistant that writes its own SQL against raw tables. It answers fast, but no one can say whether its \"revenue\" matches finance's, and it can read every table it can reach."
+  scar:
+    situation: Data is scattered, KPI definitions vary by person
+    challenge: Establish a single trusted data foundation and shared business definitions
+    action: Build a pipeline → semantic layer → Genie Agent on Databricks, then serve it as an MCP
+    result: The app's AI assistant, internal agents and coding agents call one governed Genie Agent and see the same numbers
+
+personas:
+  data_engineer:
+    name: Daniel
+    title: Data Engineer
+    home_role: Builds the **pipeline** that ingests and cleanses booking, customer, and review data.
+    quote: Source data arrives daily, but we don't have tables the analytics team can trust yet.
+    daily:
+      - Collect and load data from multiple source systems
+      - Manage scripts that clean missing and incorrect values
+      - Handle data quality issue inquiries
+  data_analyst:
+    name: Ana
+    title: Data Analyst
+    home_role: Defines business metrics once as **governed Metric Views** and groups them in a **Domain**.
+    quote: We recalculate the same KPI on every dashboard, and the numbers don't match.
+    daily:
+      - Build dashboards for executives and business teams
+      - Handle repeated data extraction requests
+      - Manage KPI definitions and calculation logic
+  ai_engineer:
+    name: Aiden
+    title: AI Engineer
+    home_role: Builds a **Genie Agent**, improves its accuracy with business feedback and evaluation, then **serves it as an MCP** to the Wanderbricks app and to coding agents.
+    quote: I want to build an AI that business users can ask directly, but I'm worried it will give wrong answers.
+    daily:
+      - Build in-house AI agents and applications
+      - Evaluate and improve AI answer quality
+      - Connect structured and unstructured data to AI
+  business_user:
+    name: Mina
+    title: Marketing Executive
+    home_role: Asks business questions in the **Wanderbricks app**, whose AI assistant calls Genie over MCP.
+    quote: I want to check campaign performance right away, but I have to request from the data team and wait.
+    daily:
+      - Plan marketing campaigns and allocate budgets by country and segment
+      - Check campaign performance against targets
+      - Monitor revenue metrics for executive reporting
+
+text:
+  journey_step1: Cleanse booking, customer, and review data from Bronze → Silver → Gold.
+
+# ----------------------------------------------------------------------------- architecture + data
+# mode: uc_table   sources are Unity Catalog tables (STREAM(catalog.schema.table))
+#       files      sources are files in a Volume or cloud storage (Auto Loader read_files)
+#       federation sources are tables in a Lakehouse Federation foreign catalog (batch)
+architecture:
+  mode: uc_table
+  source_label: samples.wanderbricks
+  # Optional: systems upstream of the source, drawn on the home-page architecture diagram.
+  # upstream:
+  #   - label: Operational systems
+  #     nodes:
+  #       - { name: Booking service, detail: PostgreSQL }
+  upstream: []
+  # files mode only:
+  # files: { root: /Volumes/<cat>/<schema>/<volume>/, format: csv, options: { header: true } }
+  # federation mode only:
+  # federation: { system: Amazon Redshift, foreign_catalog: redshift_prod }
+
+source:
+  noun: sample data
+  home_tip_title: No data preparation needed
+  home_tip: The lab uses `samples.wanderbricks`, the sample dataset that comes with every Databricks workspace.
+  intro: This lab uses the sample data `samples.wanderbricks` that is provided by default in all workspaces. You will use the `users`, `bookings`, and `reviews` tables.
+  browse_alt: samples.wanderbricks table list
+  browse_step: Click **Catalog** in the left sidebar and expand **samples** → **wanderbricks**. Verify that the `users`, `bookings`, and `reviews` tables exist.
+  facilitator_setup: ""   # markdown shown as "Before the workshop (facilitator)" on the Prerequisites page
+
+# Exactly 3 sources, in this order: the dimension, the main fact (used by Metric View 1
+# and both traps), the secondary fact (many rows per main-fact row; used by Metric View 2).
+sources:
+  - name: users
+    role: dimension
+    ref: samples.wanderbricks.users
+    rows: 124509
+    bronze_comment: Raw source users ingestion. Original data preserved before cleansing.
+    silver:
+      table: silver_dim_users
+      header: From 124,509 source rows, removed 124 NULL email rows → 124,385 rows
+      comment: Silver user dimension. Removed missing emails, standardized country and user type.
+      constraints:
+        - { name: valid_user_id, expr: user_id IS NOT NULL, action: drop }
+        - { name: valid_email, expr: email IS NOT NULL, action: drop }
+        - { name: valid_type, expr: "user_type IN ('individual','business')", action: warn }
+      select: |-
+        user_id,
+        lower(trim(email))             AS email,
+        trim(name)                     AS name,
+        upper(trim(country))           AS country,
+        lower(trim(user_type))         AS user_type,
+        is_business,
+        nullif(trim(company_name), '') AS company_name,
+        created_at
+      rows: 124385
+      rules_summary: "`email IS NOT NULL`"
+      removed_text: 124 out of 124,509 rows with missing email
+  - name: bookings
+    role: fact
+    ref: samples.wanderbricks.bookings
+    rows: 72247
+    bronze_comment: Raw source bookings ingestion.
+    silver:
+      table: silver_fact_bookings
+      header: From 72,247 source rows, removed 1 row with total_amount ≤ 0 → 72,246 rows
+      comment: Silver bookings fact. Only valid amounts, dates, and statuses pass through. Derived nights column.
+      constraints:
+        - { name: valid_booking_id, expr: booking_id IS NOT NULL, action: drop }
+        - { name: valid_amount, expr: total_amount > 0, action: drop }
+        - { name: valid_dates, expr: check_out >= check_in, action: drop }
+        - { name: valid_status, expr: "status IN ('pending','confirmed','cancelled','completed')", action: drop }
+        - { name: valid_fk, expr: user_id IS NOT NULL AND property_id IS NOT NULL, action: drop }
+      select: |-
+        booking_id,
+        user_id,
+        property_id,
+        check_in,
+        check_out,
+        datediff(check_out, check_in) AS nights,
+        guests_count,
+        total_amount,
+        status,
+        created_at,
+        updated_at
+      rows: 72246
+      rules_summary: "`total_amount > 0`<br>`check_out >= check_in`<br>Valid status"
+      removed_text: 1 out of 72,247 rows with amount ≤ 0
+  - name: reviews
+    role: fact
+    ref: samples.wanderbricks.reviews
+    rows: 99793
+    bronze_comment: Raw source reviews ingestion. Includes is_deleted (soft-delete) flag.
+    silver:
+      table: silver_fact_reviews
+      header: From 99,793 source rows, excluded 476 soft-deleted rows → 99,317 rows
+      comment: Silver reviews fact. Excluded soft-deleted reviews, rating 1–5 only.
+      constraints:
+        - { name: valid_review_id, expr: review_id IS NOT NULL, action: drop }
+        - { name: not_deleted, expr: is_deleted = false, action: drop }
+        - { name: valid_rating, expr: rating BETWEEN 1 AND 5, action: drop }
+      select: |-
+        review_id,
+        booking_id,
+        property_id,
+        user_id,
+        rating,
+        comment,
+        is_deleted,          -- Included in projection as it is needed for not_deleted EXPECT evaluation
+        created_at,
+        updated_at
+      rows: 99317
+      rules_summary: "`is_deleted = false`<br>`rating BETWEEN 1 AND 5`"
+      removed_text: 476 out of 99,793 rows that are soft-deleted
+
+# ----------------------------------------------------------------------------- Step 1
+pipeline:
+  overview: Wanderbricks' customer, booking, and review data has been sitting in its raw form, requiring repeated cleansing each time the analysis team wants to use it.
+  expectations_note:
+    title: Expectations results for `silver_fact_reviews`
+    body: In `silver_fact_reviews`, both `not_deleted` and `valid_rating` rules show 476 violations. This is because the 476 soft-deleted reviews have invalid rating values and violate both rules simultaneously. The total rows removed is 476.
+
+gold:
+  table: gold_customer_360
+  title: Customer 360
+  grain: one row per customer
+  primary_key: user_id
+  comment: Gold customer 360. One row per user summarizing lifetime bookings, spend, average rating, and most recent booking date. Baseline table for customer segmentation, LTV analysis, churn-risk assessment, and Genie queries.
+  columns:
+    - { name: user_id, type: BIGINT, not_null: true, comment: Unique user ID (PK). One row per customer. }
+    - { name: name, type: STRING, comment: User name (PII). }
+    - { name: country, type: STRING, comment: "User country. Uppercase full country name (e.g., UNITED STATES, SOUTH KOREA, INDIA)." }
+    - { name: user_type, type: STRING, comment: "User type. Values: individual (individual customer) / business (business customer). One-to-one mapping with is_business." }
+    - { name: is_business, type: BOOLEAN, comment: "Whether customer is business (corporate, true/false)." }
+    - { name: lifetime_bookings, type: BIGINT, comment: "Total number of bookings in customer lifetime (all statuses included, distinct booking_id)." }
+    - { name: lifetime_spend, type: DOUBLE, comment: "Total customer spend in customer lifetime (currency unit). Sum of total_amount for completed bookings. NULL if no completed bookings." }
+    - { name: avg_rating_given, type: DOUBLE, comment: "Average rating of reviews left by customer (1–5 scale). Excludes soft-deleted reviews. NULL if no reviews." }
+    - { name: last_booking_at, type: TIMESTAMP, comment: "Most recent booking creation timestamp. Used to assess churn risk (no recent bookings)." }
+  sql_note: |-
+    (Note) Joining bookings and reviews simultaneously before aggregation causes a fan-out.
+           Instead, we aggregate each fact table by user first, then join to the user dimension.
+  sql: |-
+    WITH bk AS (
+      SELECT user_id,
+             count(DISTINCT booking_id) AS lifetime_bookings,
+             sum(CASE WHEN status = 'completed' THEN total_amount END) AS lifetime_spend,
+             max(created_at) AS last_booking_at
+      FROM silver_fact_bookings
+      GROUP BY user_id
+    ),
+    rv AS (
+      SELECT user_id, avg(rating) AS avg_rating_given
+      FROM silver_fact_reviews
+      GROUP BY user_id
+    )
+    SELECT
+      u.user_id,
+      u.name,
+      u.country,
+      u.user_type,
+      u.is_business,
+      coalesce(bk.lifetime_bookings, 0) AS lifetime_bookings,
+      round(bk.lifetime_spend, 2)       AS lifetime_spend,
+      round(rv.avg_rating_given, 3)     AS avg_rating_given,
+      bk.last_booking_at
+    FROM silver_dim_users u
+    LEFT JOIN bk ON u.user_id = bk.user_id
+    LEFT JOIN rv ON u.user_id = rv.user_id;
+  intro: "`gold_customer_360` is a **Materialized View** that summarizes each customer in one row, including lifetime bookings, spend, average rating, and most recent booking date. Analysts and AI tools can query this table directly."
+  key_columns:
+    - { name: lifetime_bookings, desc: Total bookings in customer lifetime (all statuses included) }
+    - { name: lifetime_spend, desc: Total customer spend in lifetime (sum of completed booking amounts) }
+    - { name: avg_rating_given, desc: "Average rating from customer's reviews" }
+    - { name: last_booking_at, desc: Most recent booking creation timestamp }
+  tip_title: Why aggregate first before joining?
+  tip: Each customer can have many bookings and many reviews. If you join bookings and reviews to the customer table all at once before aggregating, the row count explodes by bookings × reviews (a fan-out). Instead, we aggregate bookings and reviews separately by customer first, then join to the customer table.
+  rows: 124385
+  rows_note: ", same as `silver_dim_users`"
+  total_note: lifetime spend total about $4.13M
+
+genie_code_pipeline:
+  graph_removed: 476, 124, 1    # order the numbers appear on the Silver nodes of the graph
+  prompt: |-
+    Create a SQL medallion pipeline from the users, bookings, and reviews tables in samples.wanderbricks.
+    Split the code into 3 files: bronze.sql / silver.sql / gold.sql.
+
+    ## Bronze (streaming tables)
+    - bronze_users, bronze_bookings, bronze_reviews
+    - Read each source as-is with STREAM()
+    - Add columns: _ingested_at (current_timestamp), _source (source table name)
+    - Add a COMMENT and TBLPROPERTIES('quality'='bronze') to each table
+
+    ## Silver (streaming tables, read bronze with STREAM())
+    Common
+    - Define rules with CONSTRAINT ... EXPECT ... ON VIOLATION DROP ROW
+    - Add a NOT NULL check for each PK/FK column
+    - Add a COMMENT and TBLPROPERTIES('quality'='silver') to each table
+    - Keep the source columns, but drop _ingested_at and _source
+
+    Rules per table
+    - silver_dim_users
+      - Remove rows with a NULL email
+      - lower(trim) email and user_type, trim name, upper(trim) country
+      - Allow only individual/business for user_type (record violations without dropping rows)
+      - Trim company_name and set it to NULL if it is empty
+    - silver_fact_bookings
+      - total_amount > 0
+      - check_out >= check_in
+      - status is one of pending/confirmed/cancelled/completed
+      - Add nights = datediff(check_out, check_in)
+    - silver_fact_reviews
+      - is_deleted = false (keep the column because the rule uses it)
+      - rating between 1 and 5
+
+    ## Gold (Materialized View)
+    gold_customer_360: one row per customer
+
+    Columns
+    - User attributes: user_id, name, country, user_type, is_business
+    - lifetime_bookings: number of bookings in any status (distinct booking_id, 0 if no bookings)
+    - lifetime_spend: total amount of completed bookings (2 decimals, NULL if no completed bookings)
+    - avg_rating_given: average rating (3 decimals, NULL if no reviews)
+    - last_booking_at: creation time of the most recent booking
+
+    Conditions
+    - Aggregate bookings and reviews by user_id first (CTEs), then start from silver_dim_users and LEFT JOIN the aggregates (prevents fan-out)
+    - Declare each column's type and an English COMMENT in the column definitions
+    - user_id is NOT NULL + PRIMARY KEY
+    - In column comments, briefly note the value range, what NULL means, and whether the column is PII
+    - Add a table COMMENT (use: segment, LTV, and churn analysis; the base table for Genie) and TBLPROPERTIES('quality'='gold')
+  tip: Aspects like **Expectations rules**, **pre-aggregation to prevent fan-out**, and **column comments and primary key** are hard for Genie Code to infer. Include them explicitly in the prompt so you get results matching 1.1–1.3. For example, leaving out "prevent fan-out" could cause lifetime_spend to inflate when joining bookings and reviews.
+  vdp_goal: bookings and spend per customer
+  vdp_prompt: Aggregate silver_fact_bookings from ${catalog}.genie_code by user_id to get booking count (booking_id count) and completed booking total_amount sum as lifetime_spend, then LEFT JOIN silver_dim_users on user_id to show country and user_type together.
+  vdp_flow_example: Source (2) → Filter → Aggregate → Join
+  vdp_operator_review: "Click the **Aggregate** operator on the canvas. Its name differs each time (for example, **User booking stats**), and so may the column names. The right panel shows settings you can adjust: **Group by** (`user_id`) and **Aggregate by** (for example, `booking_count` and `lifetime_spend`). The **Preview** below compares input and output side by side."
+  vdp_operator_alt: Aggregate operator settings
+
+# ----------------------------------------------------------------------------- Step 2 (semantics)
+# No dashboard in this track, so the semantics step gets its own opening paragraph.
+semantics_intro: Wanderbricks teams calculate KPIs like revenue and cancellation rate in their own SQL scripts and spreadsheets, so the same question returns different numbers. An AI assistant that writes its own SQL against raw tables makes this worse, because it cannot know which definition is the official one.
+
+domain:
+  subtitle: Customer, Booking, and Review Marketing Metrics
+  description: A domain that collects the booking and review KPIs and business terms used by the Wanderbricks marketing team.
+  assets_noun: marketing analytics assets
+
+# Exactly 2 Metric Views: [0] on the main fact, [1] on the secondary fact.
+metric_views:
+  - name: mv_bookings
+    slug: bookings
+    title: Bookings
+    subject: booking data
+    kpi_noun: booking KPIs
+    kpi_summary: booking KPIs (booking count, gross booking value, cancellation rate, etc.)
+    why_silver: The `gold_customer_360` table is already summarized to **one row per customer**. With this table, you cannot answer questions like "booking count by month" or "cancellation rate by country" because you need booking-level granularity. Metric Views are designed to use the finest-grained source data (one booking = one row) and aggregate dynamically based on your query criteria. That's why we use `silver_fact_bookings` as the source.
+    explain:
+      source: A fact table where one row = one booking.
+      joins: "Brings in customer country and type information. This is a many-to-one join: many bookings to one customer."
+      synonyms_example: E.g., Cancellation Rate → cancel rate, cancellation rate
+      formats: Amounts in USD, rates in %
+    note:
+      title: Gross Booking Value includes all booking statuses
+      body: "`Gross Booking Value` includes pending, confirmed, cancelled, and completed bookings. This is the total transaction value (GBV). This definition is critical and revisited in Step 3."
+    queries:
+      - sql: |-
+          SELECT
+            MEASURE(`Booking Count`)         AS bookings,
+            MEASURE(`Gross Booking Value`)   AS gross_booking_value,
+            MEASURE(`Cancellation Rate`)     AS cancellation_rate
+          FROM ${catalog}.default.mv_bookings;
+        verify: "Verify the results: 72,246 bookings, about $40.0M gross booking value, and about 21.2% cancellation rate."
+      - intro: "Now slice the same measures by customer type:"
+        sql: |-
+          SELECT
+            `Customer Type`,
+            MEASURE(`Booking Count`)  AS bookings,
+            MEASURE(`Cancellation Rate`) AS cancellation_rate
+          FROM ${catalog}.default.mv_bookings
+          GROUP BY ALL;
+        shot_alt: Results by customer type
+    yaml: |-
+      version: 1.1
+      comment: "Wanderbricks Booking Metric View. One row = one booking (silver_fact_bookings); booking customer information is joined from silver_dim_users. Data period: 2022-12 to 2025-07-30 (based on booking creation date, latest date 2025-07-30). Customer country values are uppercase full country names (e.g., UNITED STATES, SOUTH KOREA, INDIA). Booking status: pending / confirmed / cancelled / completed."
+      source: ${catalog}.default.silver_fact_bookings
+      joins:
+        - name: dim_user
+          source: ${catalog}.default.silver_dim_users
+          'on': source.user_id = dim_user.user_id
+      dimensions:
+        - name: Booking Date
+          expr: CAST(source.created_at AS DATE)
+          comment: Date the booking was created (based on created_at). The latest data date is 2025-07-30.
+          display_name: Booking Date
+          synonyms: [booking creation date, date]
+          format:
+            type: date
+            date_format: year_month_day
+        - name: Booking Month
+          expr: "DATE_TRUNC('MONTH', source.created_at)"
+          comment: Month in which the booking was created (created_at truncated to month).
+          display_name: Booking Month
+          synonyms: [month, monthly]
+          format:
+            type: date
+            date_format: locale_short_month
+        - name: Check-in Month
+          expr: "DATE_TRUNC('MONTH', source.check_in)"
+          comment: Month of the check-in date (check_in). Used for travel (stay) time-based analysis.
+          display_name: Check-in Month
+          synonyms: [stay month, travel month]
+          format:
+            type: date
+            date_format: locale_short_month
+        - name: Booking Status
+          expr: source.status
+          comment: "Booking status. Values: pending (waiting) / confirmed (confirmed) / cancelled (cancelled) / completed (stay completed)."
+          display_name: Booking Status
+          synonyms: [status]
+        - name: Customer Country
+          expr: dim_user.country
+          comment: Country of the customer who made the booking. Uppercase full country name (e.g., UNITED STATES, SOUTH KOREA, JAPAN). Not country codes (US, KR).
+          display_name: Customer Country
+          synonyms: [country, nation, market]
+        - name: Customer Type
+          expr: dim_user.user_type
+          comment: "Customer type. Values: individual (individual customer) / business (business customer)."
+          display_name: Customer Type
+          synonyms: [customer segment, segment, user type, individual/business]
+        - name: Length of Stay
+          expr: |
+            CASE WHEN source.nights <= 2 THEN '1) 1-2 nights'
+                 WHEN source.nights <= 4 THEN '2) 3-4 nights'
+                 WHEN source.nights <= 7 THEN '3) 5-7 nights'
+                 ELSE '4) 8+ nights' END
+          comment: Check-in to check-out length of stay (nights) bucketed into 1-2 nights / 3-4 nights / 5-7 nights / 8+ nights.
+          display_name: Length of Stay
+          synonyms: [stay duration, nights bucket]
+        - name: Guests
+          expr: source.guests_count
+          comment: Number of guests for one booking (guests_count).
+          display_name: Guests
+          synonyms: [guest count, number of people]
+      measures:
+        - name: Booking Count
+          expr: COUNT(source.booking_id)
+          comment: Number of bookings. Includes all booking statuses (pending, confirmed, cancelled, completed).
+          display_name: Booking Count
+          synonyms: [number of bookings, booking volume, bookings]
+          format:
+            type: number
+            decimal_places:
+              type: exact
+              places: 0
+        - name: Gross Booking Value
+          expr: SUM(source.total_amount)
+          comment: Sum of booking amounts (total_amount). Includes all booking statuses (pending, confirmed, cancelled, completed) and represents total transaction value (GBV). Currency is USD.
+          display_name: Gross Booking Value
+          synonyms: [booking amount, GBV, total transaction value]
+          format:
+            type: currency
+            currency_code: USD
+            decimal_places:
+              type: exact
+              places: 0
+        - name: Average Booking Value
+          expr: AVG(source.total_amount)
+          comment: Average amount per booking (average of total_amount). Includes all booking statuses.
+          display_name: Average Booking Value
+          synonyms: [average order value, average transaction value, AOV]
+          format:
+            type: currency
+            currency_code: USD
+            decimal_places:
+              type: exact
+              places: 2
+        - name: Cancellation Rate
+          expr: "COUNT(source.booking_id) FILTER (WHERE source.status = 'cancelled') / COUNT(source.booking_id)"
+          comment: Ratio of cancelled bookings (status = 'cancelled') to total bookings.
+          display_name: Cancellation Rate
+          synonyms: [cancel rate]
+          format:
+            type: percentage
+            decimal_places:
+              type: exact
+              places: 1
+        - name: Booking Customers
+          expr: COUNT(DISTINCT source.user_id)
+          comment: Number of unique customers who have made at least one booking (distinct user_id).
+          display_name: Booking Customers
+          synonyms: [booker count, customer count, unique bookers]
+          format:
+            type: number
+            decimal_places:
+              type: exact
+              places: 0
+        - name: Average Length of Stay
+          expr: AVG(source.nights)
+          comment: Average number of nights per booking (nights).
+          display_name: Average Length of Stay
+          synonyms: [average nights, average stay duration, ALOS]
+          format:
+            type: number
+            decimal_places:
+              type: exact
+              places: 2
+  - name: mv_reviews
+    slug: reviews
+    title: Reviews
+    subject: review data
+    kpi_noun: review KPIs
+    kpi_summary: review KPIs (review count, average rating, low rating share, etc.)
+    why_separate:
+      title: Why not combine bookings and reviews into one Metric View?
+      body: One booking can have multiple reviews. In reality, 99,317 reviews are linked to 54,302 bookings. If you join reviews to the booking Metric View, booking rows will multiply (fanout), inflating booking counts and amounts. That's why we create separate Metric Views for each fact table.
+    note:
+      title: Some reviews have blank customer type
+      body: If you group by `Customer Type`, you'll find 138 reviews with blank values. These were left by customers excluded from Silver during Step 1 (due to missing email). This example shows how data quality rules in one table affect downstream tables.
+    queries:
+      - sql: |-
+          SELECT
+            MEASURE(`Review Count`)      AS reviews,
+            MEASURE(`Average Rating`)    AS avg_rating,
+            MEASURE(`Low Rating Share`)  AS low_rating_share
+          FROM ${catalog}.default.mv_reviews;
+        verify: "Verify the results: 99,317 reviews, average rating about 3.01, and low rating share about 26.1%."
+        shot_alt: Review KPI results
+    yaml: |-
+      version: 1.1
+      comment: "Wanderbricks Review Metric View. One row = one review (silver_fact_reviews, excluding soft-deleted reviews); review author information is joined from silver_dim_users. One booking can have multiple reviews, so reviews are kept separate from the booking Metric View. Data period: 2023-03 to 2025-07-31. Customer country values are uppercase full country names (e.g., UNITED STATES, SOUTH KOREA)."
+      source: ${catalog}.default.silver_fact_reviews
+      joins:
+        - name: dim_user
+          source: ${catalog}.default.silver_dim_users
+          'on': source.user_id = dim_user.user_id
+      dimensions:
+        - name: Review Date
+          expr: CAST(source.created_at AS DATE)
+          comment: Date the review was written (created_at).
+          display_name: Review Date
+          synonyms: [review creation date, written date]
+          format:
+            type: date
+            date_format: year_month_day
+        - name: Review Month
+          expr: "DATE_TRUNC('MONTH', source.created_at)"
+          comment: Month in which the review was written.
+          display_name: Review Month
+          synonyms: [month, monthly]
+          format:
+            type: date
+            date_format: locale_short_month
+        - name: Rating
+          expr: source.rating
+          comment: Review rating (integer 1–5).
+          display_name: Rating
+          synonyms: [star rating, score]
+        - name: Customer Country
+          expr: dim_user.country
+          comment: Country of the customer who wrote the review. Uppercase full country name (e.g., UNITED STATES, SOUTH KOREA). Not country codes.
+          display_name: Customer Country
+          synonyms: [country, nation, market]
+        - name: Customer Type
+          expr: dim_user.user_type
+          comment: "Customer type of the review author. Values: individual (individual customer) / business (business customer)."
+          display_name: Customer Type
+          synonyms: [customer segment, segment, user type]
+      measures:
+        - name: Review Count
+          expr: COUNT(source.review_id)
+          comment: Number of reviews (excluding soft-deleted reviews).
+          display_name: Review Count
+          synonyms: [number of reviews, feedback count]
+          format:
+            type: number
+            decimal_places:
+              type: exact
+              places: 0
+        - name: Average Rating
+          expr: AVG(source.rating)
+          comment: Average rating (1–5) of reviews.
+          display_name: Average Rating
+          synonyms: [average star rating, satisfaction]
+          format:
+            type: number
+            decimal_places:
+              type: exact
+              places: 2
+        - name: Low Rating Share
+          expr: "COUNT(source.review_id) FILTER (WHERE source.rating <= 2) / COUNT(source.review_id)"
+          comment: Ratio of low-rating reviews (rating 2 or below) to total reviews.
+          display_name: Low Rating Share
+          synonyms: [dissatisfaction rate, low rating ratio]
+          format:
+            type: percentage
+            decimal_places:
+              type: exact
+              places: 1
+        - name: Reviewers
+          expr: COUNT(DISTINCT source.user_id)
+          comment: Number of unique customers who have written at least one review.
+          display_name: Reviewers
+          synonyms: [reviewer count]
+          format:
+            type: number
+            decimal_places:
+              type: exact
+              places: 0
+
+# ----------------------------------------------------------------------------- Step 3 (Genie Agent)
+genie_agent:
+  overview: Marketing executive Mina had to request data from the team and wait every time she wanted to check campaign performance.
+  team: marketing team
+  why_metric_views: If you connect tables, Genie recalculates measures like "revenue" or "cancellation rate" each time. If you connect Metric Views, Genie uses the calculation logic defined in Step 2, so everyone gets the same numbers for the same question.
+  description: A Genie Agent that the Wanderbricks marketing team uses to analyze booking and review metrics in natural language.
+  instructions: |-
+    - Data is available through July 30, 2025. "Recent" should be interpreted as of July 30, 2025, not today.
+    - Country names are in full uppercase. (e.g. UNITED STATES, SOUTH KOREA, JAPAN)
+    - Currency is USD.
+  common_question: Show me the top 10 countries by booking count
+  first_answer_verify: Verify that INDIA (about 13,400 bookings) and CHINA (about 13,100 bookings) are ranked 1st and 2nd.
+  first_answer_measure: Booking Count
+
+# Two ambiguous business terms that Genie gets wrong at first, then right after Step 3.4.
+traps:
+  monitoring:              # Step 3.2: found by a business user's thumbs-down
+    term: revenue
+    persona_quote: To set next quarter's country marketing budgets, I need to first see which countries had the most revenue last year.
+    question: Show me the top 5 countries by revenue in 2024
+    question_short: Show me top 5 countries by revenue in 2024
+    wrong_measure: Gross Booking Value
+    verify_wrong: Verify that Genie used `` MEASURE(`Gross Booking Value`) `` and answered INDIA's revenue as $2,249,571 (about $2.25M).
+    explanation: |-
+      At Wanderbricks, **revenue** means confirmed (`confirmed`) or completed (`completed`) bookings. But the Metric View has no "revenue" measure, only the closest alternative: `Gross Booking Value`. `Gross Booking Value` includes cancelled (`cancelled`) and pending (`pending`) bookings, so Genie overestimated revenue by about 2.8x.
+    table:
+      key_header: Country
+      rows:
+        - { key: INDIA, wrong: about $2.25M, right: about $0.82M }
+    feedback: Revenue should only include confirmed (confirmed) and completed (completed) bookings. Including cancelled and pending bookings in the gross booking value calculation makes it much larger than actual revenue.
+  benchmark:               # Step 3.3: found by a ground-truth benchmark
+    term: peak season
+    question: How many peak-season bookings were there in 2024?
+    definition: At Wanderbricks, **peak season** is when check-in month is June, July, August (summer) or December (year-end).
+    ground_truth_sql: |-
+      SELECT MEASURE(`Booking Count`) AS peak_season_bookings
+      FROM ${catalog}.default.mv_bookings
+      WHERE YEAR(`Check-in Month`) = 2024
+        AND MONTH(`Check-in Month`) IN (6, 7, 8, 12);
+    value: 8001
+    score_reason: Filter Issue
+    explanation: The Metric View has no way to determine "peak season." So Genie either assumes different months arbitrarily (e.g. including November) or aggregates by booking date instead of check-in date, producing results different from the correct answer (8,001). The underlying problem is that **the business term "peak season" is not defined in the Metric View**.
+
+improve:
+  measures:                # added to metric_views[0]; fixes the monitoring trap
+    - name: Revenue
+      expr: SUM(source.total_amount) FILTER (WHERE source.status IN ('confirmed', 'completed'))
+      comment: Revenue (total revenue). Sum of total_amount for confirmed and completed bookings (status = confirmed, completed). Excludes cancelled and pending. Currency USD.
+      synonyms: [total revenue, revenue amount, gross revenue, sales]
+      format_ui: "Click field → select **$** for **Type** (**Currency**: US dollars)"
+      format: { type: currency, currency_code: USD }
+    - name: Net Revenue
+      expr: SUM(source.total_amount) FILTER (WHERE source.status = 'completed')
+      comment: Net Revenue (realized revenue). Sum of total_amount for completed bookings (status = completed), representing actually realized revenue. Currency USD.
+      synonyms: [realized revenue, actual revenue, net sales]
+      format_ui: "Click field → select **$** for **Type** (**Currency**: US dollars)"
+      format: { type: currency, currency_code: USD }
+  fields:                  # added to metric_views[0]; fixes the benchmark trap
+    - name: Season
+      expr: CASE WHEN MONTH(source.check_in) IN (6, 7, 8, 12) THEN 'Peak' ELSE 'Off-peak' END
+      comment: Peak season classification by check-in month. Peak = check-in in Jun, Jul, Aug (summer) + Dec (year-end), other months = off-peak. Values are exactly 'Peak' or 'Off-peak'; filter with equality (= 'Peak'). For "peak season in year N", filter the year with Check-in Year.
+      synonyms: [peak season, off-peak season, high season, low season]
+    - name: Check-in Year
+      expr: YEAR(source.check_in)
+      comment: Year of the check-in date (check_in). Used as the year filter for analysis based on check-in timing, such as peak/off-peak season.
+      synonyms: [stay year, travel year, year of stay]
+  clarify:
+    measure: Gross Booking Value
+    why: Clarify in the Comment that `Gross Booking Value` is not revenue, so Genie doesn't use it for revenue questions.
+    append: Not revenue. Use `Revenue` for revenue and `Net Revenue` for net revenue (realized revenue).
+  verify:
+    sql: |-
+      SELECT
+        MEASURE(`Gross Booking Value`) AS gross_booking_value,
+        MEASURE(`Revenue`)             AS revenue,
+        MEASURE(`Net Revenue`)         AS net_revenue,
+        MEASURE(`Booking Count`) FILTER (WHERE `Season` = 'Peak' AND `Check-in Year` = 2024) AS peak_2024_bookings
+      FROM ${catalog}.default.mv_bookings;
+    columns: [gross_booking_value, revenue, net_revenue, peak_2024_bookings]
+    results: [about $40.0M, about $14.0M, about $4.1M, "8,001"]
+  pages_example_question: What is net revenue?
+  pages:
+    - name: Revenue
+      synonyms: [total revenue, revenue amount, gross revenue, sales]
+      description: Revenue at Wanderbricks is the sum of confirmed booking amounts. It's different from Gross Booking Value (GBV) and Net Revenue.
+      body: |-
+        ## Definition
+        Revenue = Sum of total_amount for bookings where status is confirmed or completed (USD). Excludes cancelled and pending bookings.
+
+        | Metric | Included statuses | Total 2022-12 ~ 2025-07 |
+        |---|---|---|
+        | Gross Booking Value (GBV) | All statuses | about $40.0M |
+        | Revenue | confirmed, completed | about $14.0M |
+        | Net Revenue | completed | about $4.1M |
+
+        ## Business use
+        - Use when reporting confirmed demand size by market and segment.
+        - When a question contains only "revenue," apply this definition.
+        - Related asset: `Revenue` measure in mv_bookings
+    - name: Net Revenue
+      synonyms: [realized revenue, actual revenue, net sales]
+      description: Revenue from completed stays, actually realized. The baseline metric for management reporting and campaign goals.
+      body: |-
+        ## Definition
+        Net Revenue = Sum of total_amount for bookings where status is completed (stays are completed) (USD). Excludes confirmed bookings that haven't had a stay yet.
+
+        ## Business use
+        - Management reporting and campaign revenue targets are measured in Net Revenue. (e.g. the country-level Net Revenue targets of the Summer Escape 2025 campaign)
+        - Related asset: `Net Revenue` measure in mv_bookings
+    - name: Peak Season
+      synonyms: [high season, peak period, busy season]
+      description: Definition of peak travel demand period at Wanderbricks.
+      body: |-
+        ## Definition
+        Peak season = when check-in month is June, July, August (summer) or December (year-end). Other months are off-peak.
+        The reference is stay check-in timing, not booking date. "2024 peak season" means bookings where check-in year is 2024 and check-in month is 6, 7, 8, or 12.
+
+        ## Business use
+        - Use for seasonal promotion budget allocation and to compare bookings and net revenue for peak vs. off-peak.
+        - Based on 2024: average peak-season monthly bookings (about 2,000) are about 3x off-peak monthly bookings (about 700).
+        - Related assets: `Season` and `Check-in Year` fields in mv_bookings
+  benchmark_after: Verify accuracy is now **100% accurate** (1/1) and the question **Assessment** changed to **Good**. Click the result to verify Genie used `` `Season` = 'Peak' `` and `` `Check-in Year` = 2024 `` to answer 8,001 bookings.
+  reask_verify: Verify Genie now uses `` MEASURE(`Revenue`) `` and answers INDIA's revenue as about $818K.
+  before_after:
+    - { before: "Uses `Gross Booking Value` → INDIA about $2.25M (❌)", after: "Uses `Revenue` → INDIA about $818K (✅)" }
+    - { before: "No peak season criteria → Benchmark **Bad** (❌)", after: "Uses `Season` and `Check-in Year` → 8,001, Benchmark **Good** (✅)" }
+  iteration_tip: In this lab, you applied the final verified fix all at once. In real work, you often find Genie gives wrong answers for different reasons even after the first fix. For example, it might interpret "2024" by booking date instead of check-in date, or find values like "off-peak" that include "peak." **Rerun Benchmark → analyze root cause → update Metric View and Instructions → rerun** repeatedly to improve accuracy.
+
+volume:
+  label: Marketing PDF documents
+  docs_noun: marketing documents
+  docs_noun_long: marketing team internal documents
+  docs:
+    - file: 2025_Summer_Escape_Campaign_Brief.pdf
+      content: 2025 summer peak-season campaign period, 5 target countries, country-level booking and net revenue goals, channel budgets
+    - file: Refund_Cancellation_Policy_Update_2025-07.pdf
+      content: Free cancellation policy update effective July 1, 2025, expected impact, review criteria
+  description: Wanderbricks marketing internal documents. 2025 Summer Escape campaign brief (period, target countries, country-level booking and net revenue goals, channel budgets) and July 2025 refund/cancellation policy update notice (effective date, changes, expected impact, review criteria).
+  chat_mode_symptom: no goal information
+  questions:
+    - summary: How did target countries perform vs. campaign goals?
+      from_docs: Campaign period, target countries, country goals
+      from_data: Country bookings and net revenue
+      prompt: How did the campaign period bookings and net revenue for Summer Escape 2025 campaign target countries compare to goals?
+      verify: |-
+        Verify Genie finds the campaign period (2025-06-01 ~ 2025-07-31) and country goals in the campaign brief, queries the Metric View for actual results, and compares them. The answer shows documents as sources below.
+
+        | Country | Goals (bookings / net revenue) | Actual (bookings / net revenue) | Result |
+        |---|---|---|---|
+        | UNITED STATES | 800 / $55K | 870 / $61.2K | Met |
+        | GERMANY | 200 / $18K | 235 / $20.8K | Met |
+        | JAPAN | 400 / $28K | 326 / $16.6K | Missed |
+        | UNITED KINGDOM | 200 / $12K | 158 / $7.8K | Missed |
+        | SOUTH KOREA | 150 / $9K | 115 / $5.5K | Missed |
+      shot_alt: Campaign question answer
+    - summary: Is the cancellation rate after the policy change within expected range?
+      from_docs: Policy effective date, expected impact, review criteria
+      from_data: Monthly cancellation rate
+      prompt: Is the cancellation rate after the July refund policy change within the expected range in the policy document?
+      verify: Verify Genie finds the expected impact (+3%p or less) and review criteria (+5%p or more) in the policy notice, queries the cancellation rate trend, and finds it rose from about 20.4% in June to about 28.8% in July (**+8.4%p**), which exceeds the review threshold.
+      shot_alt: Policy question answer
+
+# ----------------------------------------------------------------------------- Genie One (asked over MCP in Step 4)
+genie_one:
+  definition_question:
+    prompt: How do revenue and net revenue differ at Wanderbricks? How much of each was there in 2024?
+    verify: Verify Genie One explains the difference between revenue (confirmed/completed basis) and net revenue (completed basis) and gives 2024 amounts.
+    pages: [Revenue, Net Revenue]
+    shot_alt: Revenue and net revenue answer
+  second_question:
+    title: Ask about peak season
+    prompt: When is peak season at Wanderbricks? And how many peak-season bookings were there in 2024?
+    verify: Verify Genie One explains peak season as check-in months 6, 7, 8, and 12, and answers 2024 peak-season bookings as **8,001**. Click **Genie Ontology** (1) below the answer to see **Peak Season** Page as the source.
+    shot_alt: Peak season answer
+
+# ----------------------------------------------------------------------------- Step 4 (MCP)
+# Measured live: Genie Agent MCP answered the 3.2 question with MEASURE(`Revenue`):
+# INDIA 818,028.54, CHINA 806,678.00 (same as checks.right_answer_top_country_2024).
+# Genie One MCP answered the peak-season question with 8,001 (traps.benchmark.value).
+mcp:
+  overview: The Wanderbricks product team is adding an AI assistant to the marketing workspace of the Wanderbricks app. Instead of letting that assistant write SQL against raw tables, Aiden serves the Genie Agent from Step 3 over MCP. Every answer then uses the Metric Views, instructions and Pages you built, with Unity Catalog permissions checked on every call.
+  journey_task: Serve the Genie Agent to the Wanderbricks app and to coding agents.
+  product: the Wanderbricks app
+  cli_profile: DEFAULT
+  model: databricks-claude-sonnet-4-5
+  agent_question: Show me the top 5 countries by revenue in 2024
+  agent_verify: Verify the agent called `query_space_<space-id>` and answered **INDIA** first with about **$818K**, then **CHINA** with about **$807K**. The answer names the `Revenue` measure you added in 3.4, not `Gross Booking Value`.
+  genie_one_question: When is peak season at Wanderbricks? And how many peak-season bookings were there in 2024?
+  genie_one_verify: Verify the agent called `genie_ask`, then `genie_poll_response` several times, and answered that peak season is check-in months 6, 7, 8 and 12 with **8,001** peak-season bookings in 2024. The answer ends with an **Explore in Databricks** link to the Genie One conversation.
+  consumers:
+    - { name: Wanderbricks app, detail: AI assistant (Python agent) }
+    - { name: Coding agents, detail: Claude Code · Cursor }
+
+wrapup:
+  audience: marketing executives
+  summary: You have become four personas and built a governed Genie Agent for Wanderbricks, from raw source data to a Genie Agent that the Wanderbricks app, your own agents and coding agents call over MCP.
+
+# ----------------------------------------------------------------------------- measured numbers
+# Extra SQL the dry run executes so every number quoted in prose comes from the data.
+# stage: base (before Step 3.4) or improved (after the Step 3.4 Metric View changes).
+checks:
+  - id: top_countries_by_bookings          # 3.1 first answer
+    stage: base
+    sql: |-
+      SELECT `Customer Country`, MEASURE(`Booking Count`) AS bookings
+      FROM ${catalog}.default.mv_bookings GROUP BY ALL ORDER BY bookings DESC LIMIT 3
+  - id: wrong_answer_top_country_2024      # 3.2 trap: what Genie answers with the closest measure
+    stage: base
+    sql: |-
+      SELECT `Customer Country`, MEASURE(`Gross Booking Value`) AS gbv
+      FROM ${catalog}.default.mv_bookings WHERE YEAR(`Booking Date`) = 2024
+      GROUP BY ALL ORDER BY gbv DESC LIMIT 5
+  - id: right_answer_top_country_2024      # 3.2 / 3.4 / 4.3: the correct business answer (also what the MCP agent returns)
+    stage: improved
+    sql: |-
+      SELECT `Customer Country`, MEASURE(`Revenue`) AS revenue
+      FROM ${catalog}.default.mv_bookings WHERE YEAR(`Booking Date`) = 2024
+      GROUP BY ALL ORDER BY revenue DESC LIMIT 5
+  - id: gold_total_lifetime_spend          # 1.4 total_note
+    stage: base
+    sql: SELECT round(sum(lifetime_spend), 0) FROM ${catalog}.default.gold_customer_360
