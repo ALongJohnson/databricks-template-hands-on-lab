@@ -284,6 +284,10 @@ def main() -> None:
     wdir = (ROOT / args.workshop).resolve()
     if not (wdir / "workshop.yaml").is_file():
         raise SystemExit(f"No workshop.yaml in {wdir}")
+    import agent_lab  # noqa: E402
+    if agent_lab.is_agent_lab(wdir / "workshop.yaml"):
+        agent_lab.render(wdir)
+        return
     render(wdir)
 
 

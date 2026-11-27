@@ -1,0 +1,717 @@
+property_id,title,property_type,base_price,max_guests
+19,Bungalow in Gold Coast,Summer Getaway,251.83,3
+23,Hotel in Abu Dhabi,Urban Year-Round,134.9,2
+111,Bungalow in Gold Coast,Summer Getaway,222.08,2
+187,Beach House in Byron Bay,Summer Getaway,267.94,7
+191,Apartment in Madrid,Urban Year-Round,179.72,3
+201,Bungalow in Phuket,Summer Getaway,126.78,1
+217,Serviced Residence in San Francisco,Urban Year-Round,238.19,2
+246,Hotel in Singapore,Urban Year-Round,150.23,1
+254,Hotel in Berlin,Urban Year-Round,107.22,2
+263,Bungalow in Gold Coast,Summer Getaway,337.04,4
+276,Hotel in Barcelona,Urban Year-Round,132.93,2
+286,Bungalow in Byron Bay,Summer Getaway,349.61,6
+306,Bungalow in Gold Coast,Summer Getaway,215.84,1
+323,Beach House in Mykonos,Summer Getaway,232.17,1
+376,Bungalow in Santorini,Summer Getaway,252.74,2
+391,Historic Inn in Rome,Historical Place,170.7,3
+540,Hotel in Barcelona,Urban Year-Round,152.03,1
+553,Bungalow in Sardinia,Summer Getaway,216.09,2
+568,Bungalow in Phuket,Summer Getaway,129.02,2
+571,Heritage Hotel in London,Historical Place,330.19,8
+638,Hotel in Munich,Urban Year-Round,105.42,1
+658,Hotel in Barcelona,Urban Year-Round,156.84,1
+723,Hotel in San Francisco,Urban Year-Round,223.11,1
+725,Hotel in Abu Dhabi,Urban Year-Round,250.89,9
+736,Hotel in San Francisco,Urban Year-Round,284.71,1
+792,Bungalow in Mallorca,Summer Getaway,176.33,1
+843,Bungalow in Ibiza,Summer Getaway,186.25,1
+863,Bungalow in Sardinia,Summer Getaway,191.34,1
+874,Hotel in Barcelona,Urban Year-Round,150.1,2
+892,Bungalow in Gold Coast,Summer Getaway,314.14,4
+895,Beach House in Ibiza,Summer Getaway,224.95,3
+925,Villa in Sardinia,Summer Getaway,174.15,2
+934,Hotel in Barcelona,Urban Year-Round,147.33,2
+950,Bungalow in Phuket,Summer Getaway,217.2,6
+957,Apartment in Paris,Urban Year-Round,165.39,2
+1058,Hotel in Dubai,Urban Year-Round,171.55,3
+1081,Bungalow in Gold Coast,Summer Getaway,270.78,2
+1108,Villa in Gold Coast,Summer Getaway,212.71,2
+1115,Hotel in Singapore,Urban Year-Round,171.18,2
+1158,Beach House in Phuket,Summer Getaway,248.43,6
+1171,Hotel in Tokyo,Urban Year-Round,142.42,1
+1225,Castle Stay in Rome,Historical Place,185.56,3
+1229,Bungalow in Gold Coast,Summer Getaway,339.43,6
+1243,Bungalow in Mallorca,Summer Getaway,169.17,2
+1271,Bungalow in Mallorca,Summer Getaway,160.74,2
+1277,Apartment in Paris,Urban Year-Round,186.97,4
+1327,Beach House in Mallorca,Summer Getaway,239.86,4
+1336,Heritage Hotel in Rome,Historical Place,197.48,4
+1362,Hotel in Paris,Urban Year-Round,192.25,3
+1371,Hotel in Paris,Urban Year-Round,343.02,5
+1439,Bungalow in Sardinia,Summer Getaway,304.73,6
+1452,Bungalow in Gold Coast,Summer Getaway,238.05,1
+1492,Bungalow in Sardinia,Summer Getaway,174.81,2
+1502,Villa in Phuket,Summer Getaway,184.48,5
+1537,Villa in Phuket,Summer Getaway,213.86,4
+1599,Bungalow in Ibiza,Summer Getaway,285.23,5
+1617,Heritage Hotel in Bath,Historical Place,258.78,6
+1675,Bungalow in Mallorca,Summer Getaway,216.42,3
+1740,Bungalow in Mallorca,Summer Getaway,181.66,2
+1793,Bungalow in Phuket,Summer Getaway,129.33,2
+1807,Beach House in Phuket,Summer Getaway,152.84,2
+1818,Bungalow in Gold Coast,Summer Getaway,310.62,7
+1821,Hotel in Dubai,Urban Year-Round,177.05,3
+1828,Beach House in Mallorca,Summer Getaway,163.51,2
+1870,Beach House in Gold Coast,Summer Getaway,184.83,2
+1876,Beach House in Sardinia,Summer Getaway,177.35,2
+1899,Bungalow in Phuket,Summer Getaway,125.75,1
+1900,Apartment in Paris,Urban Year-Round,202.36,4
+1941,Bungalow in Santorini,Summer Getaway,198.47,1
+1946,Hotel in Abu Dhabi,Urban Year-Round,126.32,2
+1958,Serviced Residence in Osaka,Urban Year-Round,212.72,6
+1966,Apartment in San Francisco,Urban Year-Round,257.36,2
+1976,Hotel in Berlin,Urban Year-Round,108.92,2
+2058,Beach House in Mallorca,Summer Getaway,146.43,1
+2080,Hotel in Dubai,Urban Year-Round,125.11,2
+2081,Bungalow in Mallorca,Summer Getaway,203.56,2
+2094,Serviced Residence in Singapore,Urban Year-Round,198.48,5
+2112,Serviced Residence in Dubai,Urban Year-Round,156.09,1
+2147,Beach House in Sardinia,Summer Getaway,285.0,5
+2153,Hotel in Madrid,Urban Year-Round,150.82,1
+2154,Apartment in Singapore,Urban Year-Round,140.12,2
+2157,Beach House in Krabi,Summer Getaway,136.89,1
+2165,Bungalow in Krabi,Summer Getaway,166.04,4
+2184,Bungalow in Amalfi,Summer Getaway,284.06,3
+2186,Bungalow in Mallorca,Summer Getaway,226.6,3
+2190,Bungalow in Phuket,Summer Getaway,131.89,1
+2310,Hotel in New York,Urban Year-Round,210.9,4
+2311,Hotel in Paris,Urban Year-Round,191.67,2
+2350,Apartment in Tokyo,Urban Year-Round,137.74,1
+2353,Beach House in Gold Coast,Summer Getaway,148.78,2
+2371,Hotel in San Francisco,Urban Year-Round,199.49,2
+2375,Serviced Residence in New York,Urban Year-Round,183.74,3
+2386,Beach House in Phuket,Summer Getaway,161.89,1
+2411,Hotel in New York,Urban Year-Round,371.34,8
+2443,Hotel in Munich,Urban Year-Round,141.89,2
+2447,Beach House in Mallorca,Summer Getaway,150.15,2
+2527,Bungalow in Byron Bay,Summer Getaway,219.28,1
+2547,Bungalow in Phuket,Summer Getaway,130.85,1
+2575,Beach House in Sardinia,Summer Getaway,188.67,2
+2594,Villa in Phuket,Summer Getaway,131.64,1
+2603,Bungalow in Mallorca,Summer Getaway,190.44,2
+2611,Villa in Gold Coast,Summer Getaway,207.6,2
+2635,Hotel in Munich,Urban Year-Round,172.88,5
+2656,Bungalow in Phuket,Summer Getaway,183.04,4
+2688,Hotel in Tokyo,Urban Year-Round,166.97,5
+2704,Bungalow in Mallorca,Summer Getaway,216.75,2
+2727,Hotel in Dubai,Urban Year-Round,149.59,1
+2730,Apartment in San Francisco,Urban Year-Round,235.97,2
+2733,Bungalow in Mykonos,Summer Getaway,380.34,4
+2807,Bungalow in Ibiza,Summer Getaway,255.64,4
+2936,Bungalow in Krabi,Summer Getaway,201.39,5
+2948,Bungalow in Gold Coast,Summer Getaway,193.75,2
+2968,Hotel in Tokyo,Urban Year-Round,134.42,2
+2981,Hotel in Singapore,Urban Year-Round,183.16,3
+2998,Beach House in Gold Coast,Summer Getaway,207.6,1
+3023,Hotel in Singapore,Urban Year-Round,251.1,4
+3044,Historic Inn in Xi'an,Historical Place,123.68,2
+3113,Beach House in Mallorca,Summer Getaway,181.38,1
+3139,Serviced Residence in Abu Dhabi,Urban Year-Round,118.35,1
+3142,Beach House in Mallorca,Summer Getaway,247.16,5
+3207,Bungalow in Gold Coast,Summer Getaway,283.68,5
+3229,Bungalow in Amalfi,Summer Getaway,248.41,2
+3243,Beach House in Phuket,Summer Getaway,126.64,2
+3248,Hotel in Dubai,Urban Year-Round,168.14,2
+3250,Bungalow in Gold Coast,Summer Getaway,236.39,3
+3297,Bungalow in Mykonos,Summer Getaway,374.94,9
+3340,Bungalow in Mallorca,Summer Getaway,178.75,2
+3350,Hotel in Dubai,Urban Year-Round,176.35,4
+3365,Beach House in Mallorca,Summer Getaway,199.8,2
+3400,Villa in Krabi,Summer Getaway,124.38,2
+3413,Hotel in Singapore,Urban Year-Round,216.73,3
+3568,Bungalow in Phuket,Summer Getaway,132.99,1
+3570,Serviced Residence in Munich,Urban Year-Round,134.55,2
+3572,Bungalow in Gold Coast,Summer Getaway,220.98,3
+3587,Beach House in Phuket,Summer Getaway,165.87,3
+3604,Hotel in Abu Dhabi,Urban Year-Round,133.66,2
+3640,Villa in Phuket,Summer Getaway,158.93,4
+3692,Hotel in Tokyo,Urban Year-Round,182.05,4
+3693,Apartment in Abu Dhabi,Urban Year-Round,134.4,1
+3753,Serviced Residence in Dubai,Urban Year-Round,185.46,3
+3765,Hotel in Tokyo,Urban Year-Round,149.88,2
+3790,Villa in Mallorca,Summer Getaway,232.19,4
+3798,Apartment in Paris,Urban Year-Round,153.34,3
+3868,Hotel in Dubai,Urban Year-Round,158.29,4
+3878,Bungalow in Gold Coast,Summer Getaway,234.98,2
+3931,Apartment in New York,Urban Year-Round,191.94,2
+3999,Hotel in Paris,Urban Year-Round,210.87,3
+4004,Heritage Hotel in Cairo,Historical Place,213.79,7
+4007,Heritage Hotel in Cairo,Historical Place,87.34,2
+4014,Hotel in Madrid,Urban Year-Round,153.36,2
+4023,Hotel in Tokyo,Urban Year-Round,148.48,2
+4109,Bungalow in Krabi,Summer Getaway,214.95,2
+4110,Bungalow in Mykonos,Summer Getaway,235.26,4
+4122,Hotel in Abu Dhabi,Urban Year-Round,136.86,1
+4237,Beach House in Krabi,Summer Getaway,131.26,2
+4244,Serviced Residence in Paris,Urban Year-Round,148.22,1
+4257,Bungalow in Gold Coast,Summer Getaway,209.83,1
+4260,Hotel in Barcelona,Urban Year-Round,201.83,4
+4273,Villa in Ibiza,Summer Getaway,181.48,1
+4298,Hotel in Tokyo,Urban Year-Round,213.67,4
+4318,Bungalow in Santorini,Summer Getaway,211.55,2
+4336,Hotel in Munich,Urban Year-Round,108.54,1
+4345,Bungalow in Mallorca,Summer Getaway,244.33,2
+4386,Hotel in Abu Dhabi,Urban Year-Round,131.92,2
+4443,Hotel in Abu Dhabi,Urban Year-Round,142.94,1
+4461,Bungalow in Krabi,Summer Getaway,133.09,2
+4467,Historic Inn in London,Historical Place,159.54,4
+4526,Hotel in Abu Dhabi,Urban Year-Round,193.31,3
+4545,Hotel in Munich,Urban Year-Round,112.08,1
+4580,Hotel in Berlin,Urban Year-Round,159.31,4
+4620,Beach House in Mykonos,Summer Getaway,213.5,2
+4624,Historic Inn in Rome,Historical Place,217.58,6
+4630,Hotel in Paris,Urban Year-Round,183.52,2
+4685,Bungalow in Gold Coast,Summer Getaway,229.0,1
+4717,Historic Inn in Xi'an,Historical Place,193.66,2
+4719,Bungalow in Phuket,Summer Getaway,142.73,2
+4820,Hotel in Munich,Urban Year-Round,100.73,1
+4860,Beach House in Ibiza,Summer Getaway,236.57,3
+4882,Bungalow in Gold Coast,Summer Getaway,198.62,2
+4892,Bungalow in Amalfi,Summer Getaway,342.67,5
+4905,Hotel in Abu Dhabi,Urban Year-Round,205.21,5
+4946,Hotel in Singapore,Urban Year-Round,201.24,1
+4962,Apartment in Berlin,Urban Year-Round,116.07,1
+5011,Bungalow in Byron Bay,Summer Getaway,178.12,2
+5022,Bungalow in Mallorca,Summer Getaway,179.91,2
+5023,Hotel in Osaka,Urban Year-Round,132.16,2
+5059,Bungalow in Phuket,Summer Getaway,153.16,4
+5076,Beach House in Ibiza,Summer Getaway,175.63,2
+5080,Bungalow in Phuket,Summer Getaway,143.21,3
+5119,Hotel in San Francisco,Urban Year-Round,355.31,5
+5151,Apartment in Madrid,Urban Year-Round,158.64,1
+5197,Hotel in Paris,Urban Year-Round,159.79,1
+5204,Hotel in Dubai,Urban Year-Round,140.29,2
+5250,Beach House in Phuket,Summer Getaway,152.39,3
+5256,Castle Stay in Xi'an,Historical Place,139.17,2
+5282,Bungalow in Phuket,Summer Getaway,139.65,2
+5303,Beach House in Mallorca,Summer Getaway,184.08,1
+5328,Hotel in Berlin,Urban Year-Round,134.96,3
+5331,Hotel in Berlin,Urban Year-Round,118.72,2
+5339,Bungalow in Gold Coast,Summer Getaway,258.94,3
+5361,Hotel in Tokyo,Urban Year-Round,120.77,2
+5377,Bungalow in Mallorca,Summer Getaway,235.61,4
+5395,Bungalow in Phuket,Summer Getaway,147.33,3
+5453,Serviced Residence in San Francisco,Urban Year-Round,250.78,1
+5522,Bungalow in Mallorca,Summer Getaway,224.41,2
+5563,Hotel in Barcelona,Urban Year-Round,152.73,1
+5565,Bungalow in Byron Bay,Summer Getaway,230.94,2
+5566,Heritage Hotel in Beijing,Historical Place,173.63,4
+5594,Bungalow in Phuket,Summer Getaway,124.35,1
+5604,Bungalow in Mykonos,Summer Getaway,190.82,2
+5644,Bungalow in Gold Coast,Summer Getaway,272.93,4
+5728,Bungalow in Ibiza,Summer Getaway,262.41,6
+5741,Hotel in San Francisco,Urban Year-Round,210.82,2
+5771,Bungalow in Gold Coast,Summer Getaway,327.71,7
+5782,Beach House in Gold Coast,Summer Getaway,228.92,1
+5794,Bungalow in Ibiza,Summer Getaway,192.56,2
+5810,Beach House in Krabi,Summer Getaway,162.28,3
+5826,Bungalow in Gold Coast,Summer Getaway,301.28,7
+5858,Beach House in Gold Coast,Summer Getaway,198.31,1
+5897,Apartment in San Francisco,Urban Year-Round,223.48,2
+5900,Hotel in Barcelona,Urban Year-Round,189.33,3
+5910,Hotel in Osaka,Urban Year-Round,134.43,3
+5948,Beach House in Krabi,Summer Getaway,131.71,2
+5997,Historic Inn in Agra,Historical Place,89.99,6
+6045,Bungalow in Santorini,Summer Getaway,281.84,3
+6049,Beach House in Gold Coast,Summer Getaway,208.64,1
+6122,Hotel in Madrid,Urban Year-Round,146.22,2
+6141,Hotel in Tokyo,Urban Year-Round,140.7,1
+6155,Hotel in Madrid,Urban Year-Round,184.02,3
+6172,Beach House in Mallorca,Summer Getaway,257.76,6
+6173,Hotel in Abu Dhabi,Urban Year-Round,158.69,3
+6190,Bungalow in Mallorca,Summer Getaway,207.24,4
+6223,Bungalow in Phuket,Summer Getaway,136.19,2
+6255,Hotel in Paris,Urban Year-Round,128.99,1
+6282,Hotel in New York,Urban Year-Round,190.49,1
+6310,Hotel in Osaka,Urban Year-Round,141.73,1
+6337,Hotel in Barcelona,Urban Year-Round,235.65,5
+6370,Hotel in Dubai,Urban Year-Round,174.93,3
+6441,Bungalow in Mallorca,Summer Getaway,179.51,1
+6452,Apartment in San Francisco,Urban Year-Round,282.29,4
+6527,Beach House in Mallorca,Summer Getaway,293.08,6
+6541,Beach House in Phuket,Summer Getaway,143.46,3
+6569,Apartment in Abu Dhabi,Urban Year-Round,120.23,2
+6637,Hotel in San Francisco,Urban Year-Round,232.34,1
+6677,Apartment in San Francisco,Urban Year-Round,262.84,1
+6703,Beach House in Phuket,Summer Getaway,121.65,1
+6718,Bungalow in Gold Coast,Summer Getaway,252.53,2
+6730,Bungalow in Phuket,Summer Getaway,237.58,8
+6735,Beach House in Mallorca,Summer Getaway,173.68,1
+6746,Bungalow in Phuket,Summer Getaway,150.85,2
+6769,Villa in Byron Bay,Summer Getaway,275.94,6
+6816,Bungalow in Phuket,Summer Getaway,121.81,3
+6876,Beach House in Phuket,Summer Getaway,134.8,2
+6913,Hotel in Tokyo,Urban Year-Round,185.84,2
+6934,Bungalow in Phuket,Summer Getaway,216.0,5
+7006,Hotel in Tokyo,Urban Year-Round,142.04,2
+7027,Beach House in Mallorca,Summer Getaway,166.93,2
+7098,Bungalow in Phuket,Summer Getaway,135.96,3
+7124,Hotel in Munich,Urban Year-Round,115.22,2
+7134,Bungalow in Mallorca,Summer Getaway,189.29,1
+7158,Beach House in Gold Coast,Summer Getaway,215.38,1
+7175,Bungalow in Mallorca,Summer Getaway,170.25,2
+7226,Heritage Hotel in Xi'an,Historical Place,169.09,3
+7259,Bungalow in Byron Bay,Summer Getaway,349.75,6
+7269,Hotel in Berlin,Urban Year-Round,121.93,3
+7313,Hotel in Abu Dhabi,Urban Year-Round,134.74,1
+7327,Beach House in Phuket,Summer Getaway,168.74,2
+7333,Beach House in Mallorca,Summer Getaway,202.97,2
+7372,Beach House in Mallorca,Summer Getaway,166.78,2
+7409,Hotel in Paris,Urban Year-Round,170.77,1
+7423,Hotel in Tokyo,Urban Year-Round,225.01,9
+7427,Hotel in Osaka,Urban Year-Round,125.72,2
+7468,Historic Inn in Rome,Historical Place,219.06,5
+7471,Serviced Residence in Paris,Urban Year-Round,221.84,5
+7523,Heritage Hotel in Xi'an,Historical Place,228.89,2
+7529,Hotel in New York,Urban Year-Round,192.51,1
+7552,Beach House in Phuket,Summer Getaway,154.84,2
+7600,Villa in Gold Coast,Summer Getaway,252.85,3
+7618,Hotel in Berlin,Urban Year-Round,113.84,1
+7619,Hotel in Abu Dhabi,Urban Year-Round,142.45,2
+7673,Apartment in Abu Dhabi,Urban Year-Round,124.16,2
+7676,Hotel in Tokyo,Urban Year-Round,164.59,3
+7724,Bungalow in Byron Bay,Summer Getaway,233.14,5
+7730,Bungalow in Phuket,Summer Getaway,176.42,2
+7777,Bungalow in Mallorca,Summer Getaway,187.14,2
+7783,Bungalow in Mallorca,Summer Getaway,161.38,1
+7786,Bungalow in Mykonos,Summer Getaway,213.48,1
+7834,Serviced Residence in Paris,Urban Year-Round,191.52,1
+7846,Bungalow in Gold Coast,Summer Getaway,318.1,6
+7851,Historic Inn in Rome,Historical Place,176.28,3
+7866,Historic Inn in Luxor,Historical Place,113.42,3
+7884,Bungalow in Krabi,Summer Getaway,130.27,1
+7895,Apartment in Tokyo,Urban Year-Round,144.71,2
+7940,Hotel in Barcelona,Urban Year-Round,194.5,5
+7977,Bungalow in Byron Bay,Summer Getaway,167.64,2
+7978,Bungalow in Phuket,Summer Getaway,139.16,2
+7979,Hotel in Paris,Urban Year-Round,222.55,3
+8038,Bungalow in Ibiza,Summer Getaway,191.38,2
+8043,Villa in Gold Coast,Summer Getaway,350.74,5
+8108,Apartment in Osaka,Urban Year-Round,128.95,1
+8131,Hotel in Paris,Urban Year-Round,185.88,2
+8139,Bungalow in Mallorca,Summer Getaway,221.08,3
+8141,Serviced Residence in Singapore,Urban Year-Round,161.87,2
+8178,Villa in Gold Coast,Summer Getaway,228.09,1
+8199,Hotel in San Francisco,Urban Year-Round,201.46,2
+8204,Apartment in Madrid,Urban Year-Round,124.12,1
+8210,Apartment in Paris,Urban Year-Round,157.02,2
+8228,Hotel in Tokyo,Urban Year-Round,367.22,7
+8259,Historic Inn in Cairo,Historical Place,89.12,1
+8275,Hotel in Dubai,Urban Year-Round,157.49,2
+8277,Beach House in Gold Coast,Summer Getaway,258.06,3
+8327,Beach House in Santorini,Summer Getaway,199.09,2
+8357,Bungalow in Phuket,Summer Getaway,169.64,3
+8368,Bungalow in Byron Bay,Summer Getaway,176.23,1
+8382,Hotel in Singapore,Urban Year-Round,207.85,4
+8439,Apartment in Barcelona,Urban Year-Round,150.77,2
+8476,Villa in Mallorca,Summer Getaway,186.88,2
+8492,Villa in Phuket,Summer Getaway,128.87,1
+8500,Beach House in Gold Coast,Summer Getaway,203.47,1
+8505,Bungalow in Gold Coast,Summer Getaway,231.79,4
+8627,Bungalow in Ibiza,Summer Getaway,236.99,3
+8651,Historic Inn in Rome,Historical Place,178.2,1
+8658,Beach House in Gold Coast,Summer Getaway,233.72,3
+8698,Villa in Gold Coast,Summer Getaway,299.84,8
+8705,Villa in Mykonos,Summer Getaway,204.02,1
+8739,Bungalow in Mallorca,Summer Getaway,194.77,2
+8770,Serviced Residence in Barcelona,Urban Year-Round,155.22,2
+8813,Hotel in Paris,Urban Year-Round,138.38,1
+8822,Hotel in New York,Urban Year-Round,215.36,3
+8863,Beach House in Gold Coast,Summer Getaway,206.46,1
+8885,Bungalow in Phuket,Summer Getaway,180.4,5
+8926,Apartment in Osaka,Urban Year-Round,202.79,4
+8951,Beach House in Phuket,Summer Getaway,120.39,1
+8962,Apartment in Berlin,Urban Year-Round,142.46,4
+8964,Hotel in Abu Dhabi,Urban Year-Round,158.19,4
+8989,Villa in Phuket,Summer Getaway,134.24,3
+8995,Bungalow in Gold Coast,Summer Getaway,179.95,1
+9009,Serviced Residence in San Francisco,Urban Year-Round,232.4,1
+9010,Hotel in Dubai,Urban Year-Round,144.53,2
+9040,Hotel in Dubai,Urban Year-Round,210.43,5
+9045,Bungalow in Gold Coast,Summer Getaway,229.09,2
+9123,Hotel in Abu Dhabi,Urban Year-Round,198.56,3
+9179,Beach House in Mallorca,Summer Getaway,281.95,7
+9204,Bungalow in Gold Coast,Summer Getaway,318.81,5
+9229,Hotel in Berlin,Urban Year-Round,143.01,4
+9230,Bungalow in Ibiza,Summer Getaway,189.35,2
+9242,Bungalow in Phuket,Summer Getaway,230.38,5
+9281,Bungalow in Sardinia,Summer Getaway,212.27,2
+9284,Beach House in Gold Coast,Summer Getaway,221.27,2
+9362,Hotel in Abu Dhabi,Urban Year-Round,124.94,1
+9379,Hotel in Dubai,Urban Year-Round,201.64,3
+9391,Bungalow in Gold Coast,Summer Getaway,208.05,1
+9398,Apartment in Madrid,Urban Year-Round,174.53,4
+9413,Bungalow in Ibiza,Summer Getaway,182.26,2
+9421,Beach House in Gold Coast,Summer Getaway,200.1,1
+9447,Bungalow in Mallorca,Summer Getaway,181.74,1
+9468,Bungalow in Mallorca,Summer Getaway,176.27,2
+9474,Hotel in Madrid,Urban Year-Round,154.97,3
+9492,Bungalow in Gold Coast,Summer Getaway,186.56,1
+9548,Beach House in Mallorca,Summer Getaway,240.9,2
+9558,Hotel in Dubai,Urban Year-Round,122.62,2
+9572,Bungalow in Krabi,Summer Getaway,153.73,1
+9615,Hotel in Munich,Urban Year-Round,121.96,2
+9623,Apartment in Osaka,Urban Year-Round,123.69,2
+9632,Serviced Residence in Osaka,Urban Year-Round,134.39,2
+9637,Serviced Residence in Singapore,Urban Year-Round,175.19,1
+9736,Bungalow in Gold Coast,Summer Getaway,191.99,1
+9778,Bungalow in Mallorca,Summer Getaway,168.12,1
+9787,Bungalow in Gold Coast,Summer Getaway,190.03,1
+9866,Villa in Phuket,Summer Getaway,118.72,2
+9957,Bungalow in Ibiza,Summer Getaway,229.52,3
+9978,Beach House in Sardinia,Summer Getaway,346.93,7
+10000,Hotel in Abu Dhabi,Urban Year-Round,188.76,5
+10023,Bungalow in Gold Coast,Summer Getaway,211.52,1
+10046,Bungalow in Krabi,Summer Getaway,133.34,2
+10067,Bungalow in Mallorca,Summer Getaway,188.93,1
+10098,Beach House in Krabi,Summer Getaway,212.54,8
+10160,Hotel in Tokyo,Urban Year-Round,139.67,1
+10183,Hotel in Abu Dhabi,Urban Year-Round,131.23,1
+10202,Apartment in Dubai,Urban Year-Round,126.07,2
+10240,Hotel in Tokyo,Urban Year-Round,204.36,4
+10244,Bungalow in Mallorca,Summer Getaway,181.88,2
+10266,Bungalow in Mallorca,Summer Getaway,211.73,2
+10271,Bungalow in Mallorca,Summer Getaway,269.43,5
+10300,Bungalow in Byron Bay,Summer Getaway,170.54,2
+10324,Hotel in San Francisco,Urban Year-Round,214.85,2
+10350,Bungalow in Phuket,Summer Getaway,119.87,1
+10393,Beach House in Gold Coast,Summer Getaway,210.62,2
+10442,Apartment in Singapore,Urban Year-Round,318.72,9
+10501,Bungalow in Gold Coast,Summer Getaway,185.57,1
+10592,Hotel in Singapore,Urban Year-Round,171.68,3
+10620,Hotel in Berlin,Urban Year-Round,111.67,3
+10642,Hotel in San Francisco,Urban Year-Round,271.12,2
+10649,Apartment in Berlin,Urban Year-Round,112.92,1
+10683,Hotel in Singapore,Urban Year-Round,140.98,1
+10699,Bungalow in Phuket,Summer Getaway,127.72,1
+10720,Hotel in Munich,Urban Year-Round,108.63,1
+10722,Hotel in Barcelona,Urban Year-Round,235.32,4
+10723,Bungalow in Sardinia,Summer Getaway,235.46,5
+10751,Bungalow in Phuket,Summer Getaway,120.9,1
+10766,Bungalow in Mallorca,Summer Getaway,261.58,3
+10774,Hotel in Berlin,Urban Year-Round,121.2,1
+10784,Beach House in Ibiza,Summer Getaway,228.24,3
+10789,Beach House in Phuket,Summer Getaway,242.07,5
+10791,Bungalow in Mallorca,Summer Getaway,174.47,1
+10795,Apartment in Madrid,Urban Year-Round,164.08,4
+10826,Villa in Phuket,Summer Getaway,143.22,2
+10879,Hotel in Madrid,Urban Year-Round,158.05,2
+10906,Bungalow in Phuket,Summer Getaway,128.62,2
+10955,Beach House in Phuket,Summer Getaway,121.93,1
+10961,Hotel in Paris,Urban Year-Round,192.09,2
+10969,Hotel in Abu Dhabi,Urban Year-Round,172.17,4
+10979,Historic Inn in Agra,Historical Place,86.81,5
+10991,Bungalow in Ibiza,Summer Getaway,287.66,6
+11007,Heritage Hotel in Xi'an,Historical Place,147.6,2
+11008,Bungalow in Gold Coast,Summer Getaway,261.14,3
+11019,Hotel in Abu Dhabi,Urban Year-Round,129.95,2
+11032,Bungalow in Krabi,Summer Getaway,160.84,4
+11037,Bungalow in Krabi,Summer Getaway,175.03,4
+11082,Apartment in Paris,Urban Year-Round,166.12,2
+11158,Bungalow in Phuket,Summer Getaway,152.2,2
+11181,Apartment in Abu Dhabi,Urban Year-Round,155.76,2
+11187,Historic Inn in Rome,Historical Place,140.75,1
+11345,Villa in Ibiza,Summer Getaway,405.2,8
+11349,Hotel in Madrid,Urban Year-Round,143.7,2
+11361,Beach House in Phuket,Summer Getaway,132.26,1
+11389,Apartment in Abu Dhabi,Urban Year-Round,120.46,2
+11391,Bungalow in Gold Coast,Summer Getaway,195.98,2
+11420,Hotel in Abu Dhabi,Urban Year-Round,150.26,2
+11457,Bungalow in Phuket,Summer Getaway,203.93,6
+11468,Bungalow in Gold Coast,Summer Getaway,260.66,2
+11486,Hotel in Barcelona,Urban Year-Round,166.66,2
+11496,Bungalow in Phuket,Summer Getaway,204.47,5
+11498,Bungalow in Gold Coast,Summer Getaway,198.9,2
+11592,Heritage Hotel in Cairo,Historical Place,99.46,1
+11614,Heritage Hotel in Cairo,Historical Place,109.93,4
+11702,Beach House in Mallorca,Summer Getaway,221.78,3
+11725,Serviced Residence in Dubai,Urban Year-Round,127.99,1
+11732,Bungalow in Gold Coast,Summer Getaway,191.85,2
+11733,Bungalow in Phuket,Summer Getaway,126.29,1
+11734,Bungalow in Sardinia,Summer Getaway,215.35,2
+11743,Hotel in Singapore,Urban Year-Round,178.8,2
+11759,Hotel in Madrid,Urban Year-Round,144.95,2
+11781,Hotel in Singapore,Urban Year-Round,152.53,1
+11815,Beach House in Ibiza,Summer Getaway,282.79,5
+11817,Beach House in Gold Coast,Summer Getaway,203.42,1
+11833,Hotel in Munich,Urban Year-Round,113.78,1
+11841,Bungalow in Phuket,Summer Getaway,113.71,1
+11846,Bungalow in Mallorca,Summer Getaway,161.65,1
+11865,Bungalow in Mallorca,Summer Getaway,159.46,2
+11869,Serviced Residence in Tokyo,Urban Year-Round,229.45,6
+11884,Bungalow in Phuket,Summer Getaway,120.39,2
+11895,Castle Stay in London,Historical Place,150.25,2
+11897,Bungalow in Gold Coast,Summer Getaway,241.81,2
+11911,Bungalow in Gold Coast,Summer Getaway,209.28,1
+11912,Historic Inn in Rome,Historical Place,175.36,3
+11917,Hotel in Barcelona,Urban Year-Round,165.6,2
+12008,Serviced Residence in Abu Dhabi,Urban Year-Round,135.19,2
+12031,Apartment in Abu Dhabi,Urban Year-Round,168.43,4
+12040,Apartment in Singapore,Urban Year-Round,155.54,1
+12046,Bungalow in Phuket,Summer Getaway,198.54,7
+12104,Hotel in New York,Urban Year-Round,178.33,2
+12110,Apartment in Madrid,Urban Year-Round,210.79,2
+12163,Hotel in Tokyo,Urban Year-Round,138.42,2
+12184,Hotel in Paris,Urban Year-Round,176.56,3
+12267,Hotel in Tokyo,Urban Year-Round,200.06,6
+12279,Hotel in New York,Urban Year-Round,160.56,1
+12287,Bungalow in Krabi,Summer Getaway,201.09,5
+12354,Hotel in Abu Dhabi,Urban Year-Round,128.49,3
+12363,Bungalow in Sardinia,Summer Getaway,193.26,4
+12408,Bungalow in Mallorca,Summer Getaway,250.46,5
+12455,Hotel in Dubai,Urban Year-Round,155.13,2
+12469,Bungalow in Mallorca,Summer Getaway,177.99,2
+12511,Hotel in Madrid,Urban Year-Round,132.54,2
+12516,Bungalow in Phuket,Summer Getaway,163.53,4
+12589,Hotel in New York,Urban Year-Round,191.1,1
+12627,Hotel in Berlin,Urban Year-Round,107.65,1
+12655,Serviced Residence in Tokyo,Urban Year-Round,150.64,3
+12685,Hotel in Dubai,Urban Year-Round,151.67,2
+12697,Hotel in San Francisco,Urban Year-Round,234.09,2
+12729,Apartment in New York,Urban Year-Round,159.14,2
+12730,Bungalow in Gold Coast,Summer Getaway,220.03,2
+12752,Bungalow in Phuket,Summer Getaway,148.39,2
+12762,Beach House in Gold Coast,Summer Getaway,202.39,2
+12774,Apartment in Dubai,Urban Year-Round,188.57,2
+12783,Castle Stay in Cairo,Historical Place,173.76,7
+12848,Hotel in Singapore,Urban Year-Round,197.08,3
+12895,Heritage Hotel in Xi'an,Historical Place,142.32,1
+12915,Beach House in Mallorca,Summer Getaway,175.25,1
+12923,Hotel in Paris,Urban Year-Round,151.59,2
+12941,Bungalow in Gold Coast,Summer Getaway,289.72,3
+12947,Hotel in Dubai,Urban Year-Round,230.05,5
+12986,Bungalow in Gold Coast,Summer Getaway,191.03,1
+13001,Villa in Phuket,Summer Getaway,177.03,5
+13066,Bungalow in Phuket,Summer Getaway,164.53,4
+13116,Bungalow in Byron Bay,Summer Getaway,293.14,4
+13159,Bungalow in Phuket,Summer Getaway,136.77,1
+13161,Bungalow in Gold Coast,Summer Getaway,206.96,1
+13163,Bungalow in Phuket,Summer Getaway,133.69,1
+13243,Bungalow in Mykonos,Summer Getaway,207.95,2
+13258,Hotel in New York,Urban Year-Round,203.53,2
+13282,Hotel in Abu Dhabi,Urban Year-Round,122.02,1
+13283,Bungalow in Krabi,Summer Getaway,132.36,2
+13285,Bungalow in Gold Coast,Summer Getaway,194.68,2
+13308,Hotel in Abu Dhabi,Urban Year-Round,168.83,2
+13318,Serviced Residence in San Francisco,Urban Year-Round,227.33,3
+13337,Heritage Hotel in London,Historical Place,173.99,2
+13345,Bungalow in Mallorca,Summer Getaway,151.93,2
+13349,Bungalow in Phuket,Summer Getaway,155.09,2
+13356,Hotel in Singapore,Urban Year-Round,209.49,2
+13385,Bungalow in Phuket,Summer Getaway,137.58,2
+13394,Heritage Hotel in Florence,Historical Place,174.69,3
+13485,Bungalow in Mykonos,Summer Getaway,347.59,7
+13530,Heritage Hotel in London,Historical Place,157.87,1
+13552,Bungalow in Sardinia,Summer Getaway,179.8,2
+13568,Beach House in Gold Coast,Summer Getaway,197.78,3
+13591,Serviced Residence in Abu Dhabi,Urban Year-Round,168.26,3
+13596,Hotel in Osaka,Urban Year-Round,117.94,2
+13597,Serviced Residence in New York,Urban Year-Round,228.12,2
+13604,Bungalow in Gold Coast,Summer Getaway,264.65,2
+13611,Apartment in Singapore,Urban Year-Round,272.81,6
+13617,Bungalow in Mallorca,Summer Getaway,325.0,4
+13636,Apartment in Dubai,Urban Year-Round,134.77,1
+13639,Bungalow in Ibiza,Summer Getaway,192.83,1
+13679,Castle Stay in Agra,Historical Place,69.26,1
+13693,Hotel in Abu Dhabi,Urban Year-Round,185.87,4
+13725,Bungalow in Amalfi,Summer Getaway,275.92,2
+13738,Bungalow in Phuket,Summer Getaway,169.44,2
+13739,Bungalow in Mykonos,Summer Getaway,196.66,2
+13774,Villa in Mykonos,Summer Getaway,192.37,1
+13777,Bungalow in Phuket,Summer Getaway,123.9,2
+13824,Hotel in Tokyo,Urban Year-Round,164.51,1
+13906,Hotel in Dubai,Urban Year-Round,187.59,3
+13935,Hotel in Madrid,Urban Year-Round,183.22,3
+13940,Hotel in Munich,Urban Year-Round,136.64,5
+13959,Beach House in Mallorca,Summer Getaway,272.84,4
+13978,Serviced Residence in San Francisco,Urban Year-Round,289.57,4
+13980,Beach House in Gold Coast,Summer Getaway,243.55,3
+14019,Villa in Gold Coast,Summer Getaway,165.2,2
+14027,Apartment in Abu Dhabi,Urban Year-Round,152.38,1
+14045,Hotel in Abu Dhabi,Urban Year-Round,145.24,2
+14052,Bungalow in Mykonos,Summer Getaway,273.09,5
+14083,Bungalow in Mallorca,Summer Getaway,162.14,2
+14126,Bungalow in Krabi,Summer Getaway,186.03,5
+14128,Bungalow in Phuket,Summer Getaway,142.09,1
+14141,Hotel in Madrid,Urban Year-Round,137.67,1
+14170,Villa in Gold Coast,Summer Getaway,187.04,1
+14176,Apartment in Osaka,Urban Year-Round,127.47,2
+14207,Apartment in Singapore,Urban Year-Round,322.44,7
+14219,Hotel in Dubai,Urban Year-Round,156.78,2
+14229,Bungalow in Krabi,Summer Getaway,140.77,2
+14269,Bungalow in Mykonos,Summer Getaway,209.75,1
+14286,Hotel in Osaka,Urban Year-Round,149.42,1
+14319,Bungalow in Mallorca,Summer Getaway,194.07,2
+14358,Apartment in Dubai,Urban Year-Round,188.8,4
+14373,Hotel in Abu Dhabi,Urban Year-Round,130.11,1
+14405,Hotel in Osaka,Urban Year-Round,214.34,3
+14419,Beach House in Krabi,Summer Getaway,186.4,3
+14424,Beach House in Gold Coast,Summer Getaway,193.91,1
+14458,Bungalow in Mallorca,Summer Getaway,171.45,2
+14476,Beach House in Phuket,Summer Getaway,168.99,2
+14477,Historic Inn in Luxor,Historical Place,139.79,4
+14492,Apartment in Berlin,Urban Year-Round,137.39,4
+14500,Apartment in Abu Dhabi,Urban Year-Round,134.1,1
+14513,Hotel in Singapore,Urban Year-Round,153.35,2
+14533,Heritage Hotel in Cairo,Historical Place,88.58,1
+14556,Bungalow in Gold Coast,Summer Getaway,263.84,4
+14557,Hotel in Tokyo,Urban Year-Round,245.64,6
+14694,Bungalow in Sardinia,Summer Getaway,165.74,1
+14700,Hotel in Munich,Urban Year-Round,128.94,2
+14701,Apartment in Osaka,Urban Year-Round,142.66,2
+14717,Beach House in Mallorca,Summer Getaway,209.36,5
+14729,Castle Stay in Cairo,Historical Place,139.25,7
+14735,Bungalow in Mallorca,Summer Getaway,220.23,4
+14759,Hotel in Paris,Urban Year-Round,154.2,2
+14767,Hotel in Barcelona,Urban Year-Round,218.56,3
+14812,Beach House in Gold Coast,Summer Getaway,177.17,1
+14875,Apartment in Tokyo,Urban Year-Round,139.98,2
+14887,Bungalow in Mallorca,Summer Getaway,179.07,1
+14890,Bungalow in Gold Coast,Summer Getaway,307.61,5
+14957,Beach House in Mykonos,Summer Getaway,323.01,4
+14969,Bungalow in Gold Coast,Summer Getaway,258.22,3
+15010,Apartment in Paris,Urban Year-Round,208.46,3
+15013,Bungalow in Krabi,Summer Getaway,142.12,1
+15019,Hotel in Abu Dhabi,Urban Year-Round,138.1,1
+15031,Bungalow in Phuket,Summer Getaway,158.14,1
+15032,Serviced Residence in Abu Dhabi,Urban Year-Round,214.08,3
+15051,Hotel in Paris,Urban Year-Round,167.47,3
+15055,Bungalow in Mallorca,Summer Getaway,252.76,4
+15079,Bungalow in Ibiza,Summer Getaway,193.42,2
+15089,Beach House in Phuket,Summer Getaway,179.49,4
+15093,Hotel in Dubai,Urban Year-Round,271.45,5
+15117,Serviced Residence in Paris,Urban Year-Round,168.25,2
+15126,Villa in Gold Coast,Summer Getaway,178.14,2
+15133,Hotel in Barcelona,Urban Year-Round,140.7,2
+15149,Hotel in San Francisco,Urban Year-Round,423.28,5
+15219,Bungalow in Gold Coast,Summer Getaway,248.16,2
+15226,Bungalow in Gold Coast,Summer Getaway,260.1,3
+15252,Bungalow in Krabi,Summer Getaway,112.98,1
+15253,Apartment in Madrid,Urban Year-Round,123.3,2
+15285,Historic Inn in Agra,Historical Place,74.74,3
+15309,Bungalow in Mallorca,Summer Getaway,225.12,3
+15349,Villa in Sardinia,Summer Getaway,210.66,3
+15350,Hotel in Dubai,Urban Year-Round,144.65,2
+15406,Hotel in San Francisco,Urban Year-Round,273.41,2
+15452,Hotel in Abu Dhabi,Urban Year-Round,205.48,5
+15455,Beach House in Phuket,Summer Getaway,139.61,2
+15488,Bungalow in Gold Coast,Summer Getaway,258.65,3
+15525,Bungalow in Phuket,Summer Getaway,125.51,2
+15552,Hotel in New York,Urban Year-Round,214.89,3
+15587,Beach House in Gold Coast,Summer Getaway,195.37,1
+15592,Apartment in San Francisco,Urban Year-Round,273.27,3
+15622,Hotel in Munich,Urban Year-Round,170.77,4
+15624,Bungalow in Phuket,Summer Getaway,177.94,5
+15637,Hotel in Dubai,Urban Year-Round,242.74,4
+15671,Beach House in Sardinia,Summer Getaway,171.81,2
+15711,Serviced Residence in New York,Urban Year-Round,218.33,3
+15728,Bungalow in Phuket,Summer Getaway,145.75,2
+15771,Hotel in Abu Dhabi,Urban Year-Round,191.34,5
+15826,Bungalow in Gold Coast,Summer Getaway,211.91,2
+15834,Bungalow in Phuket,Summer Getaway,158.7,3
+15840,Bungalow in Sardinia,Summer Getaway,231.22,3
+15886,Bungalow in Phuket,Summer Getaway,139.15,1
+15910,Bungalow in Phuket,Summer Getaway,194.84,3
+15921,Bungalow in Phuket,Summer Getaway,136.1,1
+16014,Hotel in New York,Urban Year-Round,185.06,2
+16077,Bungalow in Phuket,Summer Getaway,165.6,3
+16108,Castle Stay in Rome,Historical Place,136.62,1
+16159,Serviced Residence in Berlin,Urban Year-Round,139.58,4
+16197,Hotel in Paris,Urban Year-Round,215.6,3
+16243,Beach House in Mallorca,Summer Getaway,157.19,1
+16255,Beach House in Gold Coast,Summer Getaway,217.64,2
+16256,Hotel in Osaka,Urban Year-Round,133.86,1
+16302,Apartment in Tokyo,Urban Year-Round,161.54,3
+16334,Hotel in New York,Urban Year-Round,206.68,2
+16358,Apartment in Paris,Urban Year-Round,156.83,1
+16360,Apartment in Singapore,Urban Year-Round,153.2,1
+16375,Hotel in Dubai,Urban Year-Round,154.76,1
+16419,Beach House in Santorini,Summer Getaway,249.58,2
+16422,Villa in Mallorca,Summer Getaway,280.55,7
+16465,Hotel in Osaka,Urban Year-Round,135.74,1
+16477,Bungalow in Phuket,Summer Getaway,274.65,6
+16480,Bungalow in Phuket,Summer Getaway,134.8,2
+16485,Villa in Sardinia,Summer Getaway,265.38,7
+16498,Villa in Mallorca,Summer Getaway,195.36,2
+16518,Hotel in New York,Urban Year-Round,173.08,2
+16543,Beach House in Phuket,Summer Getaway,166.86,1
+16560,Hotel in Osaka,Urban Year-Round,118.38,2
+16596,Bungalow in Mallorca,Summer Getaway,225.13,2
+16630,Bungalow in Phuket,Summer Getaway,130.32,1
+16635,Bungalow in Gold Coast,Summer Getaway,286.91,3
+16651,Apartment in San Francisco,Urban Year-Round,346.12,2
+16652,Castle Stay in Jaipur,Historical Place,84.74,2
+16654,Serviced Residence in Paris,Urban Year-Round,183.36,5
+16721,Hotel in Osaka,Urban Year-Round,157.51,2
+16795,Bungalow in Santorini,Summer Getaway,207.79,1
+16831,Bungalow in Mallorca,Summer Getaway,371.19,7
+16842,Beach House in Mallorca,Summer Getaway,186.31,1
+16860,Hotel in Dubai,Urban Year-Round,131.21,2
+16864,Bungalow in Phuket,Summer Getaway,140.33,2
+16880,Bungalow in Mallorca,Summer Getaway,274.4,4
+16937,Hotel in Barcelona,Urban Year-Round,149.82,1
+16967,Bungalow in Phuket,Summer Getaway,145.56,3
+16974,Bungalow in Gold Coast,Summer Getaway,252.81,3
+17015,Hotel in Paris,Urban Year-Round,145.0,1
+17037,Bungalow in Byron Bay,Summer Getaway,162.21,1
+17044,Hotel in Osaka,Urban Year-Round,121.47,1
+17063,Bungalow in Gold Coast,Summer Getaway,210.46,1
+17066,Beach House in Amalfi,Summer Getaway,210.38,3
+17144,Hotel in Munich,Urban Year-Round,182.1,6
+17150,Bungalow in Phuket,Summer Getaway,137.65,1
+17152,Bungalow in Phuket,Summer Getaway,144.45,2
+17160,Villa in Mallorca,Summer Getaway,246.68,3
+17161,Hotel in Barcelona,Urban Year-Round,155.22,2
+17176,Heritage Hotel in London,Historical Place,150.15,2
+17212,Bungalow in Sardinia,Summer Getaway,157.36,1
+17226,Serviced Residence in Berlin,Urban Year-Round,93.56,2
+17263,Bungalow in Gold Coast,Summer Getaway,235.05,3
+17325,Bungalow in Phuket,Summer Getaway,165.41,2
+17328,Apartment in Berlin,Urban Year-Round,199.94,7
+17341,Bungalow in Mallorca,Summer Getaway,176.5,2
+17379,Beach House in Gold Coast,Summer Getaway,187.06,1
+17384,Hotel in Paris,Urban Year-Round,149.65,1
+17401,Hotel in Madrid,Urban Year-Round,128.0,1
+17408,Bungalow in Mallorca,Summer Getaway,228.1,1
+17420,Apartment in San Francisco,Urban Year-Round,270.63,2
+17459,Villa in Krabi,Summer Getaway,160.38,2
+17487,Bungalow in Mallorca,Summer Getaway,191.65,2
+17498,Beach House in Mallorca,Summer Getaway,185.15,2
+17543,Apartment in Paris,Urban Year-Round,167.93,1
+17575,Bungalow in Krabi,Summer Getaway,119.47,1
+17600,Apartment in Madrid,Urban Year-Round,161.07,1
+17620,Hotel in Singapore,Urban Year-Round,160.88,2
+17673,Hotel in New York,Urban Year-Round,224.74,2
+17703,Beach House in Mallorca,Summer Getaway,190.7,2
+17750,Apartment in San Francisco,Urban Year-Round,235.33,2
+17759,Bungalow in Phuket,Summer Getaway,149.8,1
+17765,Beach House in Phuket,Summer Getaway,145.04,1
+17785,Bungalow in Sardinia,Summer Getaway,203.0,2
+17821,Hotel in New York,Urban Year-Round,232.76,2
+17848,Hotel in Tokyo,Urban Year-Round,148.44,3
+17858,Hotel in Barcelona,Urban Year-Round,228.81,4
+17870,Hotel in Paris,Urban Year-Round,210.58,4
+17875,Apartment in San Francisco,Urban Year-Round,263.01,1
+17883,Hotel in Barcelona,Urban Year-Round,258.37,5
+17899,Hotel in Madrid,Urban Year-Round,135.51,1
+17909,Hotel in New York,Urban Year-Round,205.92,2
+17926,Apartment in Tokyo,Urban Year-Round,257.88,5
+17933,Castle Stay in London,Historical Place,192.83,1
+17936,Villa in Phuket,Summer Getaway,122.28,1
+17969,Beach House in Phuket,Summer Getaway,144.15,4
+17997,Historic Inn in Florence,Historical Place,162.97,2
+18012,Villa in Phuket,Summer Getaway,190.06,3
+18021,Beach House in Mallorca,Summer Getaway,203.5,1
+18113,Bungalow in Phuket,Summer Getaway,160.69,3
+18162,Hotel in Abu Dhabi,Urban Year-Round,119.53,1

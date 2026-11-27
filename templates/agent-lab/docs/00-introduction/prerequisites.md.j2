@@ -1,0 +1,48 @@
+# Prerequisites
+
+## In your Databricks workspace
+
+1. Sign in to your workspace and confirm you can open **Catalog** in the left sidebar and see **samples** > **wanderbricks**.
+2. Pick a catalog you can create schemas in. Your workspace catalog works. The lab calls it `<catalog>`.
+3. Open the **SQL editor** and run the following, replacing `<catalog>`:
+
+    ```sql
+    CREATE SCHEMA IF NOT EXISTS <catalog>.{{ n.schema }};
+    CREATE SCHEMA IF NOT EXISTS <catalog>.{{ n.trace_schema }};
+    ```
+
+4. Note the ID of a SQL warehouse you can use: open **SQL Warehouses**, click the warehouse, and copy the ID from the overview. The lab calls it `<warehouse-id>`.
+
+!!! note "Admin settings to check"
+    Ask a workspace admin to confirm that **Databricks Apps** is enabled and that **Unity Gateway** is available in your region. Unity Gateway service policies (Step 2, optional) need the *Unity Gateway Service Policies* preview.
+
+## On your laptop
+
+1. Install the **Databricks CLI** (version 1.0 or later) and sign in, choosing a profile name such as `accelerator`:
+
+    ```bash
+    databricks auth login --host https://<your-workspace-host> --profile accelerator
+    ```
+
+2. Install **uv**, which runs every lab project with pinned dependencies: see [docs.astral.sh/uv](https://docs.astral.sh/uv/getting-started/installation/).
+3. Install the **Agent Bricks CLI** and save your profile as its default:
+
+    ```bash
+    uv tool install databricks-agentbricks==0.11.0
+    agentbricks login --profile accelerator
+    ```
+
+4. Download the lab files and unzip them: [{{ s.lab.zip }}](../assets/files/{{ s.lab.zip }}). You can also browse them on [GitHub]({{ s.lab.lab_files_url }}).
+
+!!! tip "Optional: a model provider key"
+    Step 1 runs Wanda against a model provider directly, the way it runs today. If you have an OpenAI API key, use it. If not, read Step 1 and start running Wanda in Step 2, where Unity Gateway supplies the model.
+
+## Checklist
+
+- [ ] `samples.wanderbricks` is visible.
+- [ ] `<catalog>.{{ n.schema }}` and `<catalog>.{{ n.trace_schema }}` exist.
+- [ ] You have a `<warehouse-id>`.
+- [ ] `databricks current-user me --profile accelerator` prints your user.
+- [ ] `agentbricks --version` prints 0.11.0.
+
+[Start Step 1 :material-arrow-right:](../01-external-agent/index.md){ .md-button .md-button--primary }

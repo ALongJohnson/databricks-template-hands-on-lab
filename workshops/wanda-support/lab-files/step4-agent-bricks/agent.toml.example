@@ -1,0 +1,31 @@
+schema_version = 1
+
+[agent]
+framework = "openai"
+server = "agentbricks"
+deployment_name = "wanda-support"
+
+[memory_store]
+name = "wanda-support-xxxxxx-memory"
+
+[session_store]
+name = "wanda-support-xxxxxx-sessions"
+
+[tracing]
+experiment_name = "/Users/<you>/wanda-support-traces"
+[[tools]]
+id = "get_booking"
+auth = "user"
+source = {kind = "uc_function", function = "<catalog>.wanda_support.get_booking"}
+[[tools]]
+id = "list_guest_bookings"
+auth = "user"
+source = {kind = "uc_function", function = "<catalog>.wanda_support.list_guest_bookings"}
+[[tools]]
+id = "quote_refund"
+auth = "user"
+source = {kind = "uc_function", function = "<catalog>.wanda_support.quote_refund"}
+[[tools]]
+id = "get_refund_policy"
+auth = "user"
+source = {kind = "uc_function", function = "<catalog>.wanda_support.get_refund_policy"}

@@ -1,0 +1,37 @@
+# Scenario: Wanda, the {{ s.lab.company }} support agent
+
+**{{ s.lab.company }}** is a fictional online vacation-rental marketplace that connects travelers with property hosts around the world. Its guest-support team built **Wanda**, an AI agent that answers booking questions and handles cancellations.
+
+## How Wanda works today
+
+- Wanda is a Python app built with the **OpenAI Agents SDK**. It runs on an engineer's laptop and in a container.
+- It calls a model provider directly, with one API key shared by the whole team.
+- Its tools read a **CSV snapshot** of bookings, guests, properties and payments that the data team exported by hand ({{ f.snapshot_bookings }} bookings that check in during July 2025).
+- It applies the refund policy below, and it can issue a refund on its own.
+- Nothing is traced. Quality is checked by reading a few conversations.
+
+## The refund policy
+
+The lab treats **{{ f.today }}** as "today", because the sample data ends in July 2025.
+
+| Cancelled | Refund |
+|---|---|
+| 14 or more days before check-in | Full refund |
+| 7 to 13 days before check-in | 50% refund |
+| Less than 7 days before check-in | No refund |
+
+Only bookings with a completed payment can be refunded. Refunds go to the original payment method. The policy says nothing about timelines, fees, vouchers or compensation.
+
+## The three bookings you will use
+
+| Booking | Property | Check-in | Days before check-in | Paid | Refund if cancelled today |
+|---|---|---|---|---|---|
+{% for c in f.cases %}
+| {{ c.booking }} | {{ c.property }} | {{ c.check_in }} | {{ c.days }} | ${{ c.paid }} | **${{ c.refund }}** ({{ c.rule }}) |
+{% endfor %}
+
+## The deal that is stuck
+
+A large travel-management company wants to roll Wanda out to its corporate travelers. Its security questionnaire asks who can access guest data, where model calls go, how actions are approved, how quality is measured, and how long records are kept. Today the support team cannot answer any of it. That is your job.
+
+[Next: Prerequisites :material-arrow-right:](prerequisites.md){ .md-button .md-button--primary }

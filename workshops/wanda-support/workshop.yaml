@@ -1,0 +1,39 @@
+# =============================================================================
+# Workshop spec: Wanda guest support (agent lab, Track 2)
+#
+# kind: agent_lab renders templates/agent-lab/ instead of the data-pipeline lab.
+# Lab files live in this folder's lab-files/ and are copied to the site as-is and as a zip.
+# Every number quoted on the site was measured on samples.wanderbricks (see checks below).
+# =============================================================================
+kind: agent_lab
+
+lab:
+  company: Wanderbricks
+  title: "Track 2: Move Your Agent onto Databricks"
+  short_title: Agent governance lab
+  site_url: https://alongjohnson.github.io/databricks-template-hands-on-lab/agent_bricks/eng/
+  repo_url: https://github.com/ALongJohnson/databricks-template-hands-on-lab
+  lab_files_url: https://github.com/ALongJohnson/databricks-template-hands-on-lab/tree/agent_bricks/workshops/wanda-support/lab-files
+  zip: wanda-lab-files.zip
+  duration: About 3 hours (plus 30 minutes for the optional Step 7)
+
+# Names learners create. <catalog> is a catalog you can write to (your workspace catalog works).
+naming:
+  schema: wanda_support
+  trace_schema: wanda_traces
+  experiment: /Users/<you>/wanda-support-traces
+  model_service: wanda_assistant
+  deployment: wanda-support
+  app: agent-bricks-wanda-support
+  endpoint: wanda-cancellation-risk
+  model: system.ai.claude-sonnet-4-5
+  uc_model: system.ai.databricks-claude-sonnet-4-5
+
+# Measured on samples.wanderbricks with the lab's "today" of 1 July 2025.
+facts:
+  today: 1 July 2025
+  snapshot_bookings: 731
+  cases:
+    - { booking: 532, property: Hotel in Abu Dhabi, check_in: 24 July 2025, days: 23, paid: "393.51", refund: "393.51", rule: full refund }
+    - { booking: 166, property: Bungalow in Gold Coast, check_in: 10 July 2025, days: 9, paid: "385.31", refund: "192.66", rule: 50% refund }
+    - { booking: 703, property: Hotel in San Francisco, check_in: 3 July 2025, days: 2, paid: "765.07", refund: "0.00", rule: no refund }

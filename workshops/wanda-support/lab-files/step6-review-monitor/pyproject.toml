@@ -1,0 +1,11 @@
+[project]
+name = "wanda-review-monitor"
+version = "1.0.0"
+description = "Monitor Wanda in production and send traces to human reviewers"
+requires-python = ">=3.11"
+dependencies = [
+    "mlflow[databricks]==3.18.0",
+    "databricks-sdk==0.171.0",
+    "requests==2.32.5",
+    "python-dotenv==1.2.4",
+]

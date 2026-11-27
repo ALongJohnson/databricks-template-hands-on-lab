@@ -1,0 +1,20 @@
+{
+  "comment": "Wanda guest-support agent. Rename the destination to switch models without a code change.",
+  "config": {
+    "routing": {
+      "destinations": [
+        {
+          "name": "claude-sonnet-4-5",
+          "destination_type": "DESTINATION_TYPE_PAY_PER_TOKEN_FOUNDATION_MODEL",
+          "pay_per_token_config": {"model": "models/system.ai.databricks-claude-sonnet-4-5"},
+          "traffic_percentage": 100
+        }
+      ]
+    },
+    "rate_limits": [
+      {"key": "RATE_LIMIT_KEY_SERVICE", "renewal_period": "RATE_LIMIT_RENEWAL_PERIOD_MINUTE", "requests": 120, "tokens": 500000},
+      {"key": "RATE_LIMIT_KEY_USER_DEFAULT", "renewal_period": "RATE_LIMIT_RENEWAL_PERIOD_MINUTE", "requests": 20}
+    ],
+    "inference_table": {"parent": "schemas/<catalog>.wanda_support", "table_name_prefix": "wanda_assistant"}
+  }
+}

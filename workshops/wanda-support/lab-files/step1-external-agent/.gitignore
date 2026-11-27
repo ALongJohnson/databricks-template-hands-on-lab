@@ -1,0 +1,4 @@
+.env
+.venv/
+refunds.csv
+__pycache__/

@@ -1,0 +1,29 @@
+# Introduction
+
+Enterprise buyers rarely reject an AI product because the model is weak. They reject it because the vendor cannot answer the security review: where does the agent run, who can see which data, what did it do last Tuesday, how do you know the answers are right, and what does it cost? This lab shows you how to answer each question from one platform, using an agent you already have.
+
+## What you will build
+
+You start with **Wanda**, a guest-support agent that already works, and move it onto Databricks one layer at a time. After each step, Wanda still works, and one more governance gap is closed.
+
+| Gap a buyer will find | Today (Step 1) | After this lab | Step |
+|---|---|---|---|
+| Who can call which model, and at what cost? | One shared provider API key in a `.env` file | Every call goes through **Unity Gateway**, behind a named model service with rate limits, usage tracking and payload logs | 2 |
+| What did the agent do? | Nothing recorded | Every model call and tool call is an **MLflow trace**, stored in **Unity Catalog** tables | 3 |
+| Which data can it see? | A CSV snapshot that anyone with the file can read | **Unity Catalog functions** over the source tables, run as the signed-in user | 4 |
+| Can it take actions on its own? | Refunds run as soon as the model asks | Refunds pause for **human approval** | 4 |
+| Where does it run? | A laptop or a container | **Agent Runtime** on Databricks Apps, with managed sessions and memory | 4 |
+| How do you know it is right? | Someone reads a few chats | **MLflow evaluation** with judges and a release gate | 5 |
+| Does it stay right? | Complaints | **Production judges** on live traffic and **expert review** | 6 |
+| Where is your own model trained and served? | Somewhere else | **Trained, registered and served** on Databricks (optional) | 7 |
+
+## How to use this lab
+
+- Follow the steps in order. Each step changes as little as possible, so you can see what each layer adds.
+- Every command and number on these pages was run on a real workspace with `samples.wanderbricks`. Your answers from the model may be worded differently, but the numbers must match.
+- When you finish, repeat Steps 2 to 6 on your own agent. The wrap-up page lists the evidence to collect for your buyer.
+
+!!! note "Preview features"
+    Agent Bricks, Agent Runtime and some MLflow features used here are in Beta or Preview. Your SA mentor will confirm what is available in your workspace region and suggest alternatives where needed.
+
+[Next: Scenario :material-arrow-right:](scenario.md){ .md-button .md-button--primary }

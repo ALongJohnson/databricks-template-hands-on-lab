@@ -27,8 +27,12 @@ def main() -> None:
     ap.add_argument("--workshop", default=os.environ.get("WORKSHOP", "workshops/wanderbricks"))
     args = ap.parse_args()
     wdir = (ROOT / args.workshop).resolve()
-    forbid = [] if wdir.name == REFERENCE else REFERENCE_TERMS
-    errors, warns = validate(wdir / "workshop.yaml", forbid=forbid)
+    import agent_lab  # noqa: E402
+    if agent_lab.is_agent_lab(wdir / "workshop.yaml"):
+        errors, warns = agent_lab.validate(wdir)
+    else:
+        forbid = [] if wdir.name == REFERENCE else REFERENCE_TERMS
+        errors, warns = validate(wdir / "workshop.yaml", forbid=forbid)
     for w in warns:
         print(f"WARN  {w}")
     for e in errors:

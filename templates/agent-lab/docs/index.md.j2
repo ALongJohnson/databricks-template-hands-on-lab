@@ -1,0 +1,145 @@
+---
+hide:
+  - navigation
+  - toc
+---
+
+<div class="wb-hero" markdown>
+
+<div class="wb-hero__text" markdown>
+
+<p class="wb-hero__eyebrow">Unity Gateway · MLflow 3 · Agent Bricks · Unity Catalog</p>
+
+# {{ s.lab.company }} <span>{{ s.lab.short_title }}</span>
+
+<p class="wb-hero__lead">Take an AI agent that already runs outside Databricks, move it onto Databricks, and leave with the governance evidence enterprise buyers ask for.</p>
+
+<div class="wb-hero__actions" markdown>
+
+[Start the lab :material-arrow-right:](00-introduction/index.md){ .md-button .md-button--primary }
+[Check prerequisites](00-introduction/prerequisites.md){ .md-button }
+
+</div>
+
+<div class="wb-hero__facts" markdown>
+
+- :material-stairs: 6 hands-on steps, plus 1 optional
+- :material-robot-outline: 1 agent, before and after
+- :material-database-check: Built-in sample data
+- :material-clock-outline: {{ s.lab.duration }}
+
+</div>
+
+</div>
+
+<div class="wb-hero__art" markdown>
+
+![Wanderbricks agent moving onto Databricks](assets/images/00-introduction/overview-generic.svg)
+
+</div>
+
+</div>
+
+## What this track is for
+
+This is **Track 2** of the accelerator: *move your agentic system onto Databricks and apply enterprise governance*. You practise on **Wanda**, the guest-support agent of the fictional vacation-rental marketplace {{ s.lab.company }}. Wanda already works. The problem is that nobody can prove it is governed: the model is called with a shared API key, the data is an exported copy, nothing is traced, and quality is checked by reading a few chats.
+
+By the end you will have moved Wanda's **model calls, data access, hosting, traces, evaluation and monitoring** onto Databricks, and, optionally, **trained and served** a model of your own. Then you repeat the same steps on your own agent.
+
+!!! tip "No data preparation needed"
+    The lab uses `samples.wanderbricks`, the sample dataset that comes with every Databricks workspace. The lab code is in the [lab files]({{ s.lab.lab_files_url }}), or download it as [one zip](assets/files/{{ s.lab.zip }}).
+
+## Lab journey
+
+<div class="wb-journey" markdown>
+
+{% set steps = [
+  ("01-external-agent/index.md", "Run the Agent You Have Today", "Run Wanda as it runs today: an OpenAI Agents SDK app on a CSV snapshot, calling a model provider directly.", "Your baseline, and the governance gaps a buyer will find.", ["OpenAI Agents SDK"], "15 min"),
+  ("02-unity-gateway/index.md", "Govern Model Calls with Unity Gateway", "Route every model call through Unity Gateway with no code change, behind a named model service with rate limits.", "One place for model access, limits, usage and payload logs.", ["Unity Gateway", "Model services"], "25 min"),
+  ("03-tracing/index.md", "Trace with MLflow into Unity Catalog", "Record every model call and tool call as an MLflow trace, stored in Unity Catalog tables.", "Traces you can query with SQL and govern like any table.", ["MLflow 3 Tracing", "Unity Catalog"], "20 min"),
+  ("04-agent-runtime/index.md", "Move the Agent onto Agent Runtime", "Replace the CSV snapshot with governed Unity Catalog functions, port Wanda with the Agent Bricks CLI, and deploy it.", "Data access as the signed-in user, human approval for refunds.", ["Agent Bricks CLI", "Agent Runtime", "UC functions"], "50 min"),
+  ("05-evaluate/index.md", "Evaluate and Gate Releases", "Score Wanda with MLflow judges against questions your support team signs off, and block releases that fail.", "An evaluation record for every version you ship.", ["MLflow Evaluation", "LLM judges"], "30 min"),
+  ("06-review-monitor/index.md", "Human Review and Monitoring", "Keep judging live traffic, and send real conversations to a human expert for review.", "Quality signals from production, not only from tests.", ["Production monitoring", "Review App"], "20 min"),
+  ("07-train-serve/index.md", "(Optional) Train and Serve a Model", "Train a cancellation-risk model on Databricks, register it in Unity Catalog and serve it.", "Training and serving inside the same governance as your data.", ["MLflow", "Model Serving"], "30 min"),
+] %}
+{% for href, title, task, desc, tags, time in steps %}
+<div class="wb-step" markdown>
+
+<div class="wb-step__num">{{ loop.index }}</div>
+
+<div class="wb-step__main" markdown>
+
+[{{ title }}]({{ href }})
+{ .wb-step__title }
+
+{{ task }}
+{ .wb-step__task }
+
+{{ desc }}
+{ .wb-step__desc }
+
+<p class="wb-step__tags">{% for t in tags %}<span>{{ t }}</span>{% endfor %}</p>
+
+</div>
+
+<div class="wb-step__who" markdown>
+
+![AI engineer](assets/images/personas/ai-engineer.svg)
+<span>You<small>AI engineer</small></span>
+
+<p class="wb-step__time">About {{ time }}</p>
+
+</div>
+
+</div>
+{% endfor %}
+
+</div>
+
+## Architecture: before and after
+
+<div class="wb-arch">
+  <div class="wb-arch__col wb-arch__col--center">
+    <p class="wb-arch__label">Before (Step 1)</p>
+    <div class="wb-arch__node wb-arch__node--source"><strong>Wanda app</strong><span>Laptop or container</span></div>
+    <div class="wb-arch__node wb-arch__node--source"><strong>Model provider</strong><span>Shared API key</span></div>
+    <div class="wb-arch__node wb-arch__node--source"><strong>CSV snapshot</strong><span>Exported by hand</span></div>
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col">
+    <p class="wb-arch__label">Agent Runtime</p>
+    <div class="wb-arch__node"><strong>Wanda on Agent Runtime</strong><span>{{ n.app }}</span><em>Step 4</em></div>
+    <div class="wb-arch__node"><strong>Human approval</strong><span>issue_refund</span><em>Step 4</em></div>
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col">
+    <p class="wb-arch__label">Unity Gateway</p>
+    <div class="wb-arch__node"><strong>Model service</strong><span>{{ n.model_service }}: limits, usage, payloads</span><em>Step 2</em></div>
+    <div class="wb-arch__node"><strong>Model Serving</strong><span>{{ n.endpoint }} (optional)</span><em>Step 7</em></div>
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col wb-arch__col--uc">
+    <p class="wb-arch__label">Unity Catalog</p>
+    <div class="wb-arch__node"><strong>Functions</strong><span>get_booking · quote_refund · ...</span><em>Step 4</em></div>
+    <div class="wb-arch__node"><strong>Trace tables</strong><span>{{ n.trace_schema }}.wanda_otel_spans</span><em>Step 3</em></div>
+    <div class="wb-arch__node"><strong>Models</strong><span>cancellation_risk (optional)</span><em>Step 7</em></div>
+  </div>
+  <div class="wb-arch__flow" aria-hidden="true"></div>
+  <div class="wb-arch__col">
+    <p class="wb-arch__label">MLflow</p>
+    <div class="wb-arch__node"><strong>Evaluation</strong><span>Judges and release gate</span><em>Step 5</em></div>
+    <div class="wb-arch__node wb-arch__node--accent"><strong>Monitoring and review</strong><span>Live judges, expert labels</span><em>Step 6</em></div>
+  </div>
+</div>
+
+## Ready to start?
+
+<div class="wb-ready" markdown>
+
+- [ ] You can sign in to a Databricks workspace and you have a catalog you can create schemas in.
+- [ ] You can install the Databricks CLI, `uv` and the Agent Bricks CLI on your laptop.
+- [ ] You can focus on the lab for about 3 hours.
+
+[Go to the introduction and start :material-arrow-right:](00-introduction/index.md){ .md-button .md-button--primary }
+
+</div>
