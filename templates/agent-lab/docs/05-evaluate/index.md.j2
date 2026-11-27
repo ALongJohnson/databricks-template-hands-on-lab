@@ -1,0 +1,62 @@
+# Step 5: Evaluate and gate releases
+
+Reading a few chats does not tell you whether Wanda is right, and it does not tell a buyer anything. In this step you define what "right" means with the support team, score Wanda with **MLflow judges**, and block any release that misses the bar.
+
+## 5.1 Look at the evaluation set and judges
+
+Open `step5-evaluate/` from the lab files.
+
+- `eval_dataset.py` holds eight questions the support team signed off, each with the **facts a correct answer must contain**. They cover the three bookings, the policy, a guest pushing for more money, a booking that does not exist, and a question the policy cannot answer (refund timelines).
+- `evaluate.py` scores every answer with five judges:
+
+| Judge | Checks |
+|---|---|
+| `correctness` | The answer contains the expected facts |
+| `relevance_to_query` | The answer addresses the question |
+| `safety` | No harmful content |
+| `follows_refund_policy` | Refund amounts follow the policy, and no invented timelines, fees, vouchers or compensation |
+| `support_tone` | Polite, plain language, no SQL, tool names or error messages |
+
+The last two are **Guidelines** judges: plain-language rules your business owner can read and change.
+
+## 5.2 Run the evaluation against the deployed agent
+
+1. In `step5-evaluate/`, run:
+
+    ```bash
+    DATABRICKS_CONFIG_PROFILE=accelerator uv run python evaluate.py \
+      --app {{ n.app }} --experiment-id <your experiment id> --warehouse-id <warehouse-id>
+    ```
+
+2. Wait for the run to finish (a few minutes) and read the summary. Each judge shows `PASS` or `FAIL` against an 80% bar, then the verdict.
+3. Open the link the script prints to see each question, Wanda's answer and every judge's rationale in the experiment's **Evaluation** tab.
+
+In testing, the first run **blocked the release**: correctness, relevance and safety passed, but `follows_refund_policy` failed. Wanda kept adding refund timelines and goodwill gestures the policy does not define, the same "5-7 business days" you saw in Step 4.3.
+
+!!! tip "Evaluate before you deploy"
+    The same script runs against `agentbricks dev`: `--url http://localhost:8000` instead of `--app`. Run it in CI and the exit code (1 on failure) blocks the deploy.
+
+## 5.3 Fix the instructions and re-run
+
+1. In `wanda-agent/agent/agent.py`, add two rules to the end of `INSTRUCTIONS`:
+
+    ```text
+    - The refund policy does not define refund timelines, fees, vouchers or compensation. Never mention them. If the guest asks, say a colleague will confirm.
+    - Write for the guest in plain language. Never show SQL, table or column names, tool names or error messages.
+    ```
+
+2. Redeploy:
+
+    ```bash
+    agentbricks deploy --no-wait && agentbricks deployments wait {{ n.app }}
+    ```
+
+3. Run `evaluate.py` again and compare the two runs side by side in the **Evaluation** tab.
+
+!!! note "Not measured in this lab's test run"
+    The re-run after the instruction fix was not measured on the test workspace. If a judge still fails, read its rationale: either fix the agent, or, if the judge is wrong, make the guideline more specific. Never lower the bar to pass.
+
+!!! note "Optional: version prompts and optimize them"
+    You can store Wanda's instructions in the **MLflow Prompt Registry** in Unity Catalog and let `mlflow.genai.optimize_prompts()` (GEPA) propose better versions scored by these judges. See [Evaluate and monitor AI agents](https://docs.databricks.com/aws/en/mlflow3/genai/eval-monitor/).
+
+[Next: Step 6 :material-arrow-right:](../06-review-monitor/index.md){ .md-button .md-button--primary }

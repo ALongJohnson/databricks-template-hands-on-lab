@@ -1,0 +1,32 @@
+# Step 7 (optional): Train and serve a model
+
+If your product includes a model you train yourself, moving only the agent onto Databricks leaves the most important asset outside your governance. In this step you train a **cancellation-risk** classifier on `samples.wanderbricks`, register it in **Unity Catalog** and serve it on **Model Serving**.
+
+## 7.1 Run the notebook
+
+1. In the workspace, click **Workspace** > your user folder > **Import**, and import `step7-train-serve/train_cancellation_model.py` from the lab files.
+2. Open the notebook and connect it to **Serverless** compute.
+3. Set the widgets: **catalog** to your catalog, **schema** to `{{ n.schema }}`, **endpoint** to `{{ n.endpoint }}`.
+4. Click **Run all**.
+5. Verify the notebook:
+    - writes the feature table `<catalog>.{{ n.schema }}.booking_features`,
+    - prints the test AUC and registers `<catalog>.{{ n.schema }}.cancellation_risk`,
+    - sets the alias `champion` and creates the endpoint `{{ n.endpoint }}` with scale to zero,
+    - prints predictions for two test bookings in the last cell.
+
+Creating the endpoint takes several minutes.
+
+## 7.2 Check what Unity Catalog recorded
+
+1. Open `<catalog>.{{ n.schema }}.cancellation_risk` in **Catalog Explorer**. Verify the version has the alias `champion` and links to the MLflow run with its parameters and AUC.
+2. Click **Lineage** and verify the model traces back through `booking_features` to `samples.wanderbricks.bookings` and `users`.
+3. Open **Serving** and verify `{{ n.endpoint }}` serves that version and scales to zero when idle.
+
+## 7.3 (Optional) Give Wanda the model as a tool
+
+To let Wanda warn guests about bookings at risk, add a function tool in `wanda-agent/agent/tools/` that calls the endpoint with the Databricks SDK, `WorkspaceClient().serving_endpoints.query(name="{{ n.endpoint }}", dataframe_records=[...])`, then redeploy. The app's service principal needs **Can Query** on the endpoint.
+
+!!! note "Partly verified"
+    The notebook ran end to end on the test workspace. The agent tool in 7.3 is a pattern from the docs and was not tested in this lab.
+
+[Next: Wrap-up :material-arrow-right:](../99-wrap-up/index.md){ .md-button .md-button--primary }

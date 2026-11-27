@@ -1,5 +1,11 @@
 # Databricks Hands-on Lab Template
 
+> **This branch (`agent_bricks`) publishes Track 2: "Move your agentic system onto Databricks and
+> apply enterprise governance".** It adds a second lab kind, `kind: agent_lab`
+> (`scripts/agent_lab.py`, `templates/agent-lab/`), and the workshop `workshops/wanda-support`
+> (spec, pages data and runnable lab files). `.workshop` points at it. The data-pipeline lab
+> machinery below is unchanged and `workshops/wanderbricks` still builds.
+
 A reusable, data-driven version of the [Wanderbricks Hands-on Lab](https://github.com/Jiyu-Kim/databricks-wanderbricks-hands-on-lab).
 Every workshop built from it has **the same 7 steps and the same outputs**: a Lakeflow pipeline
 (Bronze, Silver, Gold), an AI/BI dashboard, Unity Catalog Metric Views and a Domain, a Genie Agent

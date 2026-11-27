@@ -1,0 +1,66 @@
+# Step 3: Trace with MLflow into Unity Catalog
+
+A **trace** records one run of the agent: the question, every model call and tool call with inputs, outputs, latency and tokens, and the final answer. MLflow 3 can store traces in **Unity Catalog tables**, so they are governed by table permissions, kept without a per-experiment limit, and queryable with SQL.
+
+## 3.1 Create an experiment bound to Unity Catalog
+
+1. In `step1-external-agent/`, run the setup script, replacing the placeholders:
+
+    ```bash
+    DATABRICKS_CONFIG_PROFILE=accelerator uv run python create_trace_experiment.py \
+      --catalog <catalog> --schema {{ n.trace_schema }} --warehouse-id <warehouse-id> \
+      --experiment {{ n.experiment }}
+    ```
+
+2. Copy the `MLFLOW_EXPERIMENT_ID=...` line it prints.
+3. Verify that it also prints `Spans table: <catalog>.{{ n.trace_schema }}.wanda_otel_spans`.
+
+The script calls `mlflow.set_experiment(..., trace_location=UnityCatalog(...))`. The schema must exist first. Once bound, an experiment cannot move to another trace location.
+
+## 3.2 Turn on tracing
+
+1. Add these lines to `.env`:
+
+    ```bash
+    DATABRICKS_CONFIG_PROFILE=accelerator
+    MLFLOW_TRACKING_URI=databricks
+    MLFLOW_EXPERIMENT_ID=<the id you copied>
+    MLFLOW_TRACING_SQL_WAREHOUSE_ID=<warehouse-id>
+    ```
+
+2. Look at `enable_mlflow_tracing()` in `wanda/main.py`. This is the whole change a team makes to trace an existing agent:
+
+    ```python
+    import mlflow
+    mlflow.set_experiment(experiment_id=os.environ["MLFLOW_EXPERIMENT_ID"])
+    mlflow.openai.autolog()  # traces OpenAI Agents SDK runs, model calls and tool calls
+    ```
+
+3. Ask three questions:
+
+    ```bash
+    uv run wanda "What is the status of booking 532?"
+    uv run wanda "I want to cancel booking 532. How much do I get back?"
+    uv run wanda "Can I get a refund for booking 703? I cannot travel anymore."
+    ```
+
+4. Verify the answers: booking 532 is confirmed; cancelling it gives a **{{ case[532].rule }} of ${{ case[532].refund }}**; booking 703 gets **{{ case[703].rule }}** because check-in is {{ case[703].days }} days away.
+
+!!! warning "Keep the SDK's tracing on"
+    `mlflow.openai.autolog()` replaces the Agents SDK's default trace exporter with MLflow's. If you also call `set_tracing_disabled(True)`, MLflow only records the model calls and you lose the tool spans.
+
+## 3.3 Find the traces
+
+1. Open **Experiments** in the workspace sidebar and open `{{ n.experiment }}`. Open the **Traces** tab and click a trace. Verify you see spans for `Wanda`, the model calls and the tools `get_booking` and `quote_refund`.
+2. Open the **SQL editor** and query the same traces as a table:
+
+    ```sql
+    SELECT trace_id, collect_set(name) AS spans
+    FROM <catalog>.{{ n.trace_schema }}.wanda_otel_spans
+    GROUP BY trace_id;
+    ```
+
+!!! note "Permissions on trace tables"
+    To write or read traces, a user or service principal needs `USE CATALOG`, `USE SCHEMA`, and explicit `MODIFY` and `SELECT` on each `wanda_otel_*` table. `ALL PRIVILEGES` is not enough.
+
+[Next: Step 4 :material-arrow-right:](../04-agent-runtime/index.md){ .md-button .md-button--primary }

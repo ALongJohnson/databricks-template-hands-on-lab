@@ -1,0 +1,19 @@
+# Step 4: Move the agent onto Agent Runtime
+
+Wanda's model calls and traces are now governed, but the agent still runs on a laptop and reads an ungoverned CSV copy. In this step you move both onto Databricks:
+
+- **Data:** the tools become **Unity Catalog functions** over `samples.wanderbricks`. They run as the signed-in user, so Unity Catalog decides what each person can see.
+- **Actions:** `issue_refund` pauses for **human approval** before it runs.
+- **Hosting:** the **Agent Bricks CLI** packages Wanda for **Agent Runtime** on Databricks Apps, with managed sessions and memory, and traces to the same Unity Catalog experiment.
+
+| Page | What you do | Time |
+|---|---|---|
+| [4.1 Governed tools as UC functions](4-1-uc-functions.md) | Create four SQL functions in Unity Catalog | 10 min |
+| [4.2 Port the agent with Agent Bricks](4-2-port.md) | Scaffold a project and move Wanda into it | 15 min |
+| [4.3 Run locally and approve actions](4-3-run-local.md) | Chat with Wanda and approve a refund | 10 min |
+| [4.4 Deploy and trace](4-4-deploy.md) | Deploy to Agent Runtime and find the traces | 15 min |
+
+!!! note "Beta"
+    The Agent Bricks CLI and Agent Runtime are in Beta. The lab was tested with `databricks-agentbricks` 0.11.0. Commands may change in later versions; run `agentbricks <command> --help` if one fails.
+
+[Start 4.1 :material-arrow-right:](4-1-uc-functions.md){ .md-button .md-button--primary }

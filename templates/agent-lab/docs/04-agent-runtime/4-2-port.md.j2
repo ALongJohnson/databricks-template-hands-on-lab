@@ -1,0 +1,47 @@
+# 4.2 Port the agent with Agent Bricks
+
+The Agent Bricks CLI scaffolds a project that already has the runtime, sessions, memory, tracing and a chat UI wired in. You keep your agent logic: instructions, model and tools.
+
+## Scaffold the project
+
+1. In a new terminal, outside the lab files folder, scaffold an OpenAI Agents SDK project:
+
+    ```bash
+    agentbricks init --framework openai --name {{ n.deployment }} --profile accelerator wanda-agent
+    cd wanda-agent
+    ```
+
+2. Verify the summary shows **Framework openai**, **Deploy name {{ n.deployment }}** and a **Traces experiment**.
+
+## Bring Wanda's logic in
+
+1. Copy the two files from `step4-agent-bricks/` in the lab files over the scaffold:
+
+    ```bash
+    cp <lab-files>/step4-agent-bricks/agent/agent.py agent/agent.py
+    cp <lab-files>/step4-agent-bricks/agent/tools/issue_refund.py agent/tools/issue_refund.py
+    rm agent/tools/sample_tool.py agent/tools/send_message.py
+    ```
+
+    Compared with the scaffold, `agent.py` changes three things: `INSTRUCTIONS` holds Wanda's instructions, `MODEL` defaults to `{{ n.model }}`, and `REQUIRE_APPROVAL = {"issue_refund"}`.
+
+2. Add the four UC functions as tools, replacing `<catalog>`:
+
+    ```bash
+    for f in get_booking list_guest_bookings quote_refund get_refund_policy; do
+      agentbricks tools add uc-function <catalog>.{{ n.schema }}.$f
+    done
+    ```
+
+3. Point tracing at the Unity Catalog experiment you created in Step 3:
+
+    ```bash
+    agentbricks tracing bind --experiment-id <your experiment id>
+    ```
+
+4. Open `agent.toml` and compare it with `step4-agent-bricks/agent.toml.example`. It now declares the memory store, session store, tracing experiment and four tools with `auth = "user"`.
+
+!!! tip "Migrating your own agent"
+    For your own LangGraph or OpenAI Agents SDK project, run `agentbricks init --existing --framework <langgraph|openai> .` in its folder. It prepares a migration skill and prompt under `agent-bricks-migrate/` for your coding agent (Claude Code, Codex or Cursor) and leaves your source untouched.
+
+[Next: 4.3 Run locally :material-arrow-right:](4-3-run-local.md){ .md-button .md-button--primary }

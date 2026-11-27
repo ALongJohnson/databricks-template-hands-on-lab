@@ -1,0 +1,41 @@
+# 4.3 Run locally and approve actions
+
+`agentbricks dev` runs Wanda on your laptop with the same command and environment that Agent Runtime uses.
+
+1. Start the dev server in `wanda-agent/`:
+
+    ```bash
+    agentbricks dev
+    ```
+
+2. Open [http://localhost:8000](http://localhost:8000) in your browser.
+3. Ask: *I want to cancel booking 166. How much do I get back?*
+4. Verify Wanda calls `get_booking` and `quote_refund` (the UC functions) and answers **${{ case[166].refund }}**.
+5. Reply: *Yes please, cancel it and refund me.*
+6. Verify Wanda does **not** refund yet. The chat shows an approval request for `issue_refund` with booking 166 and amount {{ case[166].refund }}.
+7. Approve the request and verify Wanda confirms the refund.
+
+## The same flow over the API
+
+Agents on Agent Runtime use one HTTP contract, `/api/invocations`. An approval arrives as an `interrupt` and you resume it in the same session:
+
+```bash
+SID=$(uuidgen)
+curl -s -X POST http://localhost:8000/api/invocations -H 'Content-Type: application/json' \
+  -H "X-Routing-Key: $SID" \
+  -d "{\"id\":\"$(uuidgen)\",\"session_id\":\"$SID\",\"input\":[{\"role\":\"user\",\"content\":\"Cancel booking 166 and refund me, I confirm.\"}]}"
+# the response has "status": "interrupted" and an action_requests entry with a call_id
+curl -s -X POST http://localhost:8000/api/invocations -H 'Content-Type: application/json' \
+  -H "X-Routing-Key: $SID" \
+  -d "{\"id\":\"$(uuidgen)\",\"session_id\":\"$SID\",\"input\":{\"messages\":[],\"resume\":{\"decisions\":[{\"type\":\"approve\",\"call_id\":\"<call_id>\"}]}}}"
+```
+
+!!! note "Local traces"
+    `agentbricks dev` traces to a local MLflow store. Traces reach your Unity Catalog experiment once you deploy.
+
+!!! warning "Watch what Wanda adds"
+    In testing, after the refund Wanda added "You should see it within 5-7 business days". The policy says nothing about timelines. Remember this: Step 5 catches it.
+
+Stop the dev server with ++ctrl+c++ when you are done.
+
+[Next: 4.4 Deploy :material-arrow-right:](4-4-deploy.md){ .md-button .md-button--primary }

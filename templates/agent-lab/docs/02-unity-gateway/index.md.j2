@@ -1,0 +1,63 @@
+# Step 2: Govern model calls with Unity Gateway
+
+**Unity Gateway** is the control plane for model inference on Databricks. Every request is authenticated with Databricks identity, authorized in Unity Catalog, and recorded. It speaks the OpenAI API, so you can move Wanda's model calls with configuration alone.
+
+## 2.1 Route Wanda through Unity Gateway
+
+1. Get a short-lived OAuth token for your profile:
+
+    ```bash
+    databricks auth token --profile accelerator
+    ```
+
+2. Copy the `access_token` value.
+3. Edit `.env` in `step1-external-agent/` so the three model settings read:
+
+    ```bash
+    MODEL_BASE_URL=https://<your-workspace-host>/ai-gateway/mlflow/v1
+    MODEL_API_KEY=<access_token>
+    MODEL_NAME={{ n.model }}
+    ```
+
+4. Ask the cancellation question again:
+
+    ```bash
+    uv run wanda "I want to cancel booking 166. How much would I get back?"
+    ```
+
+5. Verify the answer is still **${{ case[166].refund }}**. You changed where the model calls go, not a line of code.
+
+`{{ n.model }}` is a **system-provided model service** in the `system.ai` schema. Any account user can call it. The OAuth token expires after an hour; production apps use a service principal instead.
+
+## 2.2 Give Wanda its own model service
+
+Calling `system.ai` directly works, but every app looks the same in the usage data and you cannot set limits for one workload. A **custom model service** is a named, governed "virtual model" for one application. The app calls the service name; you choose the model behind it and can change it later without touching the app.
+
+1. Open `step2-unity-gateway/model_service.json`. It routes 100% of traffic to Claude Sonnet 4.5, sets a service limit of 120 requests and 500,000 tokens per minute and a default limit of 20 requests per minute per user, and logs every request and response to an inference table.
+2. Replace `<catalog>` in the file with your catalog.
+3. Create the service:
+
+    ```bash
+    databricks ai-gateway create-model-service schemas/<catalog>.{{ n.schema }} {{ n.model_service }} \
+      --json @model_service.json --profile accelerator
+    ```
+
+4. In `.env`, set `MODEL_NAME=<catalog>.{{ n.schema }}.{{ n.model_service }}`.
+5. Run the cancellation question again and verify the answer is still **${{ case[166].refund }}**.
+
+!!! note "UI alternative"
+    In the workspace sidebar, click **AI Gateway**, then **+ Model**. Pick the catalog and schema, choose the destination model, then set **Rate limits** and **Inference table**.
+
+## 2.3 See what Unity Gateway records
+
+1. In **Catalog Explorer**, open `<catalog>.{{ n.schema }}` and find the model service `{{ n.model_service }}`. Open **Permissions**: only principals with `EXECUTE` can call it.
+2. Open the inference table `{{ n.model_service }}_payload` in the same schema to see the request and response payloads. New rows can take a few minutes to arrive.
+3. Ask an admin to show you `system.ai_gateway.usage`, which records who called which service, tokens and latency. Records usually arrive within an hour.
+
+!!! note "Optional: bring your existing provider key"
+    If you need to keep using your own OpenAI, Anthropic, Amazon Bedrock or Azure OpenAI capacity, register the key once as a **model provider service** in Unity Catalog. Databricks stores the credential encrypted and never returns it. Then add it as a destination of `{{ n.model_service }}`. Callers never see the key. See [Model providers external to Databricks](https://docs.databricks.com/aws/en/ai-gateway/model-provider-services/). This lab did not test this path with a real provider key.
+
+!!! note "Optional: guardrails with service policies (Beta)"
+    Service policies allow or deny individual requests and responses, for example to block PII or prompt injection. They need the *Unity Gateway Service Policies* preview. If a policy blocks a call, the gateway can still return HTTP 200, so check the `databricks_service_policy` field in the response. See [AI governance guide](https://docs.databricks.com/aws/en/ai-gateway/ai-governance/).
+
+[Next: Step 3 :material-arrow-right:](../03-tracing/index.md){ .md-button .md-button--primary }

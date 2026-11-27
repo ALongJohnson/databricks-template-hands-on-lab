@@ -1,0 +1,37 @@
+# Wrap-up: your governance evidence
+
+Wanda started as an app with a shared API key, a CSV copy of guest data and no records. It now runs on Databricks with every layer governed. Here is the evidence you can hand to a buyer's security review, and where it lives.
+
+| Buyer question | Evidence | Where |
+|---|---|---|
+| Who can call which model? How much? | Model service `{{ n.model_service }}` with grants and rate limits; usage records | Unity Gateway, `system.ai_gateway.usage` |
+| What was sent to the model? | Request and response payloads | Inference table `{{ n.model_service }}_payload` |
+| Which data can the agent see? | UC functions run as the signed-in user, with lineage to source tables | Catalog Explorer, Lineage |
+| Can it act on its own? | `issue_refund` requires human approval | `agent.toml`, `REQUIRE_APPROVAL` |
+| What did it do in a given conversation? | Full trace of every model and tool call | `<catalog>.{{ n.trace_schema }}.wanda_otel_spans` |
+| How do you know it is right? | Evaluation runs with judges and a release gate | MLflow experiment, Evaluation tab |
+| Does it stay right? | Production judges and expert labels | MLflow experiment, Traces and Labeling tabs |
+| Where is your model trained and served? | Registered model, run, lineage and endpoint (Step 7) | Unity Catalog, Model Serving |
+| Where does it run? | Agent Runtime on Databricks Apps | Apps, `{{ n.app }}` |
+
+## Now do it for your own agent
+
+1. **Step 2 first.** Point your model client at Unity Gateway and give your app its own model service. It is a configuration change.
+2. **Step 3 next.** Bind an experiment to Unity Catalog and turn on autologging for your framework.
+3. **Then Step 4.** Move data access into UC functions or MCP services, and gate every write action behind approval. Use `agentbricks init --existing` for the migration.
+4. **Then Steps 5 and 6.** Write 20 to 50 questions with your domain expert, choose judges, and run the gate in CI.
+5. **If you train models,** do Step 7 on your own training code.
+
+## Clean up
+
+To stop costs from the lab, delete what you no longer need:
+
+```bash
+agentbricks deployments delete {{ n.app }}
+databricks serving-endpoints delete {{ n.endpoint }} --profile accelerator
+databricks ai-gateway delete-model-service model-services/<catalog>.{{ n.schema }}.{{ n.model_service }} --profile accelerator
+```
+
+Stop production judges from the experiment's **Scorers** settings, or with `get_scorer(name="prod_safety").stop()`.
+
+[Back to the home page :material-home:](../index.md){ .md-button }

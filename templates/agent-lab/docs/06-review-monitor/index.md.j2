@@ -1,0 +1,39 @@
+# Step 6: Human review and monitoring
+
+An evaluation set only covers the questions you thought of. In production, guests ask new ones. In this step you keep judging live traffic and send real conversations to a human expert.
+
+## 6.1 Judge live traffic
+
+1. In `step6-review-monitor/`, start two production judges on your trace experiment:
+
+    ```bash
+    DATABRICKS_CONFIG_PROFILE=accelerator uv run python monitor.py start \
+      --experiment-id <your experiment id> --warehouse-id <warehouse-id>
+    ```
+
+2. Verify it prints `Started prod_safety on 100% of new traces` and `Started prod_follows_refund_policy on 50% of new traces`.
+3. Chat with the deployed Wanda a few times.
+4. Open the experiment's **Traces** tab after a few minutes and verify new traces show assessments from the two judges.
+
+Each scorer is registered **and** started. Registering alone does not run it. Judges run in the background on a sample of traces, so sample less on high-volume agents to control cost.
+
+## 6.2 Ask an expert to review real conversations
+
+1. Send the ten latest traces to your support lead, replacing the email:
+
+    ```bash
+    DATABRICKS_CONFIG_PROFILE=accelerator uv run python monitor.py review \
+      --experiment-id <your experiment id> --warehouse-id <warehouse-id> --reviewer lead@yourstartup.com
+    ```
+
+2. Copy the review link it prints and send it to the reviewer.
+3. The reviewer opens the **Review App**, reads each conversation and answers *Does Wanda follow the refund policy?* with yes or no and a comment.
+4. Open the experiment's **Labeling** tab to see the labels next to the traces.
+
+!!! tip "Make the judge agree with your expert"
+    The label is named `follows_refund_policy`, the same name as the judge. That lets you compare the judge with the expert and, once you have enough labels, align the judge to your expert with MLflow's judge alignment (MemAlign). See the evaluation docs.
+
+!!! note "The reviewer needs access"
+    The script gives the reviewer edit access to the experiment. They also need to be a user in your workspace.
+
+[Next: Step 7 (optional) :material-arrow-right:](../07-train-serve/index.md){ .md-button .md-button--primary }

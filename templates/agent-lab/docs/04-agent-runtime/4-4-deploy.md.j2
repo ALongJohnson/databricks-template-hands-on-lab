@@ -1,0 +1,36 @@
+# 4.4 Deploy and trace
+
+1. Deploy from `wanda-agent/`:
+
+    ```bash
+    agentbricks deploy --no-wait
+    agentbricks deployments wait {{ n.app }}
+    ```
+
+    A first deploy takes a few minutes, mostly to start the app's compute. If `wait` says it is still deploying, run it again. Deploy creates the memory and session stores, wires in tracing, and configures the agent to act as the signed-in user for the UC function tools.
+
+2. Ask the deployed agent a question:
+
+    ```bash
+    agentbricks endpoint invoke {{ n.app }} --path /api/invocations \
+      --json "{\"id\":\"$(uuidgen)\",\"session_id\":\"$(uuidgen)\",\"input\":[{\"role\":\"user\",\"content\":\"What is the status of booking 532?\"}]}"
+    ```
+
+3. Verify the response has `"status": "completed"` and says booking 532 is confirmed.
+4. Open **Apps** in the workspace sidebar, click `{{ n.app }}` and open its URL to chat in the browser.
+5. Find the deployed agent's traces in the SQL editor:
+
+    ```sql
+    SELECT trace_id, min(from_unixtime(start_time_unix_nano / 1e9)) AS started, collect_set(name) AS spans
+    FROM <catalog>.{{ n.trace_schema }}.wanda_otel_spans
+    GROUP BY trace_id ORDER BY started DESC LIMIT 5;
+    ```
+
+6. Verify the newest traces include an `invoke` span and spans named after the UC functions, for example `<catalog>__{{ n.schema }}__get_booking`.
+
+!!! tip "If a deploy fails"
+    Run `agentbricks deployments logs {{ n.app }}`. A failed first deploy keeps the app; run `agentbricks deploy` again to resume.
+
+Wanda now runs on Databricks, reads governed data as the user, asks before it refunds, and traces every run to Unity Catalog. Next you prove it gives the right answers.
+
+[Next: Step 5 :material-arrow-right:](../05-evaluate/index.md){ .md-button .md-button--primary }

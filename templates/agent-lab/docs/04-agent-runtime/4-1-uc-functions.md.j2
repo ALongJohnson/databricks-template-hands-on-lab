@@ -1,0 +1,30 @@
+# 4.1 Governed tools as UC functions
+
+The CSV snapshot was a copy. Unity Catalog functions read the source tables directly, carry their own descriptions for the model, and are granted like any other object.
+
+1. Open `step4-agent-bricks/uc_functions.sql` from the lab files.
+2. Replace every `<catalog>` with your catalog and every `<schema>` with `{{ n.schema }}`.
+3. Open the **SQL editor**, select your SQL warehouse, paste the file and click **Run all**.
+4. Verify that four functions now exist in `<catalog>.{{ n.schema }}`: `get_booking`, `list_guest_bookings`, `quote_refund` and `get_refund_policy`.
+5. Test the refund logic against the three bookings:
+
+    ```sql
+    SELECT * FROM <catalog>.{{ n.schema }}.quote_refund(532)
+    UNION ALL SELECT * FROM <catalog>.{{ n.schema }}.quote_refund(166)
+    UNION ALL SELECT * FROM <catalog>.{{ n.schema }}.quote_refund(703);
+    ```
+
+6. Verify the results:
+
+| booking_id | total_paid | days_before_check_in | refund_amount |
+|---|---|---|---|
+{% for c in f.cases %}
+| {{ c.booking }} | {{ c.paid }} | {{ c.days }} | {{ c.refund }} |
+{% endfor %}
+
+These are the same numbers the CSV version produced, now computed from governed tables. Open a function in **Catalog Explorer** and click **Lineage** to see it reads from `samples.wanderbricks`.
+
+!!! tip "Who can run the tools"
+    A user needs `EXECUTE` on the function plus `SELECT` on the tables it reads. To keep a support agent away from guest emails, simply do not return them, as these functions do. For column masks and row filters, see the Unity Catalog documentation.
+
+[Next: 4.2 Port the agent :material-arrow-right:](4-2-port.md){ .md-button .md-button--primary }
