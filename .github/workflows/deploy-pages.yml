@@ -1,8 +1,16 @@
 name: Deploy to GitHub Pages
 
+# One Pages site, several lab tracks. A push to any branch listed in TRACKS rebuilds the
+# whole site from the latest commit of every branch:
+#   main          -> /             (the reference lab)
+#   genie_agent   -> /genie_agent/  (Track 1: Genie Agent served as MCP)
+#   agent_bricks  -> /agent_bricks/ (Track 2: move an agent onto Databricks and govern it)
+# Each branch builds itself with its own scripts/build.sh and requirements.txt.
+# Keep this file identical on every branch listed below.
+
 on:
   push:
-    branches: [main]
+    branches: [main, genie_agent, agent_bricks]
   workflow_dispatch:
 
 permissions:
@@ -14,18 +22,42 @@ concurrency:
   group: pages
   cancel-in-progress: false
 
+env:
+  TRACKS: "genie_agent agent_bricks"
+
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          path: main
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: pip
-      - run: pip install -r requirements.txt
-      - run: scripts/build.sh
-      - run: touch site/.nojekyll
+      - name: Build every track
+        run: |
+          set -euo pipefail
+          mkdir -p site
+          build_branch () {   # $1 = checkout dir, $2 = output dir
+            python -m venv "$1/.venv"
+            "$1/.venv/bin/pip" install -q -r "$1/requirements.txt"
+            (cd "$1" && PYTHON=.venv/bin/python ZENSICAL=.venv/bin/zensical scripts/build.sh)
+            mkdir -p "$2" && cp -R "$1/site/." "$2/"
+          }
+          build_branch main site
+          for b in $TRACKS; do
+            if git -C main ls-remote --exit-code --heads origin "$b" >/dev/null; then
+              git -C main fetch -q origin "$b"
+              git -C main worktree add -q "../$b" "origin/$b"
+              build_branch "$b" "site/$b"
+            else
+              echo "Branch $b not found, skipping"
+            fi
+          done
+          touch site/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
           path: site
