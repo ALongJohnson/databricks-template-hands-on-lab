@@ -91,7 +91,19 @@ shows a screenshot only if the file exists, so a new workshop renders cleanly wi
 ## Publishing
 
 Push to `main` and GitHub Actions publishes the workshop named in the one-line `.workshop`
-file (default `workshops/wanderbricks`) to GitHub Pages. Locally, `WORKSHOP=workshops/<name>`
+file (default `workshops/wanderbricks`) to GitHub Pages.
+
+The site also hosts one lab **track per branch**. A push to `main`, `genie_agent` or `agent_bricks`
+rebuilds every branch and publishes them together:
+
+| Branch | Path | Lab |
+|---|---|---|
+| `main` | `/` | Reference lab |
+| `genie_agent` | `/genie_agent/` | Track 1: Create a Genie Agent and serve it as an MCP |
+| `agent_bricks` | `/agent_bricks/` | Track 2: Move your agentic system onto Databricks and apply enterprise governance |
+
+Each branch builds with its own `scripts/build.sh`. To add a track, add the branch to `on.push.branches`
+and `TRACKS` in `.github/workflows/deploy-pages.yml`, on every branch. Locally, `WORKSHOP=workshops/<name>`
 overrides it. **This repository is public**:
 only commit anonymized data descriptions and fictional company names. For a customer-specific
 workshop, use a private fork.
